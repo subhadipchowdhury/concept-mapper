@@ -219,8 +219,8 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete }) {
                   onClick={(e) => { e.stopPropagation(); setSelectedEdgeId(edge.id); setSelectedNodeId(null); }}
                   style={{cursor: 'pointer'}}
                 >
-                  <span>{edge.label}</span>
-                  <span style={{color: 'var(--accent-teal)'}}>✓ {edge.answer}</span>
+                  <MathNode text={edge.label} />
+                  <span style={{color: 'var(--accent-teal)'}}><MathNode text={`✓ ${edge.answer}`} /></span>
                   <span style={{fontSize: 10, opacity: 0.6}}>{edge.type === 'dropdown' ? '▼' : '✏️'}</span>
                 </div>
               </div>

@@ -272,8 +272,8 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
                   title={isAnswered ? '' : 'Click to answer'}
                 >
                   {isAnswered
-                    ? <>✓ <span>{edge.label} {edge.answer}</span></>
-                    : <><span>{edge.label}</span> <span style={{opacity: 0.7}}>___</span> <span style={{fontSize: 11, marginLeft: 2}}>✏️</span></>
+                    ? <>✓ <MathNode text={`${edge.label} ${edge.answer}`} /></>
+                    : <><MathNode text={edge.label} /> <span style={{opacity: 0.7}}>___</span> <span style={{fontSize: 11, marginLeft: 2}}>✏️</span></>
                   }
                 </div>
               </div>
