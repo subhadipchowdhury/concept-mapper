@@ -781,6 +781,17 @@ body {
 .maps-grid-card-stat { font-size: 11px; color: var(--text-dim); }
 .maps-grid-card-stat span { font-weight: 700; color: var(--text); font-size: 13px; }
 
+.maps-grid-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.maps-grid-card-actions .btn {
+  flex: 1;
+  text-align: center;
+}
+
 .maps-grid-new {
   background: transparent;
   border: 1.5px dashed var(--border-2);

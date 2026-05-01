@@ -14,7 +14,7 @@ const NODE_COLOR_PALETTE = [
 ];
 
 // ─── AdminCanvas: Visual builder for one concept map ──────────────────────────
-function AdminCanvas({ mapData, onChange, onBack, onDelete }) {
+function AdminCanvas({ mapData, onChange, onBack, onDelete, onTogglePublish }) {
   const [tool, setTool] = useStateA('select'); // 'select' | 'addNode' | 'connect'
   const [selectedNodeId, setSelectedNodeId] = useStateA(null);
   const [selectedEdgeId, setSelectedEdgeId] = useStateA(null);
@@ -153,7 +153,26 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete }) {
           ))}
         </div>
         <div className="admin-tool-divider"></div>
-        <button className="admin-tool-btn" onClick={() => onChange({...mapData, _published: true})} title="Save & exit">💾 Save</button>
+        <button className="admin-tool-btn" onClick={onBack} title="Save and return to map manager">💾 Save & Exit</button>
+        {typeof onTogglePublish === 'function' && (
+          <button
+            className={`admin-tool-btn ${mapData._published ? 'active' : ''}`}
+            onClick={() => onTogglePublish(!mapData._published)}
+            title="Toggle whether this map is visible to students"
+          >
+            {mapData._published ? '📣 Published' : '📝 Draft'}
+          </button>
+        )}
+        {typeof onDelete === 'function' && (
+          <button
+            className="admin-tool-btn"
+            onClick={() => onDelete(mapData.id)}
+            title="Delete this custom map"
+            style={{ color: 'var(--accent-rose)' }}
+          >
+            🗑 Delete Map
+          </button>
+        )}
       </div>
 
       <div
@@ -413,7 +432,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete }) {
 }
 
 // ─── MapsManager: list + create ───────────────────────────────────────────────
-function MapsManager({ allMaps, customMaps, onEdit, onCreate, onDeleteCustom }) {
+function MapsManager({ allMaps, customMaps, onEdit, onCreate, onDeleteCustom, onTogglePublish }) {
   return (
     <div className="maps-manager">
       <div className="maps-manager-header">
@@ -438,7 +457,35 @@ function MapsManager({ allMaps, customMaps, onEdit, onCreate, onDeleteCustom }) 
                 <div className="maps-grid-card-stat"><span>{m.nodes.length}</span> nodes</div>
                 <div className="maps-grid-card-stat"><span>{m.edges.length}</span> edges</div>
                 {isCustom && <div className="maps-grid-card-stat" style={{color: 'var(--accent-amber)'}}>● custom</div>}
+                {isCustom && (
+                  <div className="maps-grid-card-stat" style={{color: m._published ? 'var(--accent-teal)' : 'var(--text-muted)'}}>
+                    {m._published ? '● published' : '● draft'}
+                  </div>
+                )}
               </div>
+              {isCustom && (
+                <div className="maps-grid-card-actions">
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (typeof onTogglePublish === 'function') onTogglePublish(m.id, !m._published);
+                    }}
+                  >
+                    {m._published ? 'Unpublish' : 'Publish'}
+                  </button>
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    style={{ color: 'var(--accent-rose)' }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (typeof onDeleteCustom === 'function') onDeleteCustom(m.id);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
             </div>
           );
         })}

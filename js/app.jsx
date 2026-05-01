@@ -1,5 +1,28 @@
 // Main App
-const { useState: useStateApp, useEffect: useEffectApp } = React;
+const { useState: useStateApp, useEffect: useEffectApp, useRef: useRefApp } = React;
+
+const ADMIN_PIN_KEY = 'conceptmapper_teacher_pin_v1';
+const ADMIN_UNLOCK_KEY = 'conceptmapper_teacher_unlocked_v1';
+
+function serializeProgress(progressObj) {
+  const serializable = {};
+  Object.entries(progressObj || {}).forEach(([mapId, p]) => {
+    serializable[mapId] = {
+      answeredEdges: [...(p?.answeredEdges || [])],
+    };
+  });
+  return serializable;
+}
+
+function deserializeProgress(progressObj) {
+  const restored = {};
+  Object.entries(progressObj || {}).forEach(([mapId, p]) => {
+    restored[mapId] = {
+      answeredEdges: new Set(p?.answeredEdges || []),
+    };
+  });
+  return restored;
+}
 
 function App() {
   const [view, setView] = useStateApp('student'); // 'student' | 'admin' | 'admin-edit'
@@ -8,8 +31,14 @@ function App() {
   const [allProgress, setAllProgress] = useStateApp(() => loadProgress());
   const [customMaps, setCustomMaps] = useStateApp(() => loadCustomMaps());
   const [positions, setPositions] = useStateApp(() => loadPositions());
+  const [isAdminUnlocked, setIsAdminUnlocked] = useStateApp(() => sessionStorage.getItem(ADMIN_UNLOCK_KEY) === '1');
+  const importInputRef = useRefApp(null);
 
-  const allMaps = { ...CONCEPT_MAPS, ...customMaps };
+  const publishedCustomMaps = Object.fromEntries(
+    Object.entries(customMaps).filter(([, m]) => !!m._published)
+  );
+  const studentMaps = { ...CONCEPT_MAPS, ...publishedCustomMaps };
+  const adminMaps = { ...CONCEPT_MAPS, ...customMaps };
 
   function getProgress(mapId) {
     if (!allProgress[mapId]) return { answeredEdges: new Set() };
@@ -43,6 +72,7 @@ function App() {
       accentColor: '#a78bfa',
       nodes: [],
       edges: [],
+      _published: false,
     };
     handleSaveCustomMap(id, newMap);
     setEditingMapId(id);
@@ -58,8 +88,139 @@ function App() {
     handleSaveCustomMap(updatedMap.id, updatedMap);
   }
 
-  const mapData = allMaps[activeMapId];
-  const editingMap = editingMapId ? allMaps[editingMapId] : null;
+  function handleTogglePublish(mapId, published) {
+    const existing = customMaps[mapId];
+    if (!existing) return;
+    handleSaveCustomMap(mapId, { ...existing, _published: published });
+  }
+
+  function handleDeleteCustomMap(mapId) {
+    if (!customMaps[mapId]) return;
+    if (!confirm('Delete this custom map permanently? This removes student progress for this map too.')) return;
+
+    const updatedCustomMaps = { ...customMaps };
+    delete updatedCustomMaps[mapId];
+    setCustomMaps(updatedCustomMaps);
+    saveCustomMaps(updatedCustomMaps);
+
+    const updatedProgress = { ...allProgress };
+    delete updatedProgress[mapId];
+    setAllProgress(updatedProgress);
+    saveProgress(updatedProgress);
+
+    const updatedPositions = { ...positions };
+    delete updatedPositions[mapId];
+    setPositions(updatedPositions);
+    savePositions(updatedPositions);
+
+    if (activeMapId === mapId) setActiveMapId('sequences');
+    if (editingMapId === mapId) {
+      setEditingMapId(null);
+      setView('admin');
+    }
+  }
+
+  function requestAdminAccess() {
+    let pin = localStorage.getItem(ADMIN_PIN_KEY);
+    if (!pin) {
+      const first = prompt('Set a teacher passcode for Admin access (stored on this browser).');
+      if (!first) return false;
+      if (first.trim().length < 4) {
+        alert('Passcode must be at least 4 characters.');
+        return false;
+      }
+      const confirmPin = prompt('Confirm teacher passcode:');
+      if (confirmPin !== first) {
+        alert('Passcodes did not match.');
+        return false;
+      }
+      localStorage.setItem(ADMIN_PIN_KEY, first);
+      pin = first;
+    }
+
+    const entered = prompt('Enter teacher passcode to access Admin:');
+    if (entered === null) return false;
+    if (entered !== pin) {
+      alert('Incorrect teacher passcode.');
+      return false;
+    }
+    sessionStorage.setItem(ADMIN_UNLOCK_KEY, '1');
+    setIsAdminUnlocked(true);
+    return true;
+  }
+
+  function openAdmin() {
+    if (isAdminUnlocked || requestAdminAccess()) {
+      setView('admin');
+    }
+  }
+
+  function lockAdmin() {
+    sessionStorage.removeItem(ADMIN_UNLOCK_KEY);
+    setIsAdminUnlocked(false);
+    if (view.startsWith('admin')) setView('student');
+  }
+
+  function exportStudentData() {
+    const payload = {
+      app: 'Concept Mapper',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      progress: serializeProgress(allProgress),
+      positions,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `concept-mapper-progress-${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function triggerImportStudentData() {
+    if (importInputRef.current) importInputRef.current.click();
+  }
+
+  function handleImportStudentData(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result);
+        if (!parsed || typeof parsed !== 'object') throw new Error('Invalid file');
+
+        const importedProgress = deserializeProgress(parsed.progress || {});
+        const importedPositions = parsed.positions && typeof parsed.positions === 'object' ? parsed.positions : {};
+
+        setAllProgress(importedProgress);
+        saveProgress(importedProgress);
+        setPositions(importedPositions);
+        savePositions(importedPositions);
+
+        alert('Progress imported successfully.');
+      } catch {
+        alert('Could not import file. Please choose a valid Concept Mapper export JSON file.');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  useEffectApp(() => {
+    if (view === 'student' && !studentMaps[activeMapId]) {
+      const fallback = Object.keys(studentMaps)[0] || 'sequences';
+      setActiveMapId(fallback);
+    }
+  }, [view, activeMapId, studentMaps]);
+
+  const mapData = studentMaps[activeMapId];
+  const editingMap = editingMapId ? adminMaps[editingMapId] : null;
 
   return (
     <div className="app-shell">
@@ -70,17 +231,39 @@ function App() {
         </div>
         <div className="topbar-sub">Math 163 · Real Analysis</div>
         <div className="topbar-spacer"></div>
+        {view === 'student' && (
+          <>
+            <button className="topbar-btn" onClick={exportStudentData} title="Download your progress JSON">
+              ⭳ Export Progress
+            </button>
+            <button className="topbar-btn" onClick={triggerImportStudentData} title="Import progress from a JSON file">
+              ⭱ Import Progress
+            </button>
+            <input
+              ref={importInputRef}
+              type="file"
+              accept="application/json,.json"
+              style={{ display: 'none' }}
+              onChange={handleImportStudentData}
+            />
+          </>
+        )}
         <button className={`topbar-btn ${view === 'student' ? 'active' : ''}`} onClick={() => setView('student')}>
           📚 Student
         </button>
-        <button className={`topbar-btn ${view.startsWith('admin') ? 'active' : ''}`} onClick={() => setView('admin')}>
+        <button className={`topbar-btn ${view.startsWith('admin') ? 'active' : ''}`} onClick={openAdmin}>
           ⚙ Admin
         </button>
+        {isAdminUnlocked && (
+          <button className="topbar-btn" onClick={lockAdmin} title="Lock teacher mode for this tab">
+            🔒 Lock
+          </button>
+        )}
       </header>
 
       <aside className="sidebar">
         <div className="sidebar-section-title">Topics</div>
-        {Object.values(allMaps).map(m => {
+        {Object.values(studentMaps).map(m => {
           const prog = getProgress(m.id);
           const total = m.edges.length;
           const done = (prog.answeredEdges || new Set()).size;
@@ -112,7 +295,7 @@ function App() {
         })}
         <div className="sidebar-divider"></div>
         <div className="sidebar-section-title">Admin</div>
-        <div className={`sidebar-item ${view.startsWith('admin') ? 'active' : ''}`} style={{'--item-color': 'var(--accent-amber)'}} onClick={() => setView('admin')}>
+        <div className={`sidebar-item ${view.startsWith('admin') ? 'active' : ''}`} style={{'--item-color': 'var(--accent-amber)'}} onClick={openAdmin}>
           <div className="sidebar-item-title">
             <div className="sidebar-item-dot" style={{background: 'var(--accent-amber)'}}></div>
             Map Builder
@@ -134,10 +317,12 @@ function App() {
         )}
         {view === 'admin' && (
           <MapsManager
-            allMaps={allMaps}
+            allMaps={adminMaps}
             customMaps={customMaps}
             onEdit={handleEditMap}
             onCreate={handleCreateNewMap}
+            onDeleteCustom={handleDeleteCustomMap}
+            onTogglePublish={handleTogglePublish}
           />
         )}
         {view === 'admin-edit' && editingMap && (
@@ -146,6 +331,8 @@ function App() {
             mapData={editingMap}
             onChange={handleAdminMapChange}
             onBack={() => setView('admin')}
+            onDelete={handleDeleteCustomMap}
+            onTogglePublish={(published) => handleTogglePublish(editingMapId, published)}
           />
         )}
       </main>
