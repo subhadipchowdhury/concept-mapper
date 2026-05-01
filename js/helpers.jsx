@@ -7,10 +7,25 @@ const { useState, useEffect, useRef, useCallback, useLayoutEffect } = React;
 function MathNode({ text, className = '' }) {
   const ref = useRef(null);
   useEffect(() => {
-    if (!ref.current) return;
-    if (window.MathJax && window.MathJax.typesetPromise) {
-      window.MathJax.typesetPromise([ref.current]).catch(() => {});
+    let cancelled = false;
+    let attempts = 0;
+
+    function typesetWhenReady() {
+      if (cancelled || !ref.current) return;
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        // Clear prior MathJax artifacts before re-typesetting updated content.
+        if (window.MathJax.typesetClear) window.MathJax.typesetClear([ref.current]);
+        window.MathJax.typesetPromise([ref.current]).catch(() => {});
+        return;
+      }
+      if (attempts < 40) {
+        attempts += 1;
+        setTimeout(typesetWhenReady, 100);
+      }
     }
+
+    typesetWhenReady();
+    return () => { cancelled = true; };
   }, [text]);
   const html = (text || '').replace(/\\n/g, '<br/>');
   return (
