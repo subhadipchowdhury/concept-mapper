@@ -27,7 +27,8 @@ function MathNode({ text, className = '' }) {
     typesetWhenReady();
     return () => { cancelled = true; };
   }, [text]);
-  const html = (text || '').replace(/\\n/g, '<br/>');
+  const normalizedText = (text || '').replace(/(?:\\_){2,}/g, (m) => '_'.repeat(m.length / 2));
+  const html = normalizedText.replace(/\\n/g, '<br/>');
   return (
     <span
       ref={ref}
@@ -185,6 +186,7 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
   }
 
   const canRevealHint = attempts >= 2 && edge.hint;
+  const displayLabel = (edge.label || '').replace(/(?:\\_){2,}/g, (m) => '_'.repeat(m.length / 2));
 
   return (
     <div className="answer-popup" onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}>
@@ -219,7 +221,7 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
         )}
 
         <div className="popup-label">
-          The label reads: <em>"{edge.label} ___"</em>
+          The label reads: <em>"{displayLabel} ___"</em>
         </div>
 
         {edge.type === 'fillin' ? (
