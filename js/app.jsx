@@ -1,8 +1,8 @@
 // Main App
 const { useState: useStateApp, useEffect: useEffectApp, useRef: useRefApp } = React;
 
-const ADMIN_PIN_KEY = 'conceptmapper_teacher_pin_v1';
 const ADMIN_UNLOCK_KEY = 'conceptmapper_teacher_unlocked_v1';
+const ADMIN_STATIC_PASSPHRASE = 'SECRETPHRASE';
 
 function serializeProgress(progressObj) {
   const serializable = {};
@@ -121,27 +121,10 @@ function App() {
   }
 
   function requestAdminAccess() {
-    let pin = localStorage.getItem(ADMIN_PIN_KEY);
-    if (!pin) {
-      const first = prompt('Set a teacher passcode for Admin access (stored on this browser).');
-      if (!first) return false;
-      if (first.trim().length < 4) {
-        alert('Passcode must be at least 4 characters.');
-        return false;
-      }
-      const confirmPin = prompt('Confirm teacher passcode:');
-      if (confirmPin !== first) {
-        alert('Passcodes did not match.');
-        return false;
-      }
-      localStorage.setItem(ADMIN_PIN_KEY, first);
-      pin = first;
-    }
-
-    const entered = prompt('Enter teacher passcode to access Admin:');
+    const entered = prompt('Enter teacher passphrase to access Admin:');
     if (entered === null) return false;
-    if (entered !== pin) {
-      alert('Incorrect teacher passcode.');
+    if (entered !== ADMIN_STATIC_PASSPHRASE) {
+      alert('Incorrect teacher passphrase.');
       return false;
     }
     sessionStorage.setItem(ADMIN_UNLOCK_KEY, '1');
@@ -293,15 +276,19 @@ function App() {
             </div>
           );
         })}
-        <div className="sidebar-divider"></div>
-        <div className="sidebar-section-title">Admin</div>
-        <div className={`sidebar-item ${view.startsWith('admin') ? 'active' : ''}`} style={{'--item-color': 'var(--accent-amber)'}} onClick={openAdmin}>
-          <div className="sidebar-item-title">
-            <div className="sidebar-item-dot" style={{background: 'var(--accent-amber)'}}></div>
-            Map Builder
-          </div>
-          <div className="sidebar-item-desc">Create and edit concept maps</div>
-        </div>
+        {isAdminUnlocked && (
+          <>
+            <div className="sidebar-divider"></div>
+            <div className="sidebar-section-title">Admin</div>
+            <div className={`sidebar-item ${view.startsWith('admin') ? 'active' : ''}`} style={{'--item-color': 'var(--accent-amber)'}} onClick={openAdmin}>
+              <div className="sidebar-item-title">
+                <div className="sidebar-item-dot" style={{background: 'var(--accent-amber)'}}></div>
+                Map Builder
+              </div>
+              <div className="sidebar-item-desc">Create and edit concept maps</div>
+            </div>
+          </>
+        )}
       </aside>
 
       <main className="map-area">
