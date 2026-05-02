@@ -86,14 +86,18 @@ data/maps/
 
 ### localStorage keys
 
+Version suffixes (`_v1`, `_v2`, etc.) indicate persisted-data schema versions. When a stored shape changes, a new key version prevents old browser data from breaking newer code.
+
 | Key | Contents |
 |-----|----------|
 | `conceptmapper_progress_v2` | answered edges per map |
 | `conceptmapper_positions_v2` | node positions per map |
 | `conceptmapper_maps_v2` | custom (unpublished) maps |
+| `conceptmapper_map_order_v1` | map ordering in sidebar |
 | `conceptmapper_subjects_v1` | custom-created subject folders |
 | `conceptmapper_subject_order_v1` | folder order |
 | `conceptmapper_sidebar_folder_collapse_v1` | which folders are collapsed |
+| `conceptmapper_teacher_unlocked_v1` (sessionStorage) | admin-mode unlocked flag |
 
 ---
 
@@ -128,4 +132,4 @@ concept-mapper/
     └── helpers.jsx   # storage, map loading, math rendering
 ```
 
-**Stack:** React (CDN), KaTeX, vanilla CSS, no build tools.
+**Stack:** React (CDN), MathJax, vanilla CSS, no build tools.

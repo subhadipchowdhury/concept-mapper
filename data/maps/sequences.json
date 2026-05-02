@@ -1,482 +1,435 @@
 {
   "id": "sequences",
   "title": "Sequences of Real Numbers",
-  "description": "Module 1 — From the ε–N definition to Cauchy completeness",
-  "color": "#4f8ef7",
-  "accentColor": "#a78bfa",
+  "description": "Module 1 — theorem structure, subsequences, and completeness",
+  "color": "#0f766e",
+  "accentColor": "#f59e0b",
+  "subjectId": "real-analysis",
+  "subjectTitle": "Real Analysis",
   "nodes": [
     {
       "id": "seq",
       "label": "Sequence\\n\\(\\{a_n\\}: \\mathbb{N} \\to \\mathbb{R}\\)",
-      "x": 480,
+      "x": 470,
       "y": 60,
-      "color": "#4f8ef7",
+      "color": "#0f766e",
       "isStart": true
     },
     {
       "id": "gp",
-      "label": "Geometric Progression\\n\\(a_n = ar^{n-1}\\)",
-      "x": 200,
+      "label": "Geometric Progression\\n\\(a_n=ar^{n-1}\\)",
+      "x": 180,
       "y": 60,
-      "color": "#4f8ef7"
-    },
-    {
-      "id": "limpt",
-      "label": "Limit Point of a Set\\n\\((x-\\varepsilon, x+\\varepsilon) \\cap A \\setminus\\{x\\} \\ne \\emptyset\\)",
-      "x": 760,
-      "y": 60,
-      "color": "#4f8ef7",
-      "isStart": true
+      "color": "#0f766e"
     },
     {
       "id": "enconv",
-      "label": "ε–N Convergence\\n\\(\\lim a_n = L\\)",
-      "x": 480,
-      "y": 200,
+      "label": "ε–N Convergence\\n\\(a_n \\to L\\)",
+      "x": 470,
+      "y": 190,
       "color": "#06b6d4"
+    },
+    {
+      "id": "shift",
+      "label": "Shift Theorem\\n\\(a_n\\to L \\Rightarrow a_{n+k}\\to L\\)",
+      "x": 1030,
+      "y": 190,
+      "color": "#34d399"
     },
     {
       "id": "div",
       "label": "Divergence",
       "x": 760,
-      "y": 200,
+      "y": 190,
       "color": "#fb7185"
     },
     {
       "id": "unique",
       "label": "Uniqueness of Limit",
-      "x": 250,
-      "y": 200,
+      "x": 180,
+      "y": 190,
       "color": "#06b6d4"
     },
     {
       "id": "algebra",
-      "label": "Algebra of Limits\\n(sum, product, quotient)",
-      "x": 480,
-      "y": 350,
+      "label": "Algebra of Limits",
+      "x": 470,
+      "y": 330,
+      "color": "#34d399"
+    },
+    {
+      "id": "order",
+      "label": "Order Limit Theorem",
+      "x": 760,
+      "y": 330,
       "color": "#34d399"
     },
     {
       "id": "squeeze",
       "label": "Squeeze Theorem",
-      "x": 760,
-      "y": 350,
-      "color": "#34d399"
-    },
-    {
-      "id": "order",
-      "label": "Order Limit Theorem\\n\\(a_n \\le b_n \\Rightarrow \\lim a_n \\le \\lim b_n\\)",
-      "x": 940,
-      "y": 200,
-      "color": "#34d399"
-    },
-    {
-      "id": "shift",
-      "label": "Shift Theorem\\n\\(\\lim a_{n+k} = \\lim a_n\\)",
-      "x": 940,
-      "y": 350,
+      "x": 1030,
+      "y": 330,
       "color": "#34d399"
     },
     {
       "id": "bdd",
       "label": "Bounded Sequence\\n\\(|a_n| \\le M\\)",
-      "x": 200,
-      "y": 350,
+      "x": 180,
+      "y": 330,
       "color": "#a78bfa"
     },
     {
       "id": "mono",
-      "label": "Monotone Sequence\\n(↗ or ↘)",
-      "x": 200,
-      "y": 500,
+      "label": "Monotone Sequence",
+      "x": 180,
+      "y": 470,
       "color": "#a78bfa"
     },
     {
-      "id": "conv_imp_bdd",
-      "label": "Convergent ⟹ Bounded",
-      "x": 480,
-      "y": 500,
-      "color": "#34d399"
+      "id": "subseq",
+      "label": "Subsequence\\n\\(\\{a_{n_k}\\}\\)",
+      "x": 470,
+      "y": 470,
+      "color": "#f472b6"
+    },
+    {
+      "id": "substable",
+      "label": "Subsequences Share\\nThe Same Limit",
+      "x": 760,
+      "y": 470,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "eo",
+      "label": "Even–Odd\\nCriterion",
+      "x": 1030,
+      "y": 470,
+      "color": "#f472b6"
+    },
+    {
+      "id": "cesaro",
+      "label": "Cesàro Mean\\n\\(\\sigma_n=\\frac{a_1+\\cdots+a_n}{n}\\)",
+      "x": 1230,
+      "y": 470,
+      "color": "#fcd34d"
+    },
+    {
+      "id": "sublim",
+      "label": "Subsequential Limit",
+      "x": 470,
+      "y": 610,
+      "color": "#f472b6"
+    },
+    {
+      "id": "limpt",
+      "label": "Limit Point of a Set",
+      "x": 760,
+      "y": 610,
+      "color": "#f472b6"
+    },
+    {
+      "id": "peak",
+      "label": "Peak Point",
+      "x": 180,
+      "y": 610,
+      "color": "#f472b6"
+    },
+    {
+      "id": "monlemma",
+      "label": "Monotone Subsequence\\nLemma",
+      "x": 180,
+      "y": 760,
+      "color": "#f59e0b"
     },
     {
       "id": "completeness",
       "label": "Completeness of \\(\\mathbb{R}\\)\\n(LUB property)",
       "x": 760,
-      "y": 500,
+      "y": 760,
       "color": "#f59e0b",
       "isStart": true
     },
     {
       "id": "amgm",
       "label": "AM–GM Inequality\\n\\(\\sqrt{ab} \\le (a+b)/2\\)",
-      "x": 940,
-      "y": 500,
+      "x": 1030,
+      "y": 760,
       "color": "#fcd34d",
       "isStart": true
     },
     {
       "id": "mct",
       "label": "Monotone Convergence\\nTheorem",
-      "x": 480,
-      "y": 650,
-      "color": "#f59e0b"
-    },
-    {
-      "id": "babylonian",
-      "label": "Babylonian Iteration\\n\\(x_{n+1} = \\tfrac{1}{2}(x_n + c/x_n) \\to \\sqrt{c}\\)",
-      "x": 760,
-      "y": 650,
-      "color": "#fcd34d"
-    },
-    {
-      "id": "agm",
-      "label": "Arithmetic–Geometric\\nMean (AGM)",
-      "x": 940,
-      "y": 650,
-      "color": "#fcd34d"
-    },
-    {
-      "id": "subseq",
-      "label": "Subsequence\\n\\(\\{a_{n_k}\\}\\)",
-      "x": 200,
-      "y": 800,
-      "color": "#f472b6"
-    },
-    {
-      "id": "sublim",
-      "label": "Subsequential Limit",
-      "x": 480,
-      "y": 800,
-      "color": "#f472b6"
-    },
-    {
-      "id": "eo",
-      "label": "Even–Odd\\nSubsequence Criterion",
-      "x": 760,
-      "y": 800,
-      "color": "#f472b6"
-    },
-    {
-      "id": "cesaro",
-      "label": "Cesàro Mean\\n\\(\\sigma_n = \\tfrac{a_1+\\cdots+a_n}{n}\\)",
-      "x": 940,
-      "y": 800,
-      "color": "#fcd34d"
-    },
-    {
-      "id": "peak",
-      "label": "Peak Point",
-      "x": 200,
-      "y": 950,
-      "color": "#f472b6"
-    },
-    {
-      "id": "monlemma",
-      "label": "Monotone Subsequence\\nLemma",
-      "x": 480,
-      "y": 950,
+      "x": 470,
+      "y": 760,
       "color": "#f59e0b"
     },
     {
       "id": "bw",
       "label": "Bolzano–Weierstrass\\nTheorem",
-      "x": 760,
-      "y": 950,
+      "x": 180,
+      "y": 920,
       "color": "#f59e0b"
     },
     {
       "id": "cauchy",
-      "label": "Cauchy Sequence\\n\\(|a_m - a_n| \\to 0\\)",
-      "x": 480,
-      "y": 1100,
+      "label": "Cauchy Sequence",
+      "x": 760,
+      "y": 920,
       "color": "#fb7185"
     },
     {
       "id": "cauchy_bdd",
       "label": "Cauchy ⟹ Bounded",
-      "x": 200,
-      "y": 1100,
+      "x": 1030,
+      "y": 920,
       "color": "#fb7185"
+    },
+    {
+      "id": "babylonian",
+      "label": "Babylonian Iteration\\n\\(x_{n+1}=\\frac{1}{2}(x_n+c/x_n)\\)",
+      "x": 1230,
+      "y": 920,
+      "color": "#fcd34d"
+    },
+    {
+      "id": "agm",
+      "label": "Arithmetic–Geometric\\nMean (AGM)",
+      "x": 1030,
+      "y": 1080,
+      "color": "#fcd34d"
     },
     {
       "id": "cc",
       "label": "Cauchy Convergence\\nCriterion",
-      "x": 480,
-      "y": 1250,
+      "x": 470,
+      "y": 1080,
       "color": "#f59e0b"
     }
   ],
   "edges": [
     {
-      "id": "s_e1",
+      "id": "sc_e0",
       "from": "seq",
       "to": "gp",
-      "label": "for \\(a_n = ar^{n-1}\\) (nonzero terms), \\(a_{n+1}/a_n =\\) ___",
+      "label": "for \\(a_n=ar^{n-1}\\), the ratio \\(a_{n+1}/a_n\\) is the constant ___",
       "answer": "r",
       "type": "fillin",
-      "hint": "Compute the ratio of consecutive terms and simplify."
+      "hint": "Compute one quotient of consecutive terms."
     },
     {
-      "id": "s_e2",
+      "id": "sc_e1",
       "from": "seq",
       "to": "enconv",
-      "label": "the epsilon-N condition says that eventually all terms lie ___ every \\(\\varepsilon\\)-tube around \\(L\\)",
-      "answer": "inside",
-      "type": "fillin",
-      "hint": "Think geometrically: after some index, the tail stays within the band around \\(L\\)."
-    },
-    {
-      "id": "s_e3",
-      "from": "seq",
-      "to": "div",
-      "label": "if no real \\(L\\) satisfies epsilon-N convergence, the sequence ___",
-      "answer": "diverges",
-      "type": "fillin",
-      "hint": "Use the standard term opposite to convergence."
-    },
-    {
-      "id": "s_e4",
-      "from": "seq",
-      "to": "limpt",
-      "label": "\\(x\\) is a limit point of \\(A\\) if every punctured neighborhood of \\(x\\) meets \\(A\\) in ___ many points",
-      "answer": "infinitely",
+      "label": "in the epsilon-N definition, for all \\(n>N\\) we require \\(|a_n-L|\\) ___ \\(\\varepsilon\\)",
+      "answer": "<",
       "type": "dropdown",
       "options": [
-        "finitely",
-        "infinitely",
-        "countably",
-        "uncountably"
+        "<",
+        "≤",
+        ">",
+        "="
       ],
-      "hint": "Finite exceptions are not enough for this definition."
+      "hint": "Convergence requires strict control by every positive epsilon."
     },
     {
-      "id": "s_e5",
+      "id": "sc_e2",
+      "from": "seq",
+      "to": "div",
+      "label": "if no real number satisfies the epsilon-N condition, the sequence is:",
+      "answer": "divergent",
+      "type": "dropdown",
+      "options": [
+        "divergent",
+        "bounded",
+        "monotone",
+        "Cauchy"
+      ],
+      "hint": "This is the standard opposite of convergent."
+    },
+    {
+      "id": "sc_e3",
       "from": "enconv",
       "to": "unique",
-      "label": "a convergent real sequence has exactly ___ limit",
+      "label": "a convergent sequence has how many limits?",
       "answer": "one",
       "type": "dropdown",
       "options": [
-        "no",
+        "none",
         "one",
         "two",
         "infinitely many"
       ],
-      "hint": "Uniqueness is a theorem consequence of the definition."
+      "hint": "Limit is unique in \\(\\mathbb{R}\\)."
     },
     {
-      "id": "s_e6",
+      "id": "sc_e4",
       "from": "enconv",
       "to": "algebra",
-      "label": "\\(\\lim(a_n+b_n)=\\lim a_n+\\lim b_n\\) is the ___ rule",
-      "answer": "sum",
-      "type": "dropdown",
-      "options": [
-        "sum",
-        "product",
-        "quotient",
-        "power"
-      ],
-      "hint": "Identify the operation preserved under limits."
-    },
-    {
-      "id": "s_e7",
-      "from": "algebra",
-      "to": "squeeze",
-      "label": "if \\(b_n \\le a_n \\le c_n\\) and both outer limits are \\(L\\), then \\(a_n \\to\\) ___",
-      "answer": "L",
+      "label": "if \\(a_n\\to a\\) and \\(b_n\\to b\\), then \\(a_n+b_n\\to\\) ___",
+      "answer": "a+b",
       "type": "fillin",
-      "hint": "The middle sequence is trapped by two sequences with equal limit."
+      "hint": "Use the sum law for limits."
     },
     {
-      "id": "s_e8",
+      "id": "sc_e5",
       "from": "enconv",
       "to": "order",
-      "label": "if \\(a_n \\le b_n\\) for all \\(n\\), then \\(\\lim a_n\\) ___ \\(\\lim b_n\\)",
+      "label": "if \\(a_n\\le b_n\\) eventually and both converge, then \\(\\lim a_n\\) ___ \\(\\lim b_n\\)",
       "answer": "≤",
       "type": "dropdown",
       "options": [
         "<",
         "≤",
-        "=",
-        "≥"
+        ">",
+        "="
       ],
-      "hint": "In general, limits preserve weak order."
+      "hint": "Limit inequalities preserve weak order."
     },
     {
-      "id": "s_e9",
+      "id": "sc_e5b",
       "from": "enconv",
       "to": "shift",
       "label": "removing finitely many initial terms ___ the limit",
       "answer": "preserves",
       "type": "dropdown",
       "options": [
-        "changes",
         "preserves",
-        "doubles",
-        "negates"
+        "changes",
+        "reverses",
+        "destroys"
       ],
       "hint": "Convergence depends on tail behavior."
     },
     {
-      "id": "s_e10",
+      "id": "sc_e6",
+      "from": "order",
+      "to": "squeeze",
+      "label": "if the outer sequences both tend to \\(L\\), then the trapped middle sequence also tends to ___",
+      "answer": "L",
+      "type": "fillin",
+      "hint": "The outer bounds force the same limit."
+    },
+    {
+      "id": "sc_e7",
+      "from": "seq",
+      "to": "bdd",
+      "label": "all terms lying in some interval \\( [-M,M] \\) is the property called:",
+      "answer": "bounded",
+      "type": "dropdown",
+      "options": [
+        "bounded",
+        "monotone",
+        "Cauchy",
+        "divergent"
+      ],
+      "hint": "This is a size restriction, not an order restriction."
+    },
+    {
+      "id": "sc_e7b",
       "from": "enconv",
-      "to": "conv_imp_bdd",
-      "label": "every convergent real sequence fits inside some fixed interval \\( [-M,M] \\): true or false?",
+      "to": "bdd",
+      "label": "every convergent real sequence is bounded: true or false?",
       "answer": "true",
       "type": "dropdown",
       "options": [
         "true",
         "false"
       ],
-      "hint": "This is exactly the content of the theorem at the target node."
+      "hint": "The tail is near \\(L\\), and finitely many initial terms are bounded too."
     },
     {
-      "id": "s_e11",
-      "from": "conv_imp_bdd",
-      "to": "bdd",
-      "label": "bounded means \\(\\exists M\\) with \\(|a_n| \\le\\) ___ for all \\(n\\)",
-      "answer": "M",
-      "type": "fillin",
-      "hint": "Fill in the bound constant."
-    },
-    {
-      "id": "s_e12",
+      "id": "sc_e8",
       "from": "seq",
       "to": "mono",
-      "label": "a sequence whose terms move only in one order direction is called:",
-      "answer": "monotone",
+      "label": "in the nondecreasing case, monotonicity means \\(a_{n+1}\\) ___ \\(a_n\\)",
+      "answer": "≥",
       "type": "dropdown",
       "options": [
-        "monotone",
-        "bounded",
-        "periodic",
-        "Cauchy"
+        "≥",
+        "≤",
+        "=",
+        "≠"
       ],
-      "hint": "The key feature is that the order never reverses."
+      "hint": "This edge checks the order relation, not the vocabulary word."
     },
     {
-      "id": "s_e13",
-      "from": "completeness",
-      "to": "mct",
-      "label": "the proof of MCT uses a least upper ___ coming from completeness",
-      "answer": "bound",
-      "type": "fillin",
-      "hint": "Think LUB: the candidate value is the supremum of the set of terms."
-    },
-    {
-      "id": "s_e14",
-      "from": "bdd",
-      "to": "mct",
-      "label": "if a bounded sequence is also monotone, MCT says it is ___",
-      "answer": "convergent",
-      "type": "fillin",
-      "hint": "This edge tests the theorem's conclusion rather than its missing hypothesis."
-    },
-    {
-      "id": "s_e15",
-      "from": "mono",
-      "to": "mct",
-      "label": "monotonicity alone is not enough; MCT also needs the sequence to be ___",
-      "answer": "bounded",
-      "type": "fillin",
-      "hint": "An increasing sequence like \\(a_n=n\\) shows why this extra hypothesis is needed."
-    },
-    {
-      "id": "s_e16",
-      "from": "amgm",
-      "to": "babylonian",
-      "label": "for Babylonian iteration, AM-GM gives \\(x_{n+1} \\ge\\) ___",
-      "answer": "√c",
-      "type": "fillin",
-      "hint": "Apply AM-GM to \\(x_n\\) and \\(c/x_n\\)."
-    },
-    {
-      "id": "s_e17",
-      "from": "mct",
-      "to": "babylonian",
-      "label": "to use MCT for a decreasing sequence, it must be bounded ___",
-      "answer": "below",
-      "type": "dropdown",
-      "options": [
-        "above",
-        "below",
-        "on both sides",
-        "nowhere"
-      ],
-      "hint": "For decreasing sequences, a lower bound is the useful one."
-    },
-    {
-      "id": "s_e18",
-      "from": "amgm",
-      "to": "agm",
-      "label": "in AGM iteration, the arithmetic and geometric mean sequences approach the same ___",
-      "answer": "limit",
-      "type": "fillin",
-      "hint": "Their gap shrinks to zero while order is preserved."
-    },
-    {
-      "id": "s_e19",
+      "id": "sc_e9",
       "from": "seq",
       "to": "subseq",
       "label": "a subsequence uses strictly ___ indices \\(n_1 < n_2 < \\cdots\\)",
       "answer": "increasing",
       "type": "fillin",
-      "hint": "Indices must move forward through \\(\\mathbb{N}\\)."
+      "hint": "You can skip terms, but you cannot go backward."
     },
     {
-      "id": "s_e20",
+      "id": "sc_e10",
       "from": "subseq",
       "to": "sublim",
-      "label": "if some extracted indices \\(n_k\\) satisfy \\(a_{n_k}\\to L\\), then \\(L\\) is called a:",
+      "label": "if some extracted terms \\(a_{n_k}\\) converge to \\(L\\), then \\(L\\) is a:",
       "answer": "subsequential limit",
       "type": "dropdown",
       "options": [
         "subsequential limit",
-        "global maximum",
+        "bound",
         "period",
-        "tail bound"
+        "partial sum"
       ],
-      "hint": "The name refers to the kind of limit obtained from an extracted sequence."
+      "hint": "The name reflects the kind of sequence used to obtain the limit."
     },
     {
-      "id": "s_e21",
+      "id": "sc_e11",
       "from": "enconv",
-      "to": "eo",
-      "label": "\\(\\{a_n\\}\\) converges iff even and odd subsequences have the ___ limit",
-      "answer": "same",
+      "to": "substable",
+      "label": "if \\(a_n \\to L\\), then every subsequence also converges to ___",
+      "answer": "L",
       "type": "fillin",
-      "hint": "Different even/odd limits force divergence."
+      "hint": "Passing to a subsequence does not change the tail limit."
     },
     {
-      "id": "s_e22",
+      "id": "sc_e12",
+      "from": "substable",
+      "to": "eo",
+      "label": "if the even and odd subsequences approach different numbers, the original sequence is:",
+      "answer": "divergent",
+      "type": "dropdown",
+      "options": [
+        "convergent",
+        "divergent",
+        "bounded",
+        "monotone"
+      ],
+      "hint": "A convergent sequence cannot have two different subsequential limits."
+    },
+    {
+      "id": "sc_e12b",
       "from": "enconv",
       "to": "cesaro",
-      "label": "if \\(a_n\\to L\\), then the Cesaro means satisfy \\(\\sigma_n\\to\\) ___",
+      "label": "if \\(a_n\\to L\\), Cesàro means satisfy \\(\\sigma_n\\to\\) ___",
       "answer": "L",
       "type": "fillin",
       "hint": "Averaging preserves the limit in this direction."
     },
     {
-      "id": "s_e23",
+      "id": "sc_e13",
       "from": "subseq",
       "to": "peak",
-      "label": "an index with no later term exceeding \\(a_n\\) is called a:",
+      "label": "an index with no later term larger than \\(a_n\\) is called a:",
       "answer": "peak point",
       "type": "dropdown",
       "options": [
         "peak point",
         "cluster point",
-        "partial sum",
-        "Cauchy index"
+        "fixed point",
+        "Cauchy point"
       ],
-      "hint": "Think skyline maxima while scanning forward."
+      "hint": "Think of skyline maxima."
     },
     {
-      "id": "s_e24",
+      "id": "sc_e14",
       "from": "peak",
       "to": "monlemma",
-      "label": "from infinitely many peaks you get a decreasing subsequence; otherwise an increasing one, so some subsequence is ___",
+      "label": "the peak/no-peak dichotomy guarantees some subsequence is:",
       "answer": "monotone",
       "type": "dropdown",
       "options": [
@@ -485,100 +438,184 @@
         "constant",
         "random"
       ],
-      "hint": "This is exactly the monotone subsequence lemma."
+      "hint": "This is the content of the monotone subsequence lemma."
     },
     {
-      "id": "s_e25",
-      "from": "monlemma",
-      "to": "bw",
-      "label": "to prove BW from monotone subsequences, combine boundedness with ___",
-      "answer": "MCT",
+      "id": "sc_e14b",
+      "from": "sublim",
+      "to": "limpt",
+      "label": "a subsequential limit is also an ___ point of the set of sequence values",
+      "answer": "accumulation",
       "type": "dropdown",
       "options": [
-        "MCT",
-        "Squeeze",
-        "Cauchy Criterion",
-        "Order Limit"
+        "accumulation",
+        "isolated",
+        "endpoint",
+        "periodic"
       ],
-      "hint": "Use the theorem that converts bounded monotone sequences into convergent ones."
+      "hint": "Equivalent terminology: cluster point."
     },
     {
-      "id": "s_e26",
+      "id": "sc_e15",
+      "from": "completeness",
+      "to": "mct",
+      "label": "for an increasing bounded sequence, completeness provides the least upper bound called the:",
+      "answer": "supremum",
+      "type": "dropdown",
+      "options": [
+        "supremum",
+        "infimum",
+        "derivative",
+        "average"
+      ],
+      "hint": "This value is the standard candidate limit in the MCT proof."
+    },
+    {
+      "id": "sc_e16",
+      "from": "bdd",
+      "to": "mct",
+      "label": "a bounded monotone real sequence is:",
+      "answer": "convergent",
+      "type": "dropdown",
+      "options": [
+        "convergent",
+        "periodic",
+        "eventually constant",
+        "necessarily divergent"
+      ],
+      "hint": "This is the conclusion of MCT."
+    },
+    {
+      "id": "sc_e17",
+      "from": "mono",
+      "to": "mct",
+      "label": "monotonicity by itself is not enough; the missing MCT hypothesis is:",
+      "answer": "boundedness",
+      "type": "dropdown",
+      "options": [
+        "boundedness",
+        "periodicity",
+        "alternation",
+        "summability"
+      ],
+      "hint": "Consider \\(a_n=n\\)."
+    },
+    {
+      "id": "sc_e18",
       "from": "bdd",
       "to": "bw",
-      "label": "BW states: every sequence contained in some interval \\( [-M,M] \\) has a convergent subsequence. This hypothesis is:",
-      "answer": "bounded",
-      "type": "dropdown",
-      "options": [
-        "bounded",
-        "monotone",
-        "Cauchy",
-        "eventually constant"
-      ],
-      "hint": "The theorem assumes one global size restriction, not any order property."
-    },
-    {
-      "id": "s_e27",
-      "from": "enconv",
-      "to": "cauchy",
-      "label": "if \\(a_n\\to L\\), then \\(|a_m-a_n|\\) is eventually ___",
-      "answer": "arbitrarily small",
-      "type": "dropdown",
-      "options": [
-        "zero",
-        "arbitrarily small",
-        "less than 1",
-        "bounded"
-      ],
-      "hint": "Use triangle inequality through the common limit \\(L\\)."
-    },
-    {
-      "id": "s_e28",
-      "from": "cauchy",
-      "to": "cauchy_bdd",
-      "label": "taking \\(\\varepsilon=1\\) traps the tail in a fixed interval, which proves a Cauchy sequence is:",
-      "answer": "bounded",
-      "type": "dropdown",
-      "options": [
-        "bounded",
-        "monotone",
-        "periodic",
-        "decreasing"
-      ],
-      "hint": "Once the tail is trapped, only finitely many early terms remain to control."
-    },
-    {
-      "id": "s_e29",
-      "from": "cauchy_bdd",
-      "to": "bw",
-      "label": "once Cauchy gives boundedness, the theorem that yields a convergent subsequence is ___",
+      "label": "the theorem saying every bounded real sequence has a convergent subsequence is:",
       "answer": "Bolzano-Weierstrass",
       "type": "dropdown",
       "options": [
         "Bolzano-Weierstrass",
         "Monotone Convergence",
         "Squeeze Theorem",
-        "Cesaro's Theorem"
+        "Cesaro Theorem"
       ],
-      "hint": "Name the bounded-sequence compactness theorem."
+      "hint": "This is the central compactness theorem for sequences in \\(\\mathbb{R}\\)."
     },
     {
-      "id": "s_e30",
+      "id": "sc_e19",
+      "from": "monlemma",
+      "to": "bw",
+      "label": "for a bounded sequence, monlemma gives a monotone subsequence; MCT then makes that subsequence:",
+      "answer": "convergent",
+      "type": "dropdown",
+      "options": [
+        "convergent",
+        "periodic",
+        "unbounded",
+        "constant"
+      ],
+      "hint": "This is the key step used to prove BW in \\(\\mathbb{R}\\)."
+    },
+    {
+      "id": "sc_e20",
+      "from": "enconv",
+      "to": "cauchy",
+      "label": "if a sequence converges, distances \\( |a_m-a_n| \\) eventually become:",
+      "answer": "arbitrarily small",
+      "type": "dropdown",
+      "options": [
+        "arbitrarily small",
+        "strictly increasing",
+        "equal to zero",
+        "unbounded"
+      ],
+      "hint": "Use triangle inequality through the common limit."
+    },
+    {
+      "id": "sc_e21",
+      "from": "cauchy",
+      "to": "cauchy_bdd",
+      "label": "taking \\(\\varepsilon=1\\) shows every Cauchy sequence is:",
+      "answer": "bounded",
+      "type": "dropdown",
+      "options": [
+        "bounded",
+        "monotone",
+        "eventually constant",
+        "strictly decreasing"
+      ],
+      "hint": "The tail fits inside one fixed interval."
+    },
+    {
+      "id": "sc_e21b",
+      "from": "amgm",
+      "to": "babylonian",
+      "label": "for \\(x_{n+1}=\\frac{1}{2}(x_n+c/x_n)\\), AM-GM gives \\(x_{n+1}\\ge\\) ___",
+      "answer": "√c",
+      "type": "fillin",
+      "hint": "Apply AM-GM to \\(x_n\\) and \\(c/x_n\\)."
+    },
+    {
+      "id": "sc_e21c",
+      "from": "mct",
+      "to": "babylonian",
+      "label": "if the iteration is decreasing and bounded below, MCT gives:",
+      "answer": "convergence",
+      "type": "dropdown",
+      "options": [
+        "convergence",
+        "divergence",
+        "periodicity",
+        "unboundedness"
+      ],
+      "hint": "Monotone + bounded is exactly the MCT hypothesis pattern."
+    },
+    {
+      "id": "sc_e21d",
+      "from": "amgm",
+      "to": "agm",
+      "label": "AGM iteration produces arithmetic/geometric means with the same ___",
+      "answer": "limit",
+      "type": "fillin",
+      "hint": "The two sequences squeeze together."
+    },
+    {
+      "id": "sc_e22",
       "from": "bw",
       "to": "cc",
-      "label": "if \\(a_{n_k}\\to L\\) and \\(\\{a_n\\}\\) is Cauchy, then \\(a_n\\to\\) ___",
+      "label": "if \\(a_{n_k}\\to L\\) and \\(\\{a_n\\}\\) is Cauchy, then the full sequence satisfies \\(a_n\\to\\) ___",
       "answer": "L",
       "type": "fillin",
-      "hint": "Compare \\(a_n\\) to \\(a_{n_k}\\), then \\(a_{n_k}\\) to \\(L\\)."
+      "hint": "Compare general tail terms to subsequence terms."
     },
     {
-      "id": "s_e31",
+      "id": "sc_e23",
       "from": "cauchy",
       "to": "cc",
-      "label": "in \\(\\mathbb{R}\\), Cauchy \\(\\iff\\) ___",
+      "label": "in \\(\\mathbb{R}\\), being Cauchy is equivalent to being:",
       "answer": "convergent",
-      "type": "fillin",
-      "hint": "This is the Cauchy convergence criterion in a complete space."
+      "type": "dropdown",
+      "options": [
+        "convergent",
+        "bounded",
+        "monotone",
+        "strictly decreasing"
+      ],
+      "hint": "This is exactly the Cauchy convergence criterion."
     }
   ]
 }

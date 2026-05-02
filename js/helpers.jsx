@@ -1,7 +1,7 @@
 // Helpers and shared components
 // Exposes: MathNode, launchConfetti, AnswerPopup
 
-const { useState, useEffect, useRef, useCallback, useLayoutEffect } = React;
+const { useState, useEffect, useRef } = React;
 
 // MathJax-rendered text (handles \n as <br>)
 function MathNode({ text, className = '' }) {
@@ -179,7 +179,6 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
     if (e.key === 'Escape') onClose();
   }
 
-  const canRevealHint = attempts >= 2 && edge.hint;
   const displayLabel = (edge.label || '').replace(/(?:\\_){2,}/g, (m) => '_'.repeat(m.length / 2));
   const expectsMathAnswer = edge.type === 'fillin' && /sqrt|\\\\sqrt|√|ε|≤|≥|[<>=+\-*/^()\[\]{}]|\d|^[a-z]$|^[A-Z]$/i.test(edge.answer || '');
   const answerVars = Array.from(new Set(String(edge.answer || '').match(/[a-zA-Z]/g) || [])).slice(0, 4);
@@ -314,19 +313,48 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
 }
 
 // Storage helpers
-const STORAGE_KEY = 'conceptmapper_progress_v2';
-const MAPS_KEY = 'conceptmapper_maps_v2';
-const POSITIONS_KEY = 'conceptmapper_positions_v2';
-const MAP_ORDER_KEY = 'conceptmapper_map_order_v1';
+const PROGRESS_STORAGE_KEY = 'conceptmapper_progress_v2';
+const CUSTOM_MAPS_STORAGE_KEY = 'conceptmapper_maps_v2';
+const POSITIONS_STORAGE_KEY = 'conceptmapper_positions_v2';
+const MAP_ORDER_STORAGE_KEY = 'conceptmapper_map_order_v1';
 const MAP_MANIFEST_PATH = 'data/maps/manifest.json';
+const LEGACY_SEQUENCES_MAP_ID = 'sequencesConceptual';
+const CANONICAL_SEQUENCES_MAP_ID = 'sequences';
+
+function migrateLegacyMapIdInOrder(order) {
+  const normalized = [];
+  const seen = new Set();
+  (Array.isArray(order) ? order : []).forEach((id) => {
+    const nextId = id === LEGACY_SEQUENCES_MAP_ID ? CANONICAL_SEQUENCES_MAP_ID : id;
+    if (!seen.has(nextId)) {
+      seen.add(nextId);
+      normalized.push(nextId);
+    }
+  });
+  return normalized;
+}
 
 function loadProgress() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(PROGRESS_STORAGE_KEY);
     if (!raw) return {};
     const parsed = JSON.parse(raw);
+    const migrated = { ...(parsed || {}) };
+    const legacyEntry = migrated[LEGACY_SEQUENCES_MAP_ID];
+    if (legacyEntry) {
+      const canonicalEdges = Array.isArray(migrated[CANONICAL_SEQUENCES_MAP_ID]?.answeredEdges)
+        ? migrated[CANONICAL_SEQUENCES_MAP_ID].answeredEdges
+        : [];
+      const legacyEdges = Array.isArray(legacyEntry.answeredEdges) ? legacyEntry.answeredEdges : [];
+      migrated[CANONICAL_SEQUENCES_MAP_ID] = {
+        answeredEdges: [...new Set([...canonicalEdges, ...legacyEdges])],
+      };
+      delete migrated[LEGACY_SEQUENCES_MAP_ID];
+      localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(migrated));
+    }
+
     const result = {};
-    Object.entries(parsed).forEach(([mapId, p]) => {
+    Object.entries(migrated).forEach(([mapId, p]) => {
       result[mapId] = {
         answeredEdges: new Set(p.answeredEdges || []),
       };
@@ -342,30 +370,34 @@ function saveProgress(allProgress) {
       answeredEdges: [...(p.answeredEdges || [])],
     };
   });
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(serializable));
+  localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(serializable));
 }
 
 function loadCustomMaps() {
   try {
-    const raw = localStorage.getItem(MAPS_KEY);
+    const raw = localStorage.getItem(CUSTOM_MAPS_STORAGE_KEY);
     return raw ? JSON.parse(raw) : {};
   } catch { return {}; }
 }
 
 function saveCustomMaps(maps) {
-  localStorage.setItem(MAPS_KEY, JSON.stringify(maps));
+  localStorage.setItem(CUSTOM_MAPS_STORAGE_KEY, JSON.stringify(maps));
 }
 
 function loadMapOrder() {
   try {
-    const raw = localStorage.getItem(MAP_ORDER_KEY);
+    const raw = localStorage.getItem(MAP_ORDER_STORAGE_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
+    const normalized = migrateLegacyMapIdInOrder(parsed);
+    if (raw && JSON.stringify(parsed) !== JSON.stringify(normalized)) {
+      localStorage.setItem(MAP_ORDER_STORAGE_KEY, JSON.stringify(normalized));
+    }
+    return normalized;
   } catch { return []; }
 }
 
 function saveMapOrder(order) {
-  localStorage.setItem(MAP_ORDER_KEY, JSON.stringify(Array.isArray(order) ? order : []));
+  localStorage.setItem(MAP_ORDER_STORAGE_KEY, JSON.stringify(migrateLegacyMapIdInOrder(order)));
 }
 
 function parseMapDataText(rawText, sourcePath = '') {
@@ -503,13 +535,25 @@ function downloadManifestJSON(entries) {
 
 function loadPositions() {
   try {
-    const raw = localStorage.getItem(POSITIONS_KEY);
-    return raw ? JSON.parse(raw) : {};
+    const raw = localStorage.getItem(POSITIONS_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    if (parsed && typeof parsed === 'object' && parsed[LEGACY_SEQUENCES_MAP_ID]) {
+      const migrated = { ...parsed };
+      const legacyPos = migrated[LEGACY_SEQUENCES_MAP_ID];
+      migrated[CANONICAL_SEQUENCES_MAP_ID] = {
+        ...(legacyPos || {}),
+        ...(migrated[CANONICAL_SEQUENCES_MAP_ID] || {}),
+      };
+      delete migrated[LEGACY_SEQUENCES_MAP_ID];
+      localStorage.setItem(POSITIONS_STORAGE_KEY, JSON.stringify(migrated));
+      return migrated;
+    }
+    return parsed && typeof parsed === 'object' ? parsed : {};
   } catch { return {}; }
 }
 
 function savePositions(p) {
-  localStorage.setItem(POSITIONS_KEY, JSON.stringify(p));
+  localStorage.setItem(POSITIONS_STORAGE_KEY, JSON.stringify(p));
 }
 
 // Expose to other Babel scripts

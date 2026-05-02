@@ -866,7 +866,22 @@ function App() {
           <div className="student-view-wrapper">
             {activeMapId && (
               <div className="breadcrumb">
-                {studentSections.find(s => s.maps.some(m => m.id === activeMapId))?.title || 'Maps'} › {mapData.title}
+                <div className="breadcrumb-row">
+                  <div className="breadcrumb-path">
+                    {studentSections.find(s => s.maps.some(m => m.id === activeMapId))?.title || 'Maps'} › {mapData.title}
+                  </div>
+                  <button
+                    className="btn btn-ghost breadcrumb-reset-btn"
+                    onClick={() => {
+                      if (confirm('Reset progress for this map? Node positions will stay.')) {
+                        handleProgress(activeMapId, { answeredEdges: new Set() });
+                      }
+                    }}
+                    title="Reset progress"
+                  >
+                    ↺ Reset progress
+                  </button>
+                </div>
               </div>
             )}
             <div className="map-canvas-area">

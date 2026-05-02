@@ -1,7 +1,7 @@
 // Concept Map Canvas — draggable nodes, pan, zoom, edge interaction
 // Exposes: ConceptMap
 
-const { useState: useState2, useEffect: useEffect2, useRef: useRef2, useCallback: useCallback2, useLayoutEffect: useLayoutEffect2 } = React;
+const { useState: useState2, useEffect: useEffect2, useRef: useRef2, useCallback: useCallback2 } = React;
 
 // ─── Estimate node size from label (so edges can route before measuring) ────
 function estimateNodeSize(label) {
@@ -414,15 +414,6 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
           <button className="icon-btn" onClick={spreadNodes} title="Spread nodes apart">⊕</button>
           <button className="icon-btn" onClick={compactNodes} title="Pull nodes inward">⊖</button>
           <button className="icon-btn" onClick={resetLayout} title="Reset node layout to original map">⟲</button>
-          <button
-            className="icon-btn"
-            onClick={() => {
-              if (confirm('Reset progress for this map? Node positions will stay.')) {
-                onProgress({ answeredEdges: new Set() });
-              }
-            }}
-            title="Reset progress"
-          >↺</button>
         </div>
       </div>
 

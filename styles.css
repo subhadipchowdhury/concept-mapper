@@ -293,6 +293,27 @@ body {
   flex-shrink: 0;
 }
 
+.breadcrumb-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.breadcrumb-path {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.breadcrumb-reset-btn {
+  padding: 6px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .map-area::before {
   content: '';
   position: absolute; inset: 0;
@@ -1281,6 +1302,27 @@ body {
     top: 12px;
     left: 10px;
     right: 10px;
+  }
+
+  .breadcrumb {
+    padding: 10px 12px;
+  }
+
+  .breadcrumb-row {
+    align-items: stretch;
+    gap: 8px;
+    flex-direction: column;
+  }
+
+  .breadcrumb-path {
+    white-space: normal;
+    line-height: 1.35;
+  }
+
+  .breadcrumb-reset-btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 36px;
   }
 
   .map-title {
