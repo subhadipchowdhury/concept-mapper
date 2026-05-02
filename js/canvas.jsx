@@ -260,8 +260,8 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
             <span style={{color: mapData.color, fontWeight: 700}}>{progressPct}%</span>
           </div>
           <button className="icon-btn" onClick={fitToScreen} title="Reset view">⌂</button>
-          <button className="icon-btn" onClick={spreadNodes} title="Spread nodes apart">✦</button>
-          <button className="icon-btn" onClick={compactNodes} title="Pull nodes inward">⤢</button>
+          <button className="icon-btn" onClick={spreadNodes} title="Spread nodes apart">⊕</button>
+          <button className="icon-btn" onClick={compactNodes} title="Pull nodes inward">⊖</button>
           <button className="icon-btn" onClick={resetLayout} title="Reset node layout to original map">⟲</button>
           <button
             className="icon-btn"
@@ -384,7 +384,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
         <ZoomControl scale={t.scale} setScale={(fn) => setT(prev => ({...prev, scale: typeof fn === 'function' ? fn(prev.scale) : fn}))} fitToScreen={fitToScreen} />
 
         <div className="mini-help">
-          <strong>How to use:</strong> Click any glowing label to fill in the relationship. Drag nodes to rearrange. Use mouse wheel to pan, <kbd>⌘/Ctrl</kbd>+wheel to zoom, <kbd>✦</kbd> to spread nodes apart, <kbd>⤢</kbd> to pull them in, and <kbd>⟲</kbd> to reset layout.
+          <strong>How to use:</strong> Click any glowing label to fill in the relationship. Drag nodes to rearrange. Use mouse wheel to pan, <kbd>⌘/Ctrl</kbd>+wheel to zoom, <kbd>⊕</kbd> to spread nodes apart, <kbd>⊖</kbd> to pull them in, and <kbd>⟲</kbd> to reset layout.
         </div>
       </div>
 
