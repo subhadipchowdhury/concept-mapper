@@ -94,6 +94,7 @@ function launchConfetti() {
 // Compute orthogonal bezier path between two points (anchored on box edges)
 function computeEdgePath(from, to, options = {}) {
   const portOffset = Number.isFinite(options.portOffset) ? options.portOffset : 0;
+  const labelT = Number.isFinite(options.labelT) ? Math.max(0, Math.min(1, options.labelT)) : (1 / 3);
   // from / to: { x, y, w, h }  -- center coords
   const dx = to.x - from.x;
   const dy = to.y - from.y;
@@ -126,10 +127,20 @@ function computeEdgePath(from, to, options = {}) {
     c2x = midX; c2y = ey;
   }
 
+  const omt = 1 - labelT;
+  const labelX = (omt * omt * omt * sx)
+    + (3 * omt * omt * labelT * c1x)
+    + (3 * omt * labelT * labelT * c2x)
+    + (labelT * labelT * labelT * ex);
+  const labelY = (omt * omt * omt * sy)
+    + (3 * omt * omt * labelT * c1y)
+    + (3 * omt * labelT * labelT * c2y)
+    + (labelT * labelT * labelT * ey);
+
   return {
     d: `M ${sx} ${sy} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${ex} ${ey}`,
-    midX: (sx + ex) / 2 + (c1x + c2x - sx - ex) * 0.15,
-    midY: (sy + ey) / 2 + (c1y + c2y - sy - ey) * 0.15,
+    midX: labelX,
+    midY: labelY,
     sx, sy, ex, ey
   };
 }

@@ -1,7 +1,7 @@
 // Concept Map Canvas — draggable nodes, pan, zoom, edge interaction
 // Exposes: ConceptMap
 
-const { useState: useState2, useEffect: useEffect2, useRef: useRef2, useCallback: useCallback2 } = React;
+const { useState: useState2, useEffect: useEffect2, useRef: useRef2, useCallback: useCallback2, useMemo: useMemo2 } = React;
 
 // ─── Estimate node size from label (so edges can route before measuring) ────
 function estimateNodeSize(label) {
@@ -10,6 +10,189 @@ function estimateNodeSize(label) {
   const w = Math.min(220, Math.max(140, longest * 8 + 36));
   const h = 30 + lines.length * 22;
   return { w, h };
+}
+
+function hashStringToUint32(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i += 1) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+function createSeededRandom(seedString) {
+  let seed = hashStringToUint32(seedString) || 1;
+  return function rand() {
+    seed += 0x6D2B79F5;
+    let t = seed;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function computeAutoNodeLayout(mapData) {
+  const nodes = (mapData.nodes || []).filter((n) => (
+    n &&
+    typeof n.id === 'string' &&
+    Number.isFinite(n.x) &&
+    Number.isFinite(n.y)
+  ));
+  if (!nodes.length) return {};
+
+  const nodeById = Object.fromEntries(nodes.map((n) => [n.id, n]));
+  const validEdges = (mapData.edges || []).filter((e) => nodeById[e.from] && nodeById[e.to]);
+  const edgeDirectionSet = new Set(validEdges.map((e) => `${e.from}->${e.to}`));
+
+  const rng = createSeededRandom(`${mapData.id || 'map'}|${nodes.map((n) => n.id).sort().join('|')}`);
+  const n = nodes.length;
+  const canvas = { minX: 140, maxX: 2260, minY: 120, maxY: 1380 };
+  const center = { x: 1200, y: 760 };
+
+  const cx = nodes.reduce((acc, node) => acc + node.x, 0) / n;
+  const cy = nodes.reduce((acc, node) => acc + node.y, 0) / n;
+
+  const pos = {};
+  const vel = {};
+  nodes.forEach((node, idx) => {
+    const baseAngle = (idx / n) * Math.PI * 2 + (rng() - 0.5) * 0.85;
+    const ringRadius = 100 + Math.sqrt(n) * 38 + rng() * 140;
+    const hasBase = Number.isFinite(node.x) && Number.isFinite(node.y);
+    const bx = hasBase ? center.x + (node.x - cx) * 1.25 : center.x + Math.cos(baseAngle) * ringRadius;
+    const by = hasBase ? center.y + (node.y - cy) * 1.25 : center.y + Math.sin(baseAngle) * ringRadius;
+    pos[node.id] = {
+      x: clamp(bx + (rng() - 0.5) * 60, canvas.minX, canvas.maxX),
+      y: clamp(by + (rng() - 0.5) * 60, canvas.minY, canvas.maxY),
+    };
+    vel[node.id] = { x: 0, y: 0 };
+  });
+
+  const sizes = Object.fromEntries(nodes.map((node) => [node.id, estimateNodeSize(node.label)]));
+  const edgeLabelDesiredGap = 150;
+  const iterations = Math.min(280, Math.max(160, 110 + n * 10));
+
+  for (let step = 0; step < iterations; step += 1) {
+    const alpha = 1 - (step / iterations);
+    const repulsion = 260000 * (0.35 + alpha * 0.85);
+    const springK = 0.0032 + alpha * 0.0012;
+    const gravityK = 0.001 + (1 - alpha) * 0.0014;
+
+    const force = {};
+    nodes.forEach((node) => {
+      force[node.id] = { x: 0, y: 0 };
+    });
+
+    for (let i = 0; i < nodes.length; i += 1) {
+      const ni = nodes[i];
+      for (let j = i + 1; j < nodes.length; j += 1) {
+        const nj = nodes[j];
+        const pi = pos[ni.id];
+        const pj = pos[nj.id];
+        const dx = pj.x - pi.x;
+        const dy = pj.y - pi.y;
+        const distSq = dx * dx + dy * dy + 1;
+        const dist = Math.sqrt(distSq);
+        const ux = dx / dist;
+        const uy = dy / dist;
+
+        const minNodeGap = (sizes[ni.id].w + sizes[nj.id].w) * 0.36 + 44;
+        let f = repulsion / distSq;
+        if (dist < minNodeGap) f += (minNodeGap - dist) * 0.58;
+
+        force[ni.id].x -= ux * f;
+        force[ni.id].y -= uy * f;
+        force[nj.id].x += ux * f;
+        force[nj.id].y += uy * f;
+      }
+    }
+
+    validEdges.forEach((edge) => {
+      const p1 = pos[edge.from];
+      const p2 = pos[edge.to];
+      if (!p1 || !p2) return;
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      const dist = Math.hypot(dx, dy) || 0.001;
+      const ux = dx / dist;
+      const uy = dy / dist;
+      const hasReverseEdge = edge.from !== edge.to && edgeDirectionSet.has(`${edge.to}->${edge.from}`);
+      const targetLen = hasReverseEdge ? 335 : 285;
+      const f = (dist - targetLen) * springK;
+      force[edge.from].x += ux * f;
+      force[edge.from].y += uy * f;
+      force[edge.to].x -= ux * f;
+      force[edge.to].y -= uy * f;
+    });
+
+    const labelAnchors = validEdges.map((edge) => {
+      const from = pos[edge.from];
+      const to = pos[edge.to];
+      const fromSize = sizes[edge.from];
+      const toSize = sizes[edge.to];
+      const hasReverseEdge = edge.from !== edge.to && edgeDirectionSet.has(`${edge.to}->${edge.from}`);
+      const pairSign = String(edge.from) < String(edge.to) ? 1 : -1;
+      const path = computeEdgePath(
+        { x: from.x, y: from.y, w: fromSize.w, h: fromSize.h },
+        { x: to.x, y: to.y, w: toSize.w, h: toSize.h },
+        { portOffset: hasReverseEdge ? pairSign * 18 : 0 }
+      );
+      return { edge, x: path.midX, y: path.midY };
+    });
+
+    for (let i = 0; i < labelAnchors.length; i += 1) {
+      const a = labelAnchors[i];
+      for (let j = i + 1; j < labelAnchors.length; j += 1) {
+        const b = labelAnchors[j];
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const dist = Math.hypot(dx, dy) || 0.001;
+        if (dist >= edgeLabelDesiredGap) continue;
+
+        const overlap = edgeLabelDesiredGap - dist;
+        const ux = dx / dist;
+        const uy = dy / dist;
+        const push = overlap * 0.12;
+
+        const aNodes = [a.edge.from, a.edge.to];
+        const bNodes = [b.edge.from, b.edge.to];
+        aNodes.forEach((id) => {
+          if (!force[id]) return;
+          force[id].x -= ux * push * 0.5;
+          force[id].y -= uy * push * 0.5;
+        });
+        bNodes.forEach((id) => {
+          if (!force[id]) return;
+          force[id].x += ux * push * 0.5;
+          force[id].y += uy * push * 0.5;
+        });
+      }
+    }
+
+    nodes.forEach((node) => {
+      const p = pos[node.id];
+      force[node.id].x += (center.x - p.x) * gravityK;
+      force[node.id].y += (center.y - p.y) * gravityK;
+
+      vel[node.id].x = vel[node.id].x * 0.84 + force[node.id].x;
+      vel[node.id].y = vel[node.id].y * 0.84 + force[node.id].y;
+      const maxStep = 18 * (0.45 + alpha * 0.7);
+      const speed = Math.hypot(vel[node.id].x, vel[node.id].y);
+      if (speed > maxStep) {
+        vel[node.id].x = (vel[node.id].x / speed) * maxStep;
+        vel[node.id].y = (vel[node.id].y / speed) * maxStep;
+      }
+
+      p.x = clamp(p.x + vel[node.id].x, canvas.minX, canvas.maxX);
+      p.y = clamp(p.y + vel[node.id].y, canvas.minY, canvas.maxY);
+    });
+  }
+
+  return pos;
 }
 
 // ─── Custom hook for drag-on-canvas ─────────────────────────────────────────
@@ -256,10 +439,12 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
 
   // local node positions: positions[mapId][nodeId] = {x, y}
   const mapPositions = positions[mapData.id] || {};
+  const autoLayout = useMemo2(() => computeAutoNodeLayout(mapData), [mapData]);
   // Effective node coords: stored override, else from data
   function nodeXY(node) {
     const p = mapPositions[node.id];
-    return p ? { x: p.x, y: p.y } : { x: node.x, y: node.y };
+    const a = autoLayout[node.id];
+    return p ? { x: p.x, y: p.y } : a ? { x: a.x, y: a.y } : { x: node.x, y: node.y };
   }
 
   function setNodeXY(nodeId, x, y) {
@@ -414,7 +599,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
           <button className="icon-btn" onClick={fitToScreen} title="Reset view">⌂</button>
           <button className="icon-btn" onClick={spreadNodes} title="Spread nodes apart">⊕</button>
           <button className="icon-btn" onClick={compactNodes} title="Pull nodes inward">⊖</button>
-          <button className="icon-btn" onClick={resetLayout} title="Reset node layout to original map">⟲</button>
+          <button className="icon-btn" onClick={resetLayout} title="Reset node layout to auto placement">⟲</button>
         </div>
       </div>
 
@@ -556,7 +741,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
             <span className="mini-help-caret">{isHelpOpen ? '▾' : '▸'}</span>
           </div>
           <div className="mini-help-body">
-            Tap any glowing label to fill in the relationship. Drag nodes to rearrange. On touch devices, drag to pan and pinch to zoom. On desktop, use mouse wheel to pan and <kbd>⌘/Ctrl</kbd>+wheel to zoom. Use <kbd>⊕</kbd> to spread nodes apart, <kbd>⊖</kbd> to pull them in, and <kbd>⟲</kbd> to reset layout.
+            Tap any glowing label to fill in the relationship. Drag nodes to rearrange. On touch devices, drag to pan and pinch to zoom. On desktop, use mouse wheel to pan and <kbd>⌘/Ctrl</kbd>+wheel to zoom. Use <kbd>⊕</kbd> to spread nodes apart, <kbd>⊖</kbd> to pull them in, and <kbd>⟲</kbd> to recompute auto layout.
           </div>
         </div>
       </div>
