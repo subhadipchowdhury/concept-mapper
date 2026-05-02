@@ -1,4 +1,4 @@
-{
+﻿{
   "id": "reactionKinetics",
   "title": "Chemical Kinetics and Rate Laws",
   "description": "Pedagogical pathway from measurable rate to mechanism-based rate laws",
@@ -105,28 +105,31 @@
       "id": "rk_e1",
       "from": "reaction",
       "to": "rate",
-      "label": "how fast reactants turn into products is the reaction ___",
-      "answer": "rate",
-      "type": "fillin",
+      "label": "the quantity that measures how fast reactants are consumed is the ___",
+      "answer": "reaction rate",
+      "type": "dropdown",
+      "options": ["reaction rate", "rate constant", "activation energy", "reaction order"],
       "hint": "Units are usually mol L^-1 s^-1."
     },
     {
       "id": "rk_e2",
       "from": "rate",
       "to": "concentration",
-      "label": "rate is computed from change in ___ over time",
-      "answer": "concentration",
-      "type": "fillin",
-      "hint": "For a reactant, this change is negative; for a product, positive."
+      "label": "in the expression rate = -Δ[A]/Δt, the quantity in brackets has units of ___",
+      "answer": "mol/L",
+      "type": "dropdown",
+      "options": ["mol/L", "mol/s", "kJ/mol", "L/mol·s"],
+      "hint": "Square brackets denote molar concentration; the rate itself has units of mol L⁻¹ s⁻¹."
     },
     {
       "id": "rk_e3",
       "from": "concentration",
       "to": "initialRates",
-      "label": "to isolate how each reactant affects rate, use ___ method data",
-      "answer": "initial rates",
-      "type": "fillin",
-      "hint": "Compare trials where one reactant concentration changes at a time."
+      "label": "to determine the exponent on [A] in the rate law, you vary [A] while holding other concentrations ___ across trials",
+      "answer": "constant",
+      "type": "dropdown",
+      "options": ["constant", "doubled", "equal to [B]", "at equilibrium"],
+      "hint": "Changing one variable at a time lets you isolate its effect on the rate."
     },
     {
       "id": "rk_e4",
@@ -142,28 +145,31 @@
       "id": "rk_e5",
       "from": "rateLaw",
       "to": "order",
-      "label": "exponents in the rate law define the reaction ___",
-      "answer": "order",
-      "type": "fillin",
+      "label": "the sum of exponents m + n in \\(rate = k[A]^m[B]^n\\) is the overall ___",
+      "answer": "reaction order",
+      "type": "dropdown",
+      "options": ["reaction order", "rate constant", "stoichiometric coefficient", "activation energy"],
       "hint": "Overall order is the sum of concentration exponents."
     },
     {
       "id": "rk_e6",
       "from": "rateLaw",
       "to": "rateConstant",
-      "label": "the proportionality factor in a rate law is the rate ___",
-      "answer": "constant",
-      "type": "fillin",
+      "label": "the factor k in \\(rate = k[A]^m[B]^n\\), whose units depend on reaction order, is the ___",
+      "answer": "rate constant",
+      "type": "dropdown",
+      "options": ["rate constant", "reaction order", "pre-exponential factor", "activation energy"],
       "hint": "Its units depend on overall reaction order."
     },
     {
       "id": "rk_e7",
       "from": "temperature",
       "to": "arrhenius",
-      "label": "temperature dependence of k is modeled by the ___ equation",
-      "answer": "arrhenius",
-      "type": "fillin",
-      "hint": "In linear form: ln(k) = ln(A) - E_a/(RT)."
+      "label": "according to the Arrhenius equation, doubling the absolute temperature causes k to ___",
+      "answer": "increase",
+      "type": "dropdown",
+      "options": ["increase", "decrease", "stay the same", "become zero"],
+      "hint": "Higher T makes the exponent less negative, so the exponential factor grows and k increases."
     },
     {
       "id": "rk_e8",
@@ -198,11 +204,11 @@
       "id": "rk_e11",
       "from": "mechanism",
       "to": "rds",
-      "label": "the slowest elementary step is the rate-determining ___",
-      "answer": "step",
+      "label": "among all elementary steps in a mechanism, the overall rate is controlled by the ___ step",
+      "answer": "slowest",
       "type": "dropdown",
-      "options": ["step", "reaction", "mechanism", "process"],
-      "hint": "This step sets the bottleneck for mechanism-based rate prediction."
+      "options": ["slowest", "fastest", "first", "last"],
+      "hint": "Think of it as a bottleneck: the slowest step limits how fast products accumulate."
     },
     {
       "id": "rk_e12",
@@ -235,3 +241,4 @@
     }
   ]
 }
+
