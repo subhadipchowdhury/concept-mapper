@@ -775,9 +775,9 @@ function App() {
         >
           {isSidebarCollapsed ? '▸ ' : '◂ '}<span className="topbar-btn-label">{isSidebarCollapsed ? 'Topics' : 'Topics'}</span>
         </button>
-        <div className="topbar-logo">
-          <div className="topbar-logo-mark">∑</div>
-          <span className="topbar-logo-text">Concept Mapper</span>
+        <div className="topbar-logo" aria-label="Concept Mapper">
+          <img className="topbar-logo-mark-img" src="assets/brand/concept-mapper-mark.svg" alt="" aria-hidden="true" />
+          <img className="topbar-logo-banner" src="assets/brand/concept-mapper-banner.svg" alt="Concept Mapper. See how ideas connect." />
         </div>
         <div className="topbar-spacer"></div>
         {view === 'student' && (
