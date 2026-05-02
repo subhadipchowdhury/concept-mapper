@@ -932,16 +932,19 @@ function App() {
         <div className="topbar-spacer"></div>
         {view === 'student' && (
           <>
-            <div className="topbar-progress-group">
-              <div className="topbar-progress" aria-label={`Map progress: ${completionPct}%`}>
-                <span className="topbar-progress-value">{completionPct}%</span>
-                <div className="topbar-progress-bar" aria-hidden="true">
-                  <div className="topbar-progress-fill" style={{ width: `${completionPct}%` }}></div>
+            {isSidebarCollapsed && (
+              <>
+                <div className="topbar-progress-group">
+                  <div className="topbar-progress" aria-label={`Map progress: ${completionPct}%`}>
+                    <span className="topbar-progress-value">{completionPct}%</span>
+                    <div className="topbar-progress-bar" aria-hidden="true">
+                      <div className="topbar-progress-fill" style={{ width: `${completionPct}%` }}></div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-
-            </div>
-            <div className="topbar-divider" aria-hidden="true"></div>
+                <div className="topbar-divider" aria-hidden="true"></div>
+              </>
+            )}
             <button className="topbar-icon-btn" onClick={exportStudentData} title="Download your progress so you can back it up or move it to another browser" aria-label="Save progress">
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" focusable="false">
                 <path d="M8 2v9" />
