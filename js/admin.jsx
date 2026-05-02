@@ -472,117 +472,237 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
 }
 
 // ─── MapsManager: list + create ───────────────────────────────────────────────
-function MapsManager({ allMaps, orderedMapIds, customMaps, onEdit, onCreate, onExportMap, onReorderMap, onImportMap, onTogglePublish }) {
+function MapsManager({
+  allMaps,
+  orderedMapIds,
+  subjects,
+  customMaps,
+  onEdit,
+  onCreate,
+  onCreateSubject,
+  onExportMap,
+  onExportManifest,
+  onReorderMap,
+  onMoveToSubject,
+  onImportMap,
+  onTogglePublish,
+}) {
   const [draggedId, setDraggedId] = useStateA(null);
   const [dragOverId, setDragOverId] = useStateA(null);
-  const displayOrder = (Array.isArray(orderedMapIds) ? orderedMapIds : Object.keys(allMaps))
+  const [dragOverSubjectId, setDragOverSubjectId] = useStateA(null);
+
+  const displayOrder = (Array.isArray(orderedMapIds) ? orderedMapIds : Object.keys(allMaps || {}))
     .filter(id => !!allMaps[id]);
+
+  const folderSeed = (Array.isArray(subjects) && subjects.length > 0)
+    ? subjects
+    : [{ id: 'general', title: 'General' }];
+
+  const sectionsById = {};
+  const sectionOrder = [];
+
+  folderSeed.forEach((folder) => {
+    if (!folder || typeof folder.id !== 'string') return;
+    sectionsById[folder.id] = {
+      id: folder.id,
+      title: folder.title || folder.id,
+      mapIds: [],
+    };
+    sectionOrder.push(folder.id);
+  });
+
+  displayOrder.forEach((mapId) => {
+    const mapData = allMaps[mapId];
+    if (!mapData) return;
+    const subjectId = typeof mapData.subjectId === 'string' && mapData.subjectId.trim()
+      ? mapData.subjectId.trim()
+      : 'general';
+    if (!sectionsById[subjectId]) {
+      sectionsById[subjectId] = {
+        id: subjectId,
+        title: mapData.subjectTitle || subjectId,
+        mapIds: [],
+      };
+      sectionOrder.push(subjectId);
+    }
+    sectionsById[subjectId].mapIds.push(mapId);
+  });
+
+  const sections = sectionOrder
+    .map((id) => sectionsById[id])
+    .filter(Boolean);
+
+  function createFolderFromPrompt() {
+    if (typeof onCreateSubject !== 'function') return;
+    const title = prompt('Folder name (subject):');
+    if (title === null) return;
+    const cleaned = title.trim();
+    if (!cleaned) return;
+    onCreateSubject(cleaned);
+  }
 
   return (
     <div className="maps-manager">
       <div className="maps-manager-header">
         <div>
           <div className="maps-manager-title">Admin · Concept Maps</div>
-          <div className="maps-manager-sub">Create and edit chapter maps with the visual builder. Drag cards here to reorder the left sidebar. Exported files should replace data/maps/{`{mapId}`}.json in the repo.</div>
+          <div className="maps-manager-sub">Create and edit maps by folder. New maps are created inside a chosen folder, and you can drag cards between folders. Export map JSON plus manifest.json for repo promotion.</div>
         </div>
-        <div>
+        <div className="maps-manager-actions">
           <button className="btn btn-ghost btn-sm" onClick={onImportMap}>Import JSON</button>
+          {typeof onExportManifest === 'function' && (
+            <button className="btn btn-ghost btn-sm" onClick={onExportManifest}>Export Manifest</button>
+          )}
+          {typeof onCreateSubject === 'function' && (
+            <button className="btn btn-ghost btn-sm" onClick={createFolderFromPrompt}>New Folder</button>
+          )}
         </div>
       </div>
-      <div className="maps-grid">
-        {displayOrder.map(mapId => {
-          const m = allMaps[mapId];
-          const isCustom = !!customMaps[m.id];
-          return (
-            <div
-              key={m.id}
-              className="maps-grid-card"
-              style={{
-                '--card-color': m.color,
-                outline: dragOverId === m.id ? '2px dashed var(--accent-amber)' : 'none',
-                opacity: draggedId === m.id ? 0.55 : 1,
-              }}
-              draggable
-              onDragStart={(e) => {
-                e.dataTransfer.effectAllowed = 'move';
-                setDraggedId(m.id);
-              }}
-              onDragOver={(e) => {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-                if (dragOverId !== m.id) setDragOverId(m.id);
-              }}
-              onDragLeave={() => {
-                if (dragOverId === m.id) setDragOverId(null);
-              }}
-              onDrop={(e) => {
-                e.preventDefault();
-                if (draggedId && draggedId !== m.id && typeof onReorderMap === 'function') {
-                  onReorderMap(draggedId, m.id);
-                }
-                setDragOverId(null);
-                setDraggedId(null);
-              }}
-              onDragEnd={() => {
-                setDraggedId(null);
-                setDragOverId(null);
-              }}
-              onClick={() => onEdit(m.id)}
-            >
-              <div
-                style={{
-                  fontSize: 11,
-                  opacity: 0.7,
-                  marginBottom: 6,
-                  userSelect: 'none',
-                  letterSpacing: 0.2,
-                }}
-                title="Drag to reorder sidebar topics"
-              >
-                ⋮⋮ Drag to reorder
+      <div className="folder-sections">
+        {sections.map((section) => (
+          <div
+            key={section.id}
+            className={`folder-section ${dragOverSubjectId === section.id ? 'drag-over' : ''}`}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = 'move';
+              if (dragOverSubjectId !== section.id) setDragOverSubjectId(section.id);
+            }}
+            onDragLeave={(e) => {
+              if (e.currentTarget.contains(e.relatedTarget)) return;
+              if (dragOverSubjectId === section.id) setDragOverSubjectId(null);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              if (draggedId && typeof onMoveToSubject === 'function') {
+                onMoveToSubject(draggedId, section.id);
+              }
+              setDragOverSubjectId(null);
+              setDragOverId(null);
+              setDraggedId(null);
+            }}
+          >
+            <div className="folder-section-header">
+              <div>
+                <div className="folder-section-title">{section.title}</div>
+                <div className="folder-section-meta">{section.mapIds.length} map{section.mapIds.length === 1 ? '' : 's'}</div>
               </div>
-              <div className="maps-grid-card-title">{m.title}</div>
-              <div className="maps-grid-card-meta">{m.description}</div>
-              <div className="maps-grid-card-stats">
-                <div className="maps-grid-card-stat"><span>{m.nodes.length}</span> nodes</div>
-                <div className="maps-grid-card-stat"><span>{m.edges.length}</span> edges</div>
-                {isCustom && <div className="maps-grid-card-stat" style={{color: 'var(--accent-amber)'}}>● local map</div>}
-                {isCustom && (
-                  <div className="maps-grid-card-stat" style={{color: m._published ? 'var(--accent-teal)' : 'var(--text-muted)'}}>
-                    {m._published ? '● published' : '● draft'}
-                  </div>
-                )}
-              </div>
-              {isCustom && (
-                <div className="maps-grid-card-actions">
-                  {typeof onTogglePublish === 'function' && (
-                    <button
-                      className="btn btn-ghost btn-sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onTogglePublish(m.id, !m._published);
-                      }}
-                    >
-                      {m._published ? 'Unpublish' : 'Publish'}
-                    </button>
-                  )}
-                  {typeof onExportMap === 'function' && (
-                    <button
-                      className="btn btn-ghost btn-sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onExportMap(m.id);
-                      }}
-                    >
-                      Export JSON
-                    </button>
-                  )}
-                </div>
+              {typeof onCreate === 'function' && (
+                <button className="btn btn-ghost btn-sm" onClick={() => onCreate(section.id)}>
+                  New Map
+                </button>
               )}
             </div>
-          );
-        })}
-        <div className="maps-grid-new" onClick={onCreate}>
+
+            <div className="maps-grid">
+              {section.mapIds.map((mapId) => {
+                const m = allMaps[mapId];
+                if (!m) return null;
+                const isCustom = !!customMaps[m.id];
+                return (
+                  <div
+                    key={m.id}
+                    className="maps-grid-card"
+                    style={{
+                      '--card-color': m.color,
+                      outline: dragOverId === m.id ? '2px dashed var(--accent-amber)' : 'none',
+                      opacity: draggedId === m.id ? 0.55 : 1,
+                    }}
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.effectAllowed = 'move';
+                      setDraggedId(m.id);
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = 'move';
+                      if (dragOverId !== m.id) setDragOverId(m.id);
+                    }}
+                    onDragLeave={() => {
+                      if (dragOverId === m.id) setDragOverId(null);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (draggedId && draggedId !== m.id) {
+                        if (typeof onMoveToSubject === 'function') {
+                          onMoveToSubject(draggedId, section.id);
+                        }
+                        if (typeof onReorderMap === 'function') {
+                          onReorderMap(draggedId, m.id);
+                        }
+                      }
+                      setDragOverSubjectId(null);
+                      setDragOverId(null);
+                      setDraggedId(null);
+                    }}
+                    onDragEnd={() => {
+                      setDraggedId(null);
+                      setDragOverId(null);
+                      setDragOverSubjectId(null);
+                    }}
+                    onClick={() => onEdit(m.id)}
+                  >
+                    <div
+                      style={{
+                        fontSize: 11,
+                        opacity: 0.7,
+                        marginBottom: 6,
+                        userSelect: 'none',
+                        letterSpacing: 0.2,
+                      }}
+                      title="Drag to reorder or move maps between folders"
+                    >
+                      ⋮⋮ Drag to reorder or move
+                    </div>
+                    <div className="maps-grid-card-title">{m.title}</div>
+                    <div className="maps-grid-card-meta">{m.description}</div>
+                    <div className="maps-grid-card-stats">
+                      <div className="maps-grid-card-stat"><span>{m.nodes.length}</span> nodes</div>
+                      <div className="maps-grid-card-stat"><span>{m.edges.length}</span> edges</div>
+                      {isCustom && <div className="maps-grid-card-stat" style={{color: 'var(--accent-amber)'}}>● local map</div>}
+                      {isCustom && (
+                        <div className="maps-grid-card-stat" style={{color: m._published ? 'var(--accent-teal)' : 'var(--text-muted)'}}>
+                          {m._published ? '● published' : '● draft'}
+                        </div>
+                      )}
+                    </div>
+                    {isCustom && (
+                      <div className="maps-grid-card-actions">
+                        {typeof onTogglePublish === 'function' && (
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onTogglePublish(m.id, !m._published);
+                            }}
+                          >
+                            {m._published ? 'Unpublish' : 'Publish'}
+                          </button>
+                        )}
+                        {typeof onExportMap === 'function' && (
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onExportMap(m.id);
+                            }}
+                          >
+                            Export JSON
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+              {section.mapIds.length === 0 && (
+                <div className="maps-grid-empty">Drop maps here or create a new map in this folder.</div>
+              )}
+            </div>
+          </div>
+        ))}
+
+        <div className="maps-grid-new" onClick={() => onCreate(sectionOrder[0] || 'general')}>
           <div className="maps-grid-new-icon">+</div>
           <div>New concept map</div>
         </div>

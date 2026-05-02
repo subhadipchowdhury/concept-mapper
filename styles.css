@@ -142,6 +142,15 @@ body {
   padding: 0 24px 12px;
 }
 
+.sidebar-folder-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 10px 24px 6px;
+}
+
 .sidebar-item {
   display: flex;
   flex-direction: column;
@@ -801,13 +810,68 @@ body {
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 24px;
 }
+.maps-manager-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 .maps-manager-title { font-size: 24px; font-weight: 700; letter-spacing: -0.4px; }
 .maps-manager-sub { font-size: 13px; color: var(--text-muted); }
+
+.folder-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.folder-section {
+  background: rgba(17, 20, 29, 0.72);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.folder-section.drag-over {
+  border-color: rgba(245, 158, 11, 0.8);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2) inset;
+}
+
+.folder-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.folder-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+}
+
+.folder-section-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+}
 
 .maps-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
+}
+
+.maps-grid-empty {
+  border: 1px dashed var(--border-2);
+  border-radius: 12px;
+  min-height: 108px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 14px;
 }
 
 .maps-grid-card {

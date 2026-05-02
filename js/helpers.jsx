@@ -374,6 +374,8 @@ function normalizeMapData(rawMap, fallbackId) {
     description: typeof map.description === 'string' ? map.description : '',
     color: typeof map.color === 'string' ? map.color : '#4f8ef7',
     accentColor: typeof map.accentColor === 'string' ? map.accentColor : '#a78bfa',
+    subjectId: typeof map.subjectId === 'string' ? map.subjectId : 'general',
+    subjectTitle: typeof map.subjectTitle === 'string' ? map.subjectTitle : 'General',
     nodes: safeNodes,
     edges: safeEdges,
   };
@@ -394,8 +396,8 @@ async function loadBuiltInMaps(manifestPath = MAP_MANIFEST_PATH) {
   const failures = [];
   const order = [];
 
-  await Promise.all(manifest.map(async (entry) => {
-    if (!entry || !entry.id || !entry.file) return;
+  for (const entry of manifest) {
+    if (!entry || !entry.id || !entry.file) continue;
     try {
       const resp = await fetch(entry.file, { cache: 'no-store' });
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -403,12 +405,23 @@ async function loadBuiltInMaps(manifestPath = MAP_MANIFEST_PATH) {
       const parsed = parseMapDataText(rawText, entry.file);
       const normalized = normalizeMapData(parsed, entry.id);
       const mapId = normalized.id || entry.id;
-      loadedMaps[mapId] = normalized;
+      const subjectId = typeof entry.subjectId === 'string' && entry.subjectId.trim()
+        ? entry.subjectId.trim()
+        : (typeof normalized.subjectId === 'string' && normalized.subjectId.trim() ? normalized.subjectId.trim() : 'general');
+      const subjectTitle = typeof entry.subjectTitle === 'string' && entry.subjectTitle.trim()
+        ? entry.subjectTitle.trim()
+        : (typeof normalized.subjectTitle === 'string' && normalized.subjectTitle.trim() ? normalized.subjectTitle.trim() : 'General');
+
+      loadedMaps[mapId] = {
+        ...normalized,
+        subjectId,
+        subjectTitle,
+      };
       order.push(mapId);
     } catch (err) {
       failures.push(`${entry.id}: ${err.message}`);
     }
-  }));
+  }
 
   return { maps: loadedMaps, failures, order };
 }
@@ -426,6 +439,29 @@ function downloadMapJSON(mapId, mapData) {
   const a = document.createElement('a');
   a.href = url;
   a.download = `${mapId}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function downloadManifestJSON(entries) {
+  if (!Array.isArray(entries)) return;
+  const payload = entries
+    .filter((entry) => entry && typeof entry.id === 'string' && typeof entry.file === 'string')
+    .map((entry) => ({
+      id: entry.id,
+      title: typeof entry.title === 'string' ? entry.title : entry.id,
+      file: entry.file,
+      subjectId: typeof entry.subjectId === 'string' ? entry.subjectId : 'general',
+      subjectTitle: typeof entry.subjectTitle === 'string' ? entry.subjectTitle : 'General',
+    }));
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'manifest.json';
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -451,6 +487,7 @@ Object.assign(window, {
   AnswerPopup,
   loadBuiltInMaps,
   downloadMapJSON,
+  downloadManifestJSON,
   loadProgress, saveProgress,
   loadCustomMaps, saveCustomMaps,
   loadMapOrder, saveMapOrder,

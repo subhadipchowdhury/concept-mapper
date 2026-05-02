@@ -3,6 +3,79 @@ const { useState: useStateApp, useEffect: useEffectApp, useRef: useRefApp } = Re
 
 const ADMIN_UNLOCK_KEY = 'conceptmapper_teacher_unlocked_v1';
 const ADMIN_STATIC_PASSPHRASE = 'SECRETPHRASE';
+const SUBJECTS_KEY = 'conceptmapper_subjects_v1';
+const SUBJECT_ORDER_KEY = 'conceptmapper_subject_order_v1';
+const DEFAULT_SUBJECT_ID = 'general';
+const DEFAULT_SUBJECT_TITLE = 'General';
+
+function normalizeSubjectId(subjectId) {
+  if (typeof subjectId !== 'string') return DEFAULT_SUBJECT_ID;
+  const cleaned = subjectId.trim();
+  return cleaned || DEFAULT_SUBJECT_ID;
+}
+
+function fallbackSubjectTitleFromId(subjectId) {
+  const source = normalizeSubjectId(subjectId);
+  if (source === DEFAULT_SUBJECT_ID) return DEFAULT_SUBJECT_TITLE;
+  const words = source
+    .replace(/[_-]+/g, ' ')
+    .split(' ')
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1));
+  return words.join(' ') || DEFAULT_SUBJECT_TITLE;
+}
+
+function getSubjectInfo(mapData) {
+  const id = normalizeSubjectId(mapData?.subjectId);
+  const title = typeof mapData?.subjectTitle === 'string' && mapData.subjectTitle.trim()
+    ? mapData.subjectTitle.trim()
+    : fallbackSubjectTitleFromId(id);
+  return { id, title };
+}
+
+function slugifySubjectId(title) {
+  const raw = (title || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s_-]/g, '')
+    .replace(/[\s_]+/g, '-');
+  return raw || 'subject';
+}
+
+function uniqueSubjectId(baseId, existingIds) {
+  if (!existingIds.has(baseId)) return baseId;
+  let n = 2;
+  while (existingIds.has(`${baseId}-${n}`)) n += 1;
+  return `${baseId}-${n}`;
+}
+
+function loadCustomSubjects() {
+  try {
+    const raw = localStorage.getItem(SUBJECTS_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveCustomSubjects(subjects) {
+  localStorage.setItem(SUBJECTS_KEY, JSON.stringify(subjects || {}));
+}
+
+function loadSubjectOrder() {
+  try {
+    const raw = localStorage.getItem(SUBJECT_ORDER_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveSubjectOrder(order) {
+  localStorage.setItem(SUBJECT_ORDER_KEY, JSON.stringify(Array.isArray(order) ? order : []));
+}
 
 function serializeProgress(progressObj) {
   const serializable = {};
@@ -78,6 +151,67 @@ function buildOrderedIds(preferredOrder, mapsObj) {
   return ids;
 }
 
+function buildSubjectCatalog(preferredOrder, mapsObj, customSubjects) {
+  const byId = {
+    [DEFAULT_SUBJECT_ID]: {
+      id: DEFAULT_SUBJECT_ID,
+      title: DEFAULT_SUBJECT_TITLE,
+      isCustom: false,
+    },
+  };
+
+  Object.values(mapsObj || {}).forEach((mapData) => {
+    const subject = getSubjectInfo(mapData);
+    if (!byId[subject.id]) {
+      byId[subject.id] = { id: subject.id, title: subject.title, isCustom: false };
+    }
+  });
+
+  Object.values(customSubjects || {}).forEach((subject) => {
+    if (!subject || typeof subject.id !== 'string') return;
+    const id = normalizeSubjectId(subject.id);
+    const title = typeof subject.title === 'string' && subject.title.trim()
+      ? subject.title.trim()
+      : fallbackSubjectTitleFromId(id);
+    byId[id] = { id, title, isCustom: true };
+  });
+
+  const orderedIds = buildOrderedIds(preferredOrder, byId);
+  return orderedIds.map((id) => byId[id]).filter(Boolean);
+}
+
+function buildSubjectSections(orderedMapIds, mapsObj, subjects) {
+  const sectionsById = {};
+  const baseOrder = [];
+
+  (subjects || []).forEach((subject) => {
+    if (!subject || typeof subject.id !== 'string') return;
+    sectionsById[subject.id] = {
+      ...subject,
+      maps: [],
+    };
+    baseOrder.push(subject.id);
+  });
+
+  (orderedMapIds || []).forEach((mapId) => {
+    const mapData = mapsObj?.[mapId];
+    if (!mapData) return;
+    const subject = getSubjectInfo(mapData);
+    if (!sectionsById[subject.id]) {
+      sectionsById[subject.id] = {
+        id: subject.id,
+        title: subject.title,
+        isCustom: false,
+        maps: [],
+      };
+      baseOrder.push(subject.id);
+    }
+    sectionsById[subject.id].maps.push(mapData);
+  });
+
+  return baseOrder.map((id) => sectionsById[id]).filter(Boolean);
+}
+
 function App() {
   const [view, setView] = useStateApp('student'); // 'student' | 'admin' | 'admin-edit'
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useStateApp(() => {
@@ -94,7 +228,9 @@ function App() {
   const [mapsLoadError, setMapsLoadError] = useStateApp('');
   const [allProgress, setAllProgress] = useStateApp(() => loadProgress());
   const [customMaps, setCustomMaps] = useStateApp(() => loadCustomMaps());
+  const [customSubjects, setCustomSubjects] = useStateApp(() => loadCustomSubjects());
   const [mapOrder, setMapOrder] = useStateApp(() => loadMapOrder());
+  const [subjectOrder, setSubjectOrder] = useStateApp(() => loadSubjectOrder());
   const [manifestOrder, setManifestOrder] = useStateApp([]);
   const [positions, setPositions] = useStateApp(() => loadPositions());
   const [toast, setToast] = useStateApp(null);
@@ -108,6 +244,8 @@ function App() {
   );
   const studentMaps = { ...builtInMaps, ...publishedCustomMaps };
   const adminMaps = { ...builtInMaps, ...customMaps };
+  const allSubjects = buildSubjectCatalog(subjectOrder, adminMaps, customSubjects);
+  const subjectTitleById = Object.fromEntries(allSubjects.map((s) => [s.id, s.title]));
 
   useEffectApp(() => {
     let cancelled = false;
@@ -141,6 +279,15 @@ function App() {
       saveMapOrder(nextOrder);
     }
   }, [builtInMaps, customMaps, manifestOrder, mapOrder]);
+
+  useEffectApp(() => {
+    const subjectLookup = Object.fromEntries(allSubjects.map((subject) => [subject.id, true]));
+    const nextOrder = buildOrderedIds(subjectOrder, subjectLookup);
+    if (!arraysEqual(nextOrder, subjectOrder)) {
+      setSubjectOrder(nextOrder);
+      saveSubjectOrder(nextOrder);
+    }
+  }, [allSubjects, subjectOrder]);
 
   useEffectApp(() => () => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -186,12 +333,43 @@ function App() {
   }
 
   function handleSaveCustomMap(mapId, mapData) {
-    const updated = { ...customMaps, [mapId]: mapData };
+    const subject = getSubjectInfo(mapData);
+    const resolvedTitle = subjectTitleById[subject.id] || subject.title;
+    const normalized = {
+      ...mapData,
+      subjectId: subject.id,
+      subjectTitle: resolvedTitle,
+    };
+    const updated = { ...customMaps, [mapId]: normalized };
     setCustomMaps(updated);
     saveCustomMaps(updated);
   }
 
-  function handleCreateNewMap() {
+  function handleCreateSubject(title) {
+    const cleanedTitle = (title || '').trim();
+    if (!cleanedTitle) return null;
+    const existingIds = new Set(allSubjects.map((subject) => subject.id));
+    const baseId = slugifySubjectId(cleanedTitle);
+    const subjectId = uniqueSubjectId(baseId, existingIds);
+    const nextSubjects = {
+      ...customSubjects,
+      [subjectId]: {
+        id: subjectId,
+        title: cleanedTitle,
+      },
+    };
+    const nextOrder = [...subjectOrder.filter((id) => id !== subjectId), subjectId];
+    setCustomSubjects(nextSubjects);
+    saveCustomSubjects(nextSubjects);
+    setSubjectOrder(nextOrder);
+    saveSubjectOrder(nextOrder);
+    showToast(`Created folder "${cleanedTitle}".`, 'success');
+    return subjectId;
+  }
+
+  function handleCreateNewMap(subjectId) {
+    const safeSubjectId = normalizeSubjectId(subjectId || allSubjects[0]?.id || DEFAULT_SUBJECT_ID);
+    const safeSubjectTitle = subjectTitleById[safeSubjectId] || fallbackSubjectTitleFromId(safeSubjectId);
     const id = 'custom_' + Date.now().toString(36);
     const newMap = {
       id,
@@ -199,6 +377,8 @@ function App() {
       description: 'Click "Edit" to add a description',
       color: '#4f8ef7',
       accentColor: '#a78bfa',
+      subjectId: safeSubjectId,
+      subjectTitle: safeSubjectTitle,
       nodes: [],
       edges: [],
       _published: false,
@@ -227,6 +407,42 @@ function App() {
       saveMapOrder(next);
       return next;
     });
+  }
+
+  function handleMoveMapToSubject(mapId, subjectId) {
+    const mapData = adminMaps[mapId];
+    if (!mapData) return;
+    const safeSubjectId = normalizeSubjectId(subjectId);
+    const safeSubjectTitle = subjectTitleById[safeSubjectId] || fallbackSubjectTitleFromId(safeSubjectId);
+    handleSaveCustomMap(mapId, {
+      ...mapData,
+      subjectId: safeSubjectId,
+      subjectTitle: safeSubjectTitle,
+    });
+  }
+
+  function handleExportManifestJSON() {
+    const orderedIds = buildOrderedIds(mapOrder, adminMaps);
+    const entries = orderedIds
+      .map((mapId) => adminMaps[mapId])
+      .filter(Boolean)
+      .filter((mapData) => {
+        if (!customMaps[mapData.id]) return true;
+        return !!mapData._published;
+      })
+      .map((mapData) => {
+        const subject = getSubjectInfo(mapData);
+        return {
+          id: mapData.id,
+          title: mapData.title,
+          file: `data/maps/${mapData.id}.json`,
+          subjectId: subject.id,
+          subjectTitle: subjectTitleById[subject.id] || subject.title,
+        };
+      });
+
+    downloadManifestJSON(entries);
+    showToast('Manifest exported. Repo manager should replace data/maps/manifest.json.', 'success');
   }
 
   function handleEditMap(mapId) {
@@ -279,7 +495,13 @@ function App() {
           if (!ok) return;
         }
 
-        handleSaveCustomMap(parsed.id, { ...parsed, _published: false });
+        const subject = getSubjectInfo(parsed);
+        handleSaveCustomMap(parsed.id, {
+          ...parsed,
+          subjectId: subject.id,
+          subjectTitle: subjectTitleById[subject.id] || subject.title,
+          _published: false,
+        });
         setEditingMapId(parsed.id);
         setView('admin-edit');
         showToast(`Imported map "${parsed.title}".`, 'success');
@@ -405,10 +627,13 @@ function App() {
 
   const mapData = studentMaps[activeMapId];
   const editingMap = editingMapId ? adminMaps[editingMapId] : null;
-  const orderedStudentMaps = buildOrderedIds(mapOrder, studentMaps)
-    .map((id) => studentMaps[id])
-    .filter(Boolean);
+  const orderedStudentMapIds = buildOrderedIds(mapOrder, studentMaps);
   const orderedAdminMapIds = buildOrderedIds(mapOrder, adminMaps);
+  const studentSections = buildSubjectSections(
+    orderedStudentMapIds,
+    studentMaps,
+    allSubjects
+  ).filter((section) => section.maps.length > 0);
 
   return (
     <div className={`app-shell ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
@@ -458,44 +683,49 @@ function App() {
 
       <aside className="sidebar">
         <div className="sidebar-section-title">Topics</div>
-        {orderedStudentMaps.map(m => {
-          const prog = getProgress(m.id);
-          const total = m.edges.length;
-          const done = (prog.answeredEdges || new Set()).size;
-          const pct = total > 0 ? (done / total) * 100 : 0;
-          return (
-            <div
-              key={m.id}
-              className={`sidebar-item ${activeMapId === m.id && view === 'student' ? 'active' : ''}`}
-              style={{'--item-color': m.color}}
-              onClick={() => {
-                setActiveMapId(m.id);
-                setView('student');
-                try {
-                  if (window.matchMedia('(max-width: 760px)').matches) {
-                    setIsSidebarCollapsed(true);
-                  }
-                } catch {}
-              }}
-            >
-              <div className="sidebar-item-title">
-                <div className="sidebar-item-dot" style={{background: m.color}}></div>
-                {m.title}
-              </div>
-              <div className="sidebar-item-desc">{m.description}</div>
-              <div className="sidebar-item-progress">
+        {studentSections.map((section) => (
+          <React.Fragment key={section.id}>
+            <div className="sidebar-folder-title">{section.title}</div>
+            {section.maps.map((m) => {
+              const prog = getProgress(m.id);
+              const total = m.edges.length;
+              const done = (prog.answeredEdges || new Set()).size;
+              const pct = total > 0 ? (done / total) * 100 : 0;
+              return (
                 <div
-                  className="sidebar-item-progress-fill"
-                  style={{ width: `${pct}%`, background: m.color }}
-                ></div>
-              </div>
-              <div className="sidebar-item-stats">
-                <span>{done}/{total} edges</span>
-                <span>{Math.round(pct)}%</span>
-              </div>
-            </div>
-          );
-        })}
+                  key={m.id}
+                  className={`sidebar-item ${activeMapId === m.id && view === 'student' ? 'active' : ''}`}
+                  style={{'--item-color': m.color}}
+                  onClick={() => {
+                    setActiveMapId(m.id);
+                    setView('student');
+                    try {
+                      if (window.matchMedia('(max-width: 760px)').matches) {
+                        setIsSidebarCollapsed(true);
+                      }
+                    } catch {}
+                  }}
+                >
+                  <div className="sidebar-item-title">
+                    <div className="sidebar-item-dot" style={{background: m.color}}></div>
+                    {m.title}
+                  </div>
+                  <div className="sidebar-item-desc">{m.description}</div>
+                  <div className="sidebar-item-progress">
+                    <div
+                      className="sidebar-item-progress-fill"
+                      style={{ width: `${pct}%`, background: m.color }}
+                    ></div>
+                  </div>
+                  <div className="sidebar-item-stats">
+                    <span>{done}/{total} edges</span>
+                    <span>{Math.round(pct)}%</span>
+                  </div>
+                </div>
+              );
+            })}
+          </React.Fragment>
+        ))}
         {isAdminUnlocked && (
           <>
             <div className="sidebar-divider"></div>
@@ -542,12 +772,16 @@ function App() {
         {view === 'admin' && (
           <MapsManager
             allMaps={adminMaps}
+            subjects={allSubjects}
             orderedMapIds={orderedAdminMapIds}
             customMaps={customMaps}
             onEdit={handleEditMap}
             onCreate={handleCreateNewMap}
+            onCreateSubject={handleCreateSubject}
             onExportMap={handleExportMapJSON}
+            onExportManifest={handleExportManifestJSON}
             onReorderMap={handleReorderMaps}
+            onMoveToSubject={handleMoveMapToSubject}
             onImportMap={triggerImportCustomMap}
             onTogglePublish={handleTogglePublish}
           />
