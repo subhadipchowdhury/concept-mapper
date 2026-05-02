@@ -713,6 +713,9 @@ function App() {
     allSubjects
   ).filter((section) => section.maps.length > 0);
   const studentSectionIds = studentSections.map((section) => section.id);
+  const activeSectionTitle = activeMapId
+    ? studentSections.find((section) => section.maps.some((m) => m.id === activeMapId))?.title || 'Maps'
+    : 'Maps';
 
   useEffectApp(() => {
     const valid = new Set(studentSections.map((section) => section.id));
@@ -779,6 +782,23 @@ function App() {
           <img className="topbar-logo-mark-img" src="assets/brand/concept-mapper-mark.svg" alt="" aria-hidden="true" />
           <img className="topbar-logo-banner" src="assets/brand/concept-mapper-banner.svg" alt="Concept Mapper. See how ideas connect." />
         </div>
+        {view === 'student' && mapData && (
+          <div className="topbar-context" title={`${activeSectionTitle} › ${mapData.title}`}>
+            <span className="topbar-context-path">{activeSectionTitle} › {mapData.title}</span>
+            <button
+              className="topbar-context-reset"
+              onClick={() => {
+                if (confirm('Clear your answers for this map? Your custom node positions will stay as they are.')) {
+                  handleProgress(activeMapId, { answeredEdges: new Set() });
+                }
+              }}
+              title="Clear your answers for this map"
+              aria-label="Reset answers"
+            >
+              ↺
+            </button>
+          </div>
+        )}
         <div className="topbar-spacer"></div>
         {view === 'student' && (
           <>
@@ -913,26 +933,6 @@ function App() {
         )}
         {view === 'student' && mapData && (
           <div className="student-view-wrapper">
-            {activeMapId && (
-              <div className="breadcrumb">
-                <div className="breadcrumb-row">
-                  <div className="breadcrumb-path">
-                    {studentSections.find(s => s.maps.some(m => m.id === activeMapId))?.title || 'Maps'} › {mapData.title}
-                  </div>
-                  <button
-                    className="btn btn-ghost breadcrumb-reset-btn"
-                    onClick={() => {
-                      if (confirm('Clear your answers for this map? Your custom node positions will stay as they are.')) {
-                        handleProgress(activeMapId, { answeredEdges: new Set() });
-                      }
-                    }}
-                    title="Clear your answers for this map"
-                  >
-                    ↺ Reset answers
-                  </button>
-                </div>
-              </div>
-            )}
             <div className="map-canvas-area">
               <ConceptMap
                 key={activeMapId}

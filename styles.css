@@ -77,6 +77,46 @@ body {
   max-width: min(36vw, 282px);
 }
 
+.topbar-context {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: min(42vw, 540px);
+  padding: 5px 8px 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg3);
+}
+
+.topbar-context-path {
+  font-size: 12px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar-context-reset {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.topbar-context-reset:hover {
+  background: var(--bg4);
+  color: var(--text);
+  border-color: var(--border-2);
+}
+
 .topbar-spacer { flex: 1; }
 
 .topbar-btn {
@@ -276,36 +316,6 @@ body {
   flex: 1;
   position: relative;
   overflow: hidden;
-}
-
-.breadcrumb {
-  padding: 12px 24px;
-  font-size: 13px;
-  color: var(--text-dim);
-  border-bottom: 1px solid var(--border);
-  background: var(--bg3);
-  flex-shrink: 0;
-}
-
-.breadcrumb-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.breadcrumb-path {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.breadcrumb-reset-btn {
-  padding: 6px 10px;
-  font-size: 12px;
-  white-space: nowrap;
-  flex-shrink: 0;
 }
 
 .map-area::before {
@@ -1204,6 +1214,14 @@ body {
     max-width: min(40vw, 240px);
   }
 
+  .topbar-context {
+    max-width: min(34vw, 380px);
+  }
+
+  .topbar-context-path {
+    font-size: 11.5px;
+  }
+
   .topbar-btn {
     padding: 7px 10px;
     font-size: 12px;
@@ -1334,25 +1352,23 @@ body {
     right: 10px;
   }
 
-  .breadcrumb {
-    padding: 10px 12px;
+  .topbar-context {
+    max-width: none;
+    margin-left: auto;
+    padding: 0;
+    border: none;
+    background: transparent;
   }
 
-  .breadcrumb-row {
-    align-items: stretch;
-    gap: 8px;
-    flex-direction: column;
+  .topbar-context-path {
+    display: none;
   }
 
-  .breadcrumb-path {
-    white-space: normal;
-    line-height: 1.35;
-  }
-
-  .breadcrumb-reset-btn {
-    width: 100%;
-    justify-content: center;
-    min-height: 36px;
+  .topbar-context-reset {
+    width: 32px;
+    height: 32px;
+    border-color: var(--border);
+    background: var(--bg3);
   }
 
   .map-title {
