@@ -117,7 +117,7 @@ function _cipherXB64(str) {
   const bytes = new TextEncoder().encode(str);
   let raw = '';
   for (let i = 0; i < bytes.length; i++) {
-    raw += String.fromCharCode(bytes[i] ^ key.charCodeAt(i % key.length));
+    raw += String.fromCharCode(bytes[i] ^ (key.charCodeAt(i % key.length) & 0xFF));
   }
   return btoa(raw);
 }
@@ -126,7 +126,7 @@ function _decipherXB64(encoded) {
   const raw = atob(encoded);
   const bytes = new Uint8Array(raw.length);
   for (let i = 0; i < raw.length; i++) {
-    bytes[i] = raw.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+    bytes[i] = raw.charCodeAt(i) ^ (key.charCodeAt(i % key.length) & 0xFF);
   }
   return new TextDecoder().decode(bytes);
 }
