@@ -1,4 +1,4 @@
-﻿{
+{
   "id": "funcSequences",
   "title": "Sequences & Series of Functions",
   "description": "Module 3 — theorem spine plus canonical examples and counterexamples",
@@ -208,7 +208,7 @@
       "id": "f_e1",
       "from": "fseq",
       "to": "pw",
-      "label": "if you fix \\(x\\) first and then let \\(n\\to\\infty\\), that is \\_\\_\\_ convergence",
+      "label": "if you fix \\(x\\) first and then let \\(n\\to\\infty\\), what type of convergence is this?",
       "answer": "pointwise",
       "type": "fillin",
       "hint": "The index threshold may depend on the point \\(x\\)."
@@ -217,7 +217,7 @@
       "id": "f_e2",
       "from": "fseq",
       "to": "unif",
-      "label": "if one \\(N\\) works for every \\(x\\in E\\), the convergence is \\_\\_\\_",
+      "label": "if one \\(N\\) works for every \\(x\\in E\\), what type of convergence is this?",
       "answer": "uniform",
       "type": "fillin",
       "hint": "The same index bound works across the whole domain."
@@ -226,7 +226,7 @@
       "id": "f_e3",
       "from": "unif",
       "to": "ucrit",
-      "label": "equivalent criterion: \\(\\sup_{x\\in E}|f_n(x)-f(x)|\\) \\to \\_\\_\\_",
+      "label": "in the equivalent criterion, \\(\\sup_{x\\in E}|f_n(x)-f(x)|\\) tends to what value?",
       "answer": "0",
       "type": "fillin",
       "hint": "Uniform convergence is convergence in the sup norm."
@@ -235,7 +235,7 @@
       "id": "f_e4",
       "from": "pw",
       "to": "limf",
-      "label": "the function \\(f(x)=\\lim_n f_n(x)\\) is the \\_\\_\\_ function",
+      "label": "the function \\(f(x)=\\lim_n f_n(x)\\) is called the ___ function; fill in the missing word.",
       "answer": "limit",
       "type": "fillin",
       "hint": "It is defined point by point from the sequence."
@@ -244,7 +244,7 @@
       "id": "f_e5",
       "from": "unif",
       "to": "cont",
-      "label": "uniform limit of continuous functions is automatically \\_\\_\\_",
+      "label": "a uniform limit of continuous functions is automatically what?",
       "answer": "continuous",
       "type": "fillin",
       "hint": "This is the standard uniform limit theorem."
@@ -253,7 +253,7 @@
       "id": "f_e6",
       "from": "unif",
       "to": "integ",
-      "label": "on a compact interval, uniform convergence lets limit and integral \\_\\_\\_",
+      "label": "on a compact interval, uniform convergence lets the limit and integral do what?",
       "answer": "commute",
       "type": "dropdown",
       "options": [
@@ -268,7 +268,7 @@
       "id": "f_e7",
       "from": "unif",
       "to": "diffthm",
-      "label": "to conclude \\(f_n'\\to f'\\), uniform convergence of \\(f_n\\) alone is \\_\\_\\_",
+      "label": "to conclude \\(f_n'\\to f'\\), uniform convergence of \\(f_n\\) alone is what?",
       "answer": "insufficient",
       "type": "fillin",
       "hint": "You also need control of the derivative sequence, plus convergence at a point."
@@ -277,7 +277,7 @@
       "id": "f_e8",
       "from": "fseq",
       "to": "fseries",
-      "label": "a sum \\(\\sum f_n(x)\\) is a \\_\\_\\_ of functions",
+      "label": "a sum \\(\\sum f_n(x)\\) is called a ___ of functions; fill in the term.",
       "answer": "series",
       "type": "fillin",
       "hint": "Its convergence is defined through partial sums."
@@ -286,7 +286,7 @@
       "id": "f_e9",
       "from": "fseries",
       "to": "partial",
-      "label": "the sequence used to test convergence is the sequence of \\_\\_\\_ sums",
+      "label": "the sequence used to test convergence is the sequence of ___ sums; fill in the term.",
       "answer": "partial",
       "type": "fillin",
       "hint": "Stop the infinite sum at a finite index \\(N\\)."
@@ -295,7 +295,7 @@
       "id": "f_e10",
       "from": "partial",
       "to": "mtest",
-      "label": "if \\(|f_n(x)|\\le M_n\\) and \\(\\sum M_n\\) converges, then \\(\\sum f_n\\) converges \\_\\_\\_ and absolutely",
+      "label": "if \\(|f_n(x)|\\le M_n\\) and \\(\\sum M_n\\) converges, then \\(\\sum f_n\\) converges ___ and absolutely.",
       "answer": "uniformly",
       "type": "dropdown",
       "options": [
@@ -310,7 +310,7 @@
       "id": "f_e11",
       "from": "fseries",
       "to": "power",
-      "label": "a power series has terms of the form coefficient times \\_\\_\\_",
+      "label": "a power series has terms of the form coefficient times what?",
       "answer": "(x-c)^n",
       "type": "fillin",
       "hint": "The exponent is the varying part; the center stays fixed."
@@ -319,7 +319,7 @@
       "id": "f_e12",
       "from": "power",
       "to": "center",
-      "label": "in \\(\\sum a_n(x-c)^n\\), the constant \\(c\\) is the \\_\\_\\_ of the series",
+      "label": "in \\(\\sum a_n(x-c)^n\\), the constant \\(c\\) is called the ___ of the series.",
       "answer": "center",
       "type": "fillin",
       "hint": "The powers are measured relative to this point."
@@ -328,7 +328,7 @@
       "id": "f_e13",
       "from": "power",
       "to": "radius",
-      "label": "there is a number \\(R\\) such that the series converges absolutely for \\(|x-c|<\\_\\_\\_\\)",
+      "label": "when \\(|x-c|\\) is less than which constant?",
       "answer": "R",
       "type": "fillin",
       "hint": "This number sets the interior convergence region."
@@ -337,7 +337,7 @@
       "id": "f_e14",
       "from": "radius",
       "to": "interval",
-      "label": "at the endpoints \\(|x-c|=R\\), convergence must be checked \\_\\_\\_",
+      "label": "at the endpoints \\(|x-c|=R\\), convergence must be checked how?",
       "answer": "separately",
       "type": "fillin",
       "hint": "The radius alone does not decide boundary behavior."
@@ -346,7 +346,7 @@
       "id": "f_e15",
       "from": "radius",
       "to": "compact",
-      "label": "on every closed interval strictly inside \\(|x-c|<R\\), convergence is absolute and \\_\\_\\_",
+      "label": "on every closed interval strictly inside \\(|x-c|<R\\), convergence is absolute and what kind of convergence?",
       "answer": "uniform",
       "type": "fillin",
       "hint": "This is the local uniformity that makes power series well behaved."
@@ -355,8 +355,8 @@
       "id": "f_e16",
       "from": "power",
       "to": "termops",
-      "label": "inside the interval of convergence, power series can be differentiated and integrated \\_\\_\\_ by term",
-      "answer": "termwise",
+      "label": "inside the interval of convergence, power series can be differentiated and integrated ___ by term.",
+      "answer": "term",
       "type": "fillin",
       "hint": "The operation is applied one summand at a time."
     },
@@ -364,7 +364,7 @@
       "id": "f_e17",
       "from": "termops",
       "to": "tseries",
-      "label": "if \\(a_n=f^{(n)}(c)/n!\\), the power series becomes the \\_\\_\\_ series of \\(f\\)",
+      "label": "if \\(a_n=f^{(n)}(c)/n!\\), the power series is the ___ series of \\(f\\).",
       "answer": "Taylor",
       "type": "fillin",
       "hint": "Its coefficients come from derivatives at the center."
@@ -373,7 +373,7 @@
       "id": "f_e18",
       "from": "tseries",
       "to": "tpoly",
-      "label": "the finite truncation of a Taylor series is the Taylor \\_\\_\\_",
+      "label": "the finite truncation of a Taylor series is called the Taylor ___.",
       "answer": "polynomial",
       "type": "fillin",
       "hint": "It is the partial sum through degree \\(n\\)."
@@ -382,7 +382,7 @@
       "id": "f_e19",
       "from": "tseries",
       "to": "maclaurin",
-      "label": "a Taylor series centered at \\(0\\) is called a \\_\\_\\_ series",
+      "label": "a Taylor series centered at \\(0\\) is called a ___ series.",
       "answer": "Maclaurin",
       "type": "fillin",
       "hint": "It is the special case centered at the origin."
@@ -391,7 +391,7 @@
       "id": "f_e20",
       "from": "tpoly",
       "to": "remainder",
-      "label": "the approximation error \\(f(x)-T_n(x)\\) is the \\_\\_\\_ term",
+      "label": "the approximation error \\(f(x)-T_n(x)\\) is called the ___ term.",
       "answer": "remainder",
       "type": "fillin",
       "hint": "It measures what the polynomial approximation leaves out."
@@ -400,7 +400,7 @@
       "id": "f_e21",
       "from": "remainder",
       "to": "taylorthm",
-      "label": "Taylor's theorem gives a formula or bound for the \\_\\_\\_",
+      "label": "Taylor's theorem gives a formula or bound for the ___ term.",
       "answer": "remainder",
       "type": "fillin",
       "hint": "This is the quantitative control of approximation error."
@@ -409,7 +409,7 @@
       "id": "f_e22",
       "from": "taylorthm",
       "to": "analytic",
-      "label": "if a function equals its Taylor series on a neighborhood, it is \\_\\_\\_",
+      "label": "if a function equals its Taylor series on a neighborhood, it is ___.",
       "answer": "analytic",
       "type": "fillin",
       "hint": "Smoothness alone is not enough; equality with the series is the key."
@@ -418,7 +418,7 @@
       "id": "f_e23",
       "from": "pw",
       "to": "xnexample",
-      "label": "classic example separating modes: \\(f_n(x)=x^n\\) on \\([0,1]\\) converges \\_\\_\\_",
+      "label": "classic example separating modes: \\(f_n(x)=x^n\\) on \\([0,1]\\) converges in what sense?",
       "answer": "pointwise",
       "type": "fillin",
       "hint": "The threshold depends on how close \\(x\\) is to 1."
@@ -427,7 +427,7 @@
       "id": "f_e24",
       "from": "xnexample",
       "to": "xnlimit",
-      "label": "for this example, the limit values are \\_\\_\\_ on \\([0,1)\\) and 1 at \\(x=1\\)",
+      "label": "for this example, the limit value on \\([0,1)\\) is ___.",
       "answer": "0",
       "type": "fillin",
       "hint": "This jump at \\(x=1\\) explains why convergence is not uniform on \\([0,1]\\)."
@@ -436,7 +436,7 @@
       "id": "f_e25",
       "from": "mtest",
       "to": "expseries",
-      "label": "on \\(|x|\\le R\\), choose \\(M_n=R^n/n!\\); then \\(e^x\\) series converges \\_\\_\\_",
+      "label": "on \\(|x|\\le R\\), choose \\(M_n=R^n/n!\\); then the \\(e^x\\) series converges ___.",
       "answer": "uniformly",
       "type": "fillin",
       "hint": "The majorant \\(\\sum R^n/n!\\) converges."
@@ -445,7 +445,7 @@
       "id": "f_e26",
       "from": "interval",
       "to": "logseries",
-      "label": "for \\(\\ln(1+x)\\) around 0, the radius of convergence is \\_\\_\\_",
+      "label": "for \\(\\ln(1+x)\\) around 0, what is the radius of convergence?",
       "answer": "1",
       "type": "fillin",
       "hint": "Converges for \\(|x|<1\\), with endpoint behavior checked separately."
@@ -454,7 +454,7 @@
       "id": "f_e27",
       "from": "taylorthm",
       "to": "flatcounter",
-      "label": "all derivatives at 0 can vanish while \\(f\\neq\\sum T_n\\); smooth does NOT imply \\_\\_\\_",
+      "label": "all derivatives at 0 can vanish while \\(f\\neq\\sum T_n\\); smooth does NOT imply ___.",
       "answer": "analytic",
       "type": "fillin",
       "hint": "This is the standard real-analysis counterexample."

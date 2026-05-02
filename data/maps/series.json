@@ -167,7 +167,7 @@
       "id": "r_e1",
       "from": "seq",
       "to": "series",
-      "label": "concept check: \\(\\sum a_n\\) is an \\_\\_\\_ infinite sum of sequence terms",
+      "label": "concept check: \\(\\sum a_n\\) is what kind of infinite sum of sequence terms?",
       "answer": "ordered",
       "type": "dropdown",
       "options": [
@@ -182,7 +182,7 @@
       "id": "r_e2",
       "from": "series",
       "to": "partial",
-      "label": "for \\(s_n=\\sum_{k=1}^n a_k\\), truncation happens at a \\_\\_\\_ index",
+      "label": "for \\(s_n=\\sum_{k=1}^n a_k\\), truncation happens at what kind of index?",
       "answer": "finite",
       "type": "dropdown",
       "options": [
@@ -197,7 +197,7 @@
       "id": "r_e3",
       "from": "partial",
       "to": "conv",
-      "label": "definition-level: \\(\\sum a_n\\) converges iff \\(\\{s_n\\}\\) \\_\\_\\_",
+      "label": "definition-level: \\(\\sum a_n\\) converges iff which statement about \\(\\{s_n\\}\\) is true?",
       "answer": "has a finite limit",
       "type": "dropdown",
       "options": [
@@ -212,7 +212,7 @@
       "id": "r_e4",
       "from": "partial",
       "to": "div",
-      "label": "implication check: \\(\\sum a_n\\) diverges iff \\(\\{s_n\\}\\) \\_\\_\\_",
+      "label": "implication check: \\(\\sum a_n\\) diverges iff which statement about \\(\\{s_n\\}\\) is true?",
       "answer": "fails to converge",
       "type": "dropdown",
       "options": [
@@ -227,7 +227,7 @@
       "id": "r_e5",
       "from": "series",
       "to": "divtest",
-      "label": "contrapositive use: if \\(a_n \\not\\to 0\\), then \\(\\sum a_n\\) \\_\\_\\_",
+      "label": "contrapositive use: if \\(a_n \\not\\to 0\\), then which conclusion follows for \\(\\sum a_n\\)?",
       "answer": "must diverge",
       "type": "dropdown",
       "options": [
@@ -242,7 +242,7 @@
       "id": "r_e6",
       "from": "series",
       "to": "cauchyser",
-      "label": "Cauchy criterion (series tails): for every \\(\\varepsilon>0\\), there exists \\(N\\) such that \\(|a_{m+1}+\\cdots+a_n|\\) \\_\\_\\_",
+      "label": "Cauchy criterion (series tails): for every \\(\\varepsilon>0\\), there exists \\(N\\) such that which bound holds for \\(|a_{m+1}+\\cdots+a_n|\\)?",
       "answer": "< ε for all n>m≥N",
       "type": "dropdown",
       "options": [
@@ -257,7 +257,7 @@
       "id": "r_e7",
       "from": "conv",
       "to": "geom",
-      "label": "for geometric series, convergence occurs exactly when \\(|r|\\) lies \\_\\_\\_ the unit threshold",
+      "label": "for geometric series, convergence occurs exactly when \\(|r|\\) lies where relative to the unit threshold?",
       "answer": "strictly below",
       "type": "dropdown",
       "options": [
@@ -272,7 +272,7 @@
       "id": "r_e8",
       "from": "div",
       "to": "harmonic",
-      "label": "harmonic proof idea: grouping terms in blocks shows partial sums grow without bound, so they are \\_\\_\\_",
+      "label": "harmonic proof idea: grouping terms in blocks shows partial sums grow without bound, so the partial sums are ___.",
       "answer": "unbounded",
       "type": "dropdown",
       "options": [
@@ -287,7 +287,7 @@
       "id": "r_e9",
       "from": "harmonic",
       "to": "pseries",
-      "label": "p-series threshold: convergence starts only once \\(p\\) is \\_\\_\\_ 1",
+      "label": "p-series threshold: convergence starts only once \\(p\\) is what relative to 1?",
       "answer": "strictly above",
       "type": "dropdown",
       "options": [
@@ -302,7 +302,7 @@
       "id": "r_e10",
       "from": "partial",
       "to": "mctser",
-      "label": "proof step: if \\(a_n\\ge 0\\) and partial sums are bounded above, then \\(\\{s_n\\}\\) \\_\\_\\_",
+      "label": "proof step: if \\(a_n\\ge 0\\) and partial sums are bounded above, then \\(\\{s_n\\}\\) has which property?",
       "answer": "has a finite limit",
       "type": "dropdown",
       "options": [
@@ -317,7 +317,7 @@
       "id": "r_e11",
       "from": "mctser",
       "to": "integral",
-      "label": "integral-test proof step: compare rectangles with area under \\(f\\), so \\(f\\) should be eventually \\_\\_\\_",
+      "label": "integral-test proof step: compare rectangles with area under \\(f\\), so \\(f\\) should eventually be ___.",
       "answer": "decreasing",
       "type": "dropdown",
       "options": [
@@ -332,7 +332,7 @@
       "id": "r_e12",
       "from": "integral",
       "to": "pseries",
-      "label": "integral criterion for \\(x^{-p}\\): finite area on \\([1,\\infty)\\) appears when \\(p\\) is \\_\\_\\_ 1",
+      "label": "integral criterion for \\(x^{-p}\\): finite area on \\([1,\\infty)\\) appears when \\(p\\) is what relative to 1?",
       "answer": "greater than",
       "type": "dropdown",
       "options": [
@@ -347,7 +347,7 @@
       "id": "r_e13",
       "from": "mctser",
       "to": "directcmp",
-      "label": "direct comparison (eventual nonnegative order): if \\(0\\le b_n\\le a_n\\) for all large \\(n\\), and \\(\\sum b_n\\) diverges, then \\(\\sum a_n\\) \\_\\_\\_",
+      "label": "direct comparison (eventual nonnegative order): if \\(0\\le b_n\\le a_n\\) for all large \\(n\\), and \\(\\sum b_n\\) diverges, then \\(\\sum a_n\\) ___.",
       "answer": "diverges",
       "type": "dropdown",
       "options": [
@@ -362,7 +362,7 @@
       "id": "r_e14",
       "from": "directcmp",
       "to": "limcmp",
-      "label": "limit comparison: if \\(\\lim a_n/b_n = L \\in (0, \\infty)\\), then the two series \\_\\_\\_",
+      "label": "limit comparison: if \\(\\lim a_n/b_n = L \\in (0, \\infty)\\), then the two series ___.",
       "answer": "both converge or both diverge",
       "type": "dropdown",
       "options": [
@@ -377,7 +377,7 @@
       "id": "r_e15",
       "from": "geom",
       "to": "ratio",
-      "label": "ratio test: if \\(L=\\lim |a_{n+1}/a_n|<1\\), then \\(\\sum a_n\\) converges \\_\\_\\_",
+      "label": "ratio test: if \\(L=\\lim |a_{n+1}/a_n|<1\\), then \\(\\sum a_n\\) converges ___.",
       "answer": "absolutely",
       "type": "dropdown",
       "options": [
@@ -392,7 +392,7 @@
       "id": "r_e16",
       "from": "geom",
       "to": "root",
-      "label": "root test: if \\(\\limsup |a_n|^{1/n} < 1\\), then \\(\\sum a_n\\) converges \\_\\_\\_",
+      "label": "root test: if \\(\\limsup |a_n|^{1/n} < 1\\), then \\(\\sum a_n\\) converges ___.",
       "answer": "absolutely",
       "type": "dropdown",
       "options": [
@@ -407,7 +407,7 @@
       "id": "r_e17",
       "from": "series",
       "to": "alt",
-      "label": "a \\((-1)^n\\) factor enforces sign \\_\\_\\_ across successive terms",
+      "label": "a \\((-1)^n\\) factor enforces what sign pattern across successive terms (one word)?",
       "answer": "alternation",
       "type": "dropdown",
       "options": [
@@ -422,7 +422,7 @@
       "id": "r_e18",
       "from": "alt",
       "to": "leibniz",
-      "label": "Leibniz precision: eventual decrease plus \\(b_n\\) \\_\\_\\_ is sufficient for convergence",
+      "label": "Leibniz precision: eventual decrease plus \\(b_n\\) doing what is sufficient for convergence (one word)?",
       "answer": "vanishing",
       "type": "dropdown",
       "options": [
@@ -452,7 +452,7 @@
       "id": "r_e20",
       "from": "abs",
       "to": "abstest",
-      "label": "test-setup step: absolute-convergence checks are run on term \\_\\_\\_",
+      "label": "test-setup step: absolute-convergence checks are run on which part of each term?",
       "answer": "magnitudes",
       "type": "dropdown",
       "options": [
@@ -467,7 +467,7 @@
       "id": "r_e21",
       "from": "abstest",
       "to": "cond",
-      "label": "if \\(\\sum a_n\\) converges but \\(\\sum |a_n|\\) diverges, convergence relies on sign \\_\\_\\_",
+      "label": "if \\(\\sum a_n\\) converges but \\(\\sum |a_n|\\) diverges, convergence relies on which sign effect?",
       "answer": "cancellation",
       "type": "dropdown",
       "options": [
@@ -482,7 +482,7 @@
       "id": "r_e22",
       "from": "leibniz",
       "to": "cond",
-      "label": "Leibniz remainder fact: if \\(S\\) is the sum, then \\(|S-s_n|\\le\\) \\_\\_\\_",
+      "label": "Leibniz remainder fact: if \\(S\\) is the sum, then \\(|S-s_n|\\le\\) which term?",
       "answer": "b_{n+1}",
       "type": "fillin",
       "hint": "Error magnitude is controlled by the first omitted alternating-term magnitude."
@@ -491,7 +491,7 @@
       "id": "r_e23",
       "from": "abstest",
       "to": "ratio",
-      "label": "ratio boundary case: when \\(L=\\lim |a_{n+1}/a_n|=1\\), the ratio test is \\_\\_\\_",
+      "label": "ratio boundary case: when \\(L=\\lim |a_{n+1}/a_n|=1\\), the ratio test is ___.",
       "answer": "inconclusive",
       "type": "dropdown",
       "options": [
@@ -506,7 +506,7 @@
       "id": "r_e24",
       "from": "abstest",
       "to": "root",
-      "label": "root test checkpoint: with \\(C=\\limsup |a_n|^{1/n}\\), the only always-true statement is that \\(C=1\\) is \\_\\_\\_",
+      "label": "root test checkpoint: with \\(C=\\limsup |a_n|^{1/n}\\), the only always-true statement is that \\(C=1\\) is ___.",
       "answer": "inconclusive",
       "type": "dropdown",
       "options": [
@@ -521,7 +521,7 @@
       "id": "r_e25",
       "from": "leibniz",
       "to": "dirichlet",
-      "label": "Dirichlet step: if \\(B_n=\\sum_{k=1}^n b_k\\) is bounded and \\(a_n\\downarrow 0\\), then \\(\\sum a_n b_n\\) \\_\\_\\_",
+      "label": "Dirichlet step: if \\(B_n=\\sum_{k=1}^n b_k\\) is bounded and \\(a_n\\downarrow 0\\), then \\(\\sum a_n b_n\\) ___.",
       "answer": "converges",
       "type": "dropdown",
       "options": [
@@ -536,7 +536,7 @@
       "id": "r_e26",
       "from": "root",
       "to": "limcmp",
-      "label": "for \\(a_n=\\frac{n}{n^2+3}\\), comparing with \\(b_n=1/n\\) gives a limit in \\_\\_\\_",
+      "label": "for \\(a_n=\\frac{n}{n^2+3}\\), comparing with \\(b_n=1/n\\) gives a limit in what set?",
       "answer": "(0,∞)",
       "type": "dropdown",
       "options": [
@@ -551,7 +551,7 @@
       "id": "r_e27",
       "from": "pseries",
       "to": "ratio",
-      "label": "for \\(a_n=\\frac{n!}{3^n}\\), the natural first move is to study consecutive-term \\_\\_\\_",
+      "label": "for \\(a_n=\\frac{n!}{3^n}\\), the natural first move is to study consecutive-term ___.",
       "answer": "quotients",
       "type": "dropdown",
       "options": [
@@ -566,7 +566,7 @@
       "id": "r_e28",
       "from": "integral",
       "to": "directcmp",
-      "label": "integral test gatekeeper: if \\(f(n)=a_n>0\\) but \\(f\\) is not eventually decreasing, the test is \\_\\_\\_ to apply",
+      "label": "integral test gatekeeper: if \\(f(n)=a_n>0\\) but \\(f\\) is not eventually decreasing, is the test applicable?",
       "answer": "not applicable",
       "type": "dropdown",
       "options": [
@@ -581,7 +581,7 @@
       "id": "r_e29",
       "from": "divtest",
       "to": "harmonic",
-      "label": "logic check: \\(a_n\\to 0\\) is a \\_\\_\\_ condition for \\(\\sum a_n\\) to converge",
+      "label": "logic check: \\(a_n\\to 0\\) is what kind of condition for \\(\\sum a_n\\) to converge (pick the exact phrase)?",
       "answer": "necessary but not sufficient",
       "type": "dropdown",
       "options": [
@@ -596,7 +596,7 @@
       "id": "r_e30",
       "from": "leibniz",
       "to": "alt",
-      "label": "error target: for an alternating series with \\(b_n=1/n\\), to guarantee \\(|S-s_n|<0.01\\), it is enough to choose \\(n\\) so that \\_\\_\\_",
+      "label": "error target: for an alternating series with \\(b_n=1/n\\), to guarantee \\(|S-s_n|<0.01\\), choose \\(n\\) so that what holds?",
       "answer": "1/(n+1) < 0.01",
       "type": "dropdown",
       "options": [
@@ -611,7 +611,7 @@
       "id": "r_e31",
       "from": "ratio",
       "to": "integral",
-      "label": "boundary check: for \\(a_n=1/n^p\\), when \\(p=1\\) the p-series is \\_\\_\\_",
+      "label": "boundary check: for \\(a_n=1/n^p\\), when \\(p=1\\) the p-series is ___.",
       "answer": "divergent",
       "type": "dropdown",
       "options": [
@@ -626,7 +626,7 @@
       "id": "r_e32",
       "from": "divtest",
       "to": "directcmp",
-      "label": "for \\(\\sum 1\\), the necessary condition \\(a_n\\to 0\\) is \\_\\_\\_",
+      "label": "for \\(\\sum 1\\), the necessary condition \\(a_n\\to 0\\) is ___.",
       "answer": "violated",
       "type": "dropdown",
       "options": [
@@ -641,7 +641,7 @@
       "id": "r_e33",
       "from": "limcmp",
       "to": "directcmp",
-      "label": "one-sided limit comparison: if \\(a_n,b_n\\ge 0\\), \\(\\limsup a_n/b_n<\\infty\\), and \\(\\sum b_n\\) converges, then \\(\\sum a_n\\) \\_\\_\\_",
+      "label": "one-sided limit comparison: if \\(a_n,b_n\\ge 0\\), \\(\\limsup a_n/b_n<\\infty\\), and \\(\\sum b_n\\) converges, then \\(\\sum a_n\\) ___.",
       "answer": "converges",
       "type": "dropdown",
       "options": [
@@ -656,7 +656,7 @@
       "id": "r_e34",
       "from": "ratio",
       "to": "root",
-      "label": "diagnose misuse: if \\(\\lim |a_{n+1}/a_n|\\) does NOT exist, saying \"ratio test proves convergence\" is generally \\_\\_\\_",
+      "label": "diagnose misuse: if \\(\\lim |a_{n+1}/a_n|\\) does NOT exist, saying \"ratio test proves convergence\" is generally ___.",
       "answer": "invalid without another argument",
       "type": "dropdown",
       "options": [
@@ -671,7 +671,7 @@
       "id": "r_e35",
       "from": "alt",
       "to": "abs",
-      "label": "for \\(\\sum (-1)^n n/2^n\\), applying ratio/root to \\(\\sum |a_n|\\) gives boundary constant \\_\\_\\_",
+      "label": "for \\(\\sum (-1)^n n/2^n\\), applying ratio/root to \\(\\sum |a_n|\\) gives what boundary constant?",
       "answer": "1/2",
       "type": "dropdown",
       "options": [
@@ -686,7 +686,7 @@
       "id": "r_e36",
       "from": "directcmp",
       "to": "conv",
-      "label": "comparison (convergence direction): if \\(0\\le a_n\\le b_n\\) eventually and \\(\\sum b_n\\) converges, then \\(\\sum a_n\\) is \\_\\_\\_ by a convergent majorant",
+      "label": "comparison (convergence direction): if \\(0\\le a_n\\le b_n\\) eventually and \\(\\sum b_n\\) converges, then \\(\\sum a_n\\) is ___ by a convergent majorant.",
       "answer": "dominated",
       "type": "dropdown",
       "options": [
@@ -701,7 +701,7 @@
       "id": "r_e37",
       "from": "abs",
       "to": "conv",
-      "label": "theorem implication: \\(\\sum |a_n|<\\infty\\) guarantees \\(\\sum a_n\\) has \\_\\_\\_ convergence",
+      "label": "theorem implication: \\(\\sum |a_n|<\\infty\\) guarantees \\(\\sum a_n\\) has ___ convergence.",
       "answer": "ordinary",
       "type": "dropdown",
       "options": [
@@ -716,7 +716,7 @@
       "id": "r_e38",
       "from": "cond",
       "to": "alt",
-      "label": "canonical benchmark: the alternating harmonic series converges to \\_\\_\\_",
+      "label": "canonical benchmark: the alternating harmonic series converges to what?",
       "answer": "ln 2",
       "type": "dropdown",
       "options": [
