@@ -12,6 +12,16 @@ Maps are grouped into subject folders such as Real Analysis or Differential Equa
 
 ---
 
+## Quick guide
+
+1. Open a map from the sidebar.
+2. Click or tap a glowing relationship label to answer it.
+3. Drag nodes to rearrange the layout while studying.
+4. Use the top-right controls to pan, zoom, spread, compact, or reset the layout.
+5. Adjust the **Label** slider to move arrow labels along the edge. It snaps in discrete `0.1` steps from `0.2` to `0.8`, and the setting is saved per map in your browser.
+
+---
+
 ## Student workflow
 
 1. Open a topic from the sidebar.
