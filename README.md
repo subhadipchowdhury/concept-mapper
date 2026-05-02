@@ -1,6 +1,6 @@
 # Concept Mapper
 
-A browser-based tool for building and solving concept maps, organized by subject across multiple courses. No backend, no build step — just open `index.html`.
+A browser-based tool for building and solving concept maps, organized by subject across multiple courses. 
 
 ---
 
