@@ -53,6 +53,17 @@ function getMapEdgeLabelT(mapData) {
   return Number.isFinite(raw) ? getClosestEdgeLabelTStop(clamp(raw, 0.2, 0.8)) : 0.4;
 }
 
+function resolveInitialEdgeLabelT(mapData, savedValue) {
+  const saved = Number(savedValue);
+  if (Number.isFinite(saved)) {
+    const hasMapOverride = Number.isFinite(Number(mapData && mapData.edgeLabelT));
+    // Legacy migration: old default (0.2) was persisted automatically.
+    if (!hasMapOverride && saved === 0.2) return 0.4;
+    return getClosestEdgeLabelTStop(clamp(saved, 0.2, 0.8));
+  }
+  return getMapEdgeLabelT(mapData);
+}
+
 // Compute a force-directed fallback layout when no manual positions are saved.
 function computeAutoNodeLayout(mapData, edgeLabelT = getMapEdgeLabelT(mapData)) {
   const nodes = (mapData.nodes || []).filter((n) => (
@@ -447,8 +458,8 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   const [showComplete, setShowComplete] = useState2(false);
   const [isHelpOpen, setIsHelpOpen] = useState2(false);
   const [edgeLabelT, setEdgeLabelT] = useState2(() => {
-    const saved = Number(window.localStorage.getItem(`cm:edgeLabelT:${mapData.id}`));
-    return Number.isFinite(saved) ? getClosestEdgeLabelTStop(clamp(saved, 0.2, 0.8)) : getMapEdgeLabelT(mapData);
+    const saved = window.localStorage.getItem(`cm:edgeLabelT:${mapData.id}`);
+    return resolveInitialEdgeLabelT(mapData, saved);
   });
   const viewportRef = useRef2(null);
   const { t, setT, onWheel, startPan, onTouchStart, onTouchMove, onTouchEnd } = usePanZoom();
@@ -590,8 +601,8 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   const toNode = activeEdge ? validNodes.find(n => n.id === activeEdge.to) : null;
 
   useEffect2(() => {
-    const saved = Number(window.localStorage.getItem(`cm:edgeLabelT:${mapData.id}`));
-    const next = Number.isFinite(saved) ? getClosestEdgeLabelTStop(clamp(saved, 0.2, 0.8)) : getMapEdgeLabelT(mapData);
+    const saved = window.localStorage.getItem(`cm:edgeLabelT:${mapData.id}`);
+    const next = resolveInitialEdgeLabelT(mapData, saved);
     setEdgeLabelT(next);
   }, [mapData.id]);
 
