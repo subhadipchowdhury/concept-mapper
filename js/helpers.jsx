@@ -92,7 +92,8 @@ function launchConfetti() {
 }
 
 // Compute orthogonal bezier path between two points (anchored on box edges)
-function computeEdgePath(from, to) {
+function computeEdgePath(from, to, options = {}) {
+  const curveOffset = Number.isFinite(options.curveOffset) ? options.curveOffset : 0;
   // from / to: { x, y, w, h }  -- center coords
   const dx = to.x - from.x;
   const dy = to.y - from.y;
@@ -116,6 +117,20 @@ function computeEdgePath(from, to) {
     c1x = midX; c1y = sy;
     c2x = midX; c2y = ey;
   }
+  if (curveOffset !== 0) {
+    const vx = ex - sx;
+    const vy = ey - sy;
+    const len = Math.hypot(vx, vy) || 1;
+    const nx = -vy / len;
+    const ny = vx / len;
+    const ox = nx * curveOffset;
+    const oy = ny * curveOffset;
+    sx += ox; sy += oy;
+    ex += ox; ey += oy;
+    c1x += ox; c1y += oy;
+    c2x += ox; c2y += oy;
+  }
+
   return {
     d: `M ${sx} ${sy} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${ex} ${ey}`,
     midX: (sx + ex) / 2 + (c1x + c2x - sx - ex) * 0.15,
@@ -190,9 +205,12 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
   }
 
   const displayLabel = normalizeDisplayText(edge.label || '');
-  const expectsMathAnswer = edge.type === 'fillin' && /sqrt|\\\\sqrt|√|ε|≤|≥|[<>=+\-*/^()\[\]{}]|\d|^[a-z]$|^[A-Z]$/i.test(edge.answer || '');
-  const answerVars = Array.from(new Set(String(edge.answer || '').match(/[a-zA-Z]/g) || [])).slice(0, 4);
-  const mathPaletteTokens = ['√()', 'ε', '≤', '≥', '<', '>', '=', '+', '-', '/', '^', '(', ')', ...answerVars];
+  const rawAnswer = String(edge.answer || '').trim();
+  const mathLikeAnswer = /sqrt|\\\\sqrt|\\\\[a-zA-Z]+|√|ε|π|∞|≤|≥|≈|≠|[<>=+\-*/^()\[\]{}_|]|\d|^[a-z]$|^[A-Z]$/i.test(rawAnswer);
+  const mathLikeLabel = /\\\\\(|\\\\\)|\\b(sum|lim|sup|inf|integral|series|radius|convergen|derivative)\\b|\^|_/.test(String(edge.label || ''));
+  const expectsMathAnswer = edge.type === 'fillin' && (mathLikeAnswer || (mathLikeLabel && rawAnswer.length <= 3));
+  const answerVars = Array.from(new Set(rawAnswer.match(/[a-zA-Z]/g) || [])).slice(0, 4);
+  const mathPaletteTokens = ['√()', 'ε', 'π', '∞', '≤', '≥', '<', '>', '=', '+', '-', '/', '^', '_', '{', '}', '(', ')', ...answerVars];
 
   function insertMathToken(token) {
     const el = inputRef.current;

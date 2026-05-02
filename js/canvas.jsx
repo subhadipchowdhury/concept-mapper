@@ -363,6 +363,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
     const sz = estimateNodeSize(n.label);
     geom[n.id] = { x: xy.x, y: xy.y, w: sz.w, h: sz.h };
   });
+  const edgeDirectionSet = new Set(mapData.edges.map(e => `${e.from}->${e.to}`));
 
   const totalEdges = mapData.edges.length;
   const completed = answeredEdges.size;
@@ -447,7 +448,8 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
               if (!f || !to) return null;
               const isAnswered = answeredEdges.has(edge.id);
               const fromUnlocked = unlockedNodes.has(edge.from);
-              const path = computeEdgePath(f, to);
+              const hasReverseEdge = edge.from !== edge.to && edgeDirectionSet.has(`${edge.to}->${edge.from}`);
+              const path = computeEdgePath(f, to, { curveOffset: hasReverseEdge ? 28 : 0 });
               const fromN = mapData.nodes.find(n => n.id === edge.from);
               const stroke = !fromUnlocked ? 'rgba(255,255,255,0.08)'
                            : isAnswered ? (fromN.color || '#34d399')
@@ -472,7 +474,8 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
             const isAnswered = answeredEdges.has(edge.id);
             const fromUnlocked = unlockedNodes.has(edge.from);
             if (!fromUnlocked && !isAnswered) return null;
-            const path = computeEdgePath(f, to);
+            const hasReverseEdge = edge.from !== edge.to && edgeDirectionSet.has(`${edge.to}->${edge.from}`);
+            const path = computeEdgePath(f, to, { curveOffset: hasReverseEdge ? 28 : 0 });
             return (
               <div
                 key={edge.id}

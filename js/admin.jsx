@@ -117,6 +117,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
     const sz = estimateNodeSize(n.label);
     geom[n.id] = { x: n.x, y: n.y, w: sz.w, h: sz.h };
   });
+  const edgeDirectionSet = new Set(mapData.edges.map(e => `${e.from}->${e.to}`));
 
   const selectedNode = selectedNodeId ? mapData.nodes.find(n => n.id === selectedNodeId) : null;
   const selectedEdge = selectedEdgeId ? mapData.edges.find(e => e.id === selectedEdgeId) : null;
@@ -215,7 +216,8 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
             {mapData.edges.map(edge => {
               const f = geom[edge.from], to = geom[edge.to];
               if (!f || !to) return null;
-              const path = computeEdgePath(f, to);
+              const hasReverseEdge = edge.from !== edge.to && edgeDirectionSet.has(`${edge.to}->${edge.from}`);
+              const path = computeEdgePath(f, to, { curveOffset: hasReverseEdge ? 28 : 0 });
               const fromN = mapData.nodes.find(n => n.id === edge.from);
               const stroke = selectedEdgeId === edge.id ? 'var(--accent-amber)' : (fromN.color || '#818cf8');
               return (
@@ -242,7 +244,8 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
           {mapData.edges.map(edge => {
             const f = geom[edge.from], to = geom[edge.to];
             if (!f || !to) return null;
-            const path = computeEdgePath(f, to);
+            const hasReverseEdge = edge.from !== edge.to && edgeDirectionSet.has(`${edge.to}->${edge.from}`);
+            const path = computeEdgePath(f, to, { curveOffset: hasReverseEdge ? 28 : 0 });
             return (
               <div
                 key={edge.id}
