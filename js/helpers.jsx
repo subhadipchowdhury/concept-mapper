@@ -284,6 +284,7 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
 const STORAGE_KEY = 'conceptmapper_progress_v2';
 const MAPS_KEY = 'conceptmapper_maps_v2';
 const POSITIONS_KEY = 'conceptmapper_positions_v2';
+const MAP_MANIFEST_PATH = 'data/maps/manifest.json';
 
 function loadProgress() {
   try {
@@ -321,6 +322,66 @@ function saveCustomMaps(maps) {
   localStorage.setItem(MAPS_KEY, JSON.stringify(maps));
 }
 
+function parseMapDataText(rawText, sourcePath = '') {
+  const text = (rawText || '').trim();
+  if (!text) throw new Error(`Map file is empty: ${sourcePath}`);
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`Could not parse map file: ${sourcePath}`);
+  }
+}
+
+async function loadBuiltInMaps(manifestPath = MAP_MANIFEST_PATH) {
+  const manifestResp = await fetch(manifestPath, { cache: 'no-store' });
+  if (!manifestResp.ok) {
+    throw new Error(`Failed to load map manifest (${manifestResp.status})`);
+  }
+
+  const manifest = await manifestResp.json();
+  if (!Array.isArray(manifest)) {
+    throw new Error('Map manifest must be an array.');
+  }
+
+  const loadedMaps = {};
+  const failures = [];
+
+  await Promise.all(manifest.map(async (entry) => {
+    if (!entry || !entry.id || !entry.file) return;
+    try {
+      const resp = await fetch(entry.file, { cache: 'no-store' });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const rawText = await resp.text();
+      const parsed = parseMapDataText(rawText, entry.file);
+      const mapId = parsed?.id || entry.id;
+      loadedMaps[mapId] = { ...parsed, id: mapId };
+    } catch (err) {
+      failures.push(`${entry.id}: ${err.message}`);
+    }
+  }));
+
+  return { maps: loadedMaps, failures };
+}
+
+function downloadMapJSON(mapId, mapData) {
+  if (!mapId || !mapData) return;
+  const payload = {
+    ...mapData,
+    id: mapId,
+    updatedAt: new Date().toISOString(),
+    exportedBy: 'admin',
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${mapId}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 function loadPositions() {
   try {
     const raw = localStorage.getItem(POSITIONS_KEY);
@@ -338,6 +399,8 @@ Object.assign(window, {
   launchConfetti,
   computeEdgePath,
   AnswerPopup,
+  loadBuiltInMaps,
+  downloadMapJSON,
   loadProgress, saveProgress,
   loadCustomMaps, saveCustomMaps,
   loadPositions, savePositions,

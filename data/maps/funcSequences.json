@@ -1,0 +1,256 @@
+﻿{
+  "id": "funcSequences",
+  "title": "Sequences & Series of Functions",
+  "description": "Module 3 \u2014 Pointwise vs uniform convergence, power & Taylor series",
+  "color": "#34d399",
+  "accentColor": "#06b6d4",
+  "nodes": [
+    {
+      "id": "fseq",
+      "label": "Sequence of Functions\\n\\(\\{f_n\\}\\)",
+      "x": 480,
+      "y": 60,
+      "color": "#34d399",
+      "isStart": true
+    },
+    {
+      "id": "pw",
+      "label": "Pointwise\\nConvergence",
+      "x": 250,
+      "y": 200,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "unif",
+      "label": "Uniform\\nConvergence \\(f_n \\rightrightarrows f\\)",
+      "x": 720,
+      "y": 200,
+      "color": "#34d399"
+    },
+    {
+      "id": "limf",
+      "label": "Limit Function \\(f\\)",
+      "x": 250,
+      "y": 360,
+      "color": "#a78bfa"
+    },
+    {
+      "id": "cont",
+      "label": "Preserves\\nContinuity",
+      "x": 720,
+      "y": 360,
+      "color": "#34d399"
+    },
+    {
+      "id": "integ",
+      "label": "Preserves\\nIntegrability",
+      "x": 560,
+      "y": 510,
+      "color": "#34d399"
+    },
+    {
+      "id": "diff",
+      "label": "Preserves\\nDifferentiability",
+      "x": 880,
+      "y": 510,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "fseries",
+      "label": "Series of Functions\\n\\(\\sum f_n(x)\\)",
+      "x": 250,
+      "y": 510,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "mtest",
+      "label": "Weierstrass M-Test",
+      "x": 100,
+      "y": 660,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "power",
+      "label": "Power Series\\n\\(\\sum a_n x^n\\)",
+      "x": 480,
+      "y": 660,
+      "color": "#f472b6"
+    },
+    {
+      "id": "roc",
+      "label": "Radius of Convergence \\(R\\)",
+      "x": 280,
+      "y": 800,
+      "color": "#fb7185"
+    },
+    {
+      "id": "ioc",
+      "label": "Interval of Convergence",
+      "x": 560,
+      "y": 800,
+      "color": "#fb7185"
+    },
+    {
+      "id": "taylor",
+      "label": "Taylor Series",
+      "x": 800,
+      "y": 800,
+      "color": "#a78bfa"
+    },
+    {
+      "id": "analytic",
+      "label": "Analytic Function",
+      "x": 800,
+      "y": 940,
+      "color": "#a78bfa"
+    },
+    {}
+  ],
+  "edges": [
+    {
+      "id": "f_e1",
+      "from": "fseq",
+      "to": "pw",
+      "label": "fix \\(x\\) first, THEN take \\(\\lim_{n\\to\\infty} f_n(x)\\) \u2014 this is \\_\\_\\_ convergence",
+      "answer": "pointwise",
+      "type": "fillin",
+      "hint": "Convergence at each individual point separately."
+    },
+    {
+      "id": "f_e2",
+      "from": "fseq",
+      "to": "unif",
+      "label": "one \\(N\\) works for ALL \\(x\\) \u2014 stronger than pointwise; called \\_\\_\\_",
+      "answer": "uniform",
+      "type": "fillin",
+      "hint": "The same \\(N\\) works ___ly across all \\(x\\)."
+    },
+    {
+      "id": "f_e3",
+      "from": "pw",
+      "to": "limf",
+      "label": "the function \\(f(x) := \\lim_n f_n(x)\\) is the \\_\\_\\_ of \\(\\{f_n\\}\\)",
+      "answer": "limit",
+      "type": "fillin",
+      "hint": "It is the pointwise ___ of the sequence."
+    },
+    {
+      "id": "f_e4",
+      "from": "unif",
+      "to": "cont",
+      "label": "uniform limit of continuous functions: is the limit \\(f\\) automatically continuous?",
+      "answer": "yes",
+      "type": "dropdown",
+      "options": [
+        "yes",
+        "no",
+        "only on closed intervals",
+        "only if differentiable"
+      ],
+      "hint": "Uniform convergence preserves this property \u2014 ___."
+    },
+    {
+      "id": "f_e5",
+      "from": "unif",
+      "to": "integ",
+      "label": "under uniform conv, \\(\\int (\\lim f_n) = \\lim \\int f_n\\) \u2014 the two operations \\_\\_\\_",
+      "answer": "commute",
+      "type": "dropdown",
+      "options": [
+        "commute",
+        "cancel",
+        "multiply",
+        "fail"
+      ],
+      "hint": "You can swap their order \u2014 they ___."
+    },
+    {
+      "id": "f_e6",
+      "from": "unif",
+      "to": "diff",
+      "label": "preserving derivatives needs uniform conv of \\(\\{f_n'\\}\\) too \u2014 NOT just of \\(\\{f_n\\}\\); answer Y/N: works?",
+      "answer": "no",
+      "type": "dropdown",
+      "options": [
+        "yes",
+        "no"
+      ],
+      "hint": "Uniform conv of \\(f_n\\) ALONE is not enough \u2014 ___."
+    },
+    {
+      "id": "f_e7",
+      "from": "fseq",
+      "to": "fseries",
+      "label": "form partial sums \\(S_N(x) = \\sum_{n=1}^N f_n(x)\\); their limit is a \\_\\_\\_ of functions",
+      "answer": "series",
+      "type": "fillin",
+      "hint": "\\(\\sum f_n(x)\\) is the analog of \\(\\sum a_n\\) but each term is now a function."
+    },
+    {
+      "id": "f_e8",
+      "from": "fseries",
+      "to": "mtest",
+      "label": "if \\(|f_n(x)| \\le M_n\\) and \\(\\sum M_n < \\infty\\), \\(\\sum f_n\\) converges \\_\\_\\_",
+      "answer": "uniformly",
+      "type": "dropdown",
+      "options": [
+        "pointwise",
+        "uniformly",
+        "absolutely",
+        "conditionally"
+      ],
+      "hint": "The M-test gives the STRONGEST type of convergence \u2014 ___."
+    },
+    {
+      "id": "f_e9",
+      "from": "fseries",
+      "to": "power",
+      "label": "special form \\(\\sum a_n x^n\\) \u2014 each term is \\(x\\) raised to a \\_\\_\\_",
+      "answer": "power",
+      "type": "fillin",
+      "hint": "\\(x^n\\) is \\(x\\) to the \\(n\\)-th ___."
+    },
+    {
+      "id": "f_e10",
+      "from": "power",
+      "to": "roc",
+      "label": "a power series converges for \\(|x| < R\\); this \\(R\\) is the \\_\\_\\_ of convergence",
+      "answer": "radius",
+      "type": "fillin",
+      "hint": "Geometrically, \\(R\\) measures the half-width of the convergence region \u2014 its ___."
+    },
+    {
+      "id": "f_e11",
+      "from": "roc",
+      "to": "ioc",
+      "label": "the set of all \\(x\\) where \\(\\sum a_n x^n\\) converges is an \\_\\_\\_ centered at \\(0\\)",
+      "answer": "interval",
+      "type": "fillin",
+      "hint": "A connected piece of \\(\\mathbb{R}\\), possibly with endpoints \u2014 an ___."
+    },
+    {
+      "id": "f_e12",
+      "from": "power",
+      "to": "taylor",
+      "label": "with coefficients \\(a_n = f^{(n)}(c)/n!\\), the power series equals \\(f\\) on a \\_\\_\\_ around \\(c\\)",
+      "answer": "neighborhood",
+      "type": "dropdown",
+      "options": [
+        "point",
+        "line",
+        "neighborhood",
+        "half-plane"
+      ],
+      "hint": "Local agreement between \\(f\\) and its expansion holds in some open ___ of \\(c\\)."
+    },
+    {
+      "id": "f_e13",
+      "from": "taylor",
+      "to": "analytic",
+      "label": "a function that equals its Taylor series in a nbhd of every point of its domain is called \\_\\_\\_",
+      "answer": "analytic",
+      "type": "fillin",
+      "hint": "Greek root meaning \"to break apart\" \u2014 such a function is ___."
+    }
+  ]
+}

@@ -14,7 +14,7 @@ const NODE_COLOR_PALETTE = [
 ];
 
 // ─── AdminCanvas: Visual builder for one concept map ──────────────────────────
-function AdminCanvas({ mapData, onChange, onBack, onDelete, onTogglePublish }) {
+function AdminCanvas({ mapData, onChange, onBack, onDelete, onTogglePublish, onExport }) {
   const [tool, setTool] = useStateA('select'); // 'select' | 'addNode' | 'connect'
   const [selectedNodeId, setSelectedNodeId] = useStateA(null);
   const [selectedEdgeId, setSelectedEdgeId] = useStateA(null);
@@ -154,6 +154,18 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onTogglePublish }) {
         </div>
         <div className="admin-tool-divider"></div>
         <button className="admin-tool-btn" onClick={onBack} title="Save and return to map manager">💾 Save & Exit</button>
+        {typeof onExport === 'function' && (
+          <button
+            className="admin-tool-btn"
+            onClick={() => onExport(mapData.id, mapData)}
+            title="Download this map as JSON for GitHub promotion"
+          >
+            ⭳ Export JSON
+          </button>
+        )}
+        <span style={{ fontSize: 11, opacity: 0.72 }}>
+          Repo path: data/maps/{mapData.id}.json
+        </span>
         {typeof onTogglePublish === 'function' && (
           <button
             className={`admin-tool-btn ${mapData._published ? 'active' : ''}`}
@@ -432,13 +444,13 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onTogglePublish }) {
 }
 
 // ─── MapsManager: list + create ───────────────────────────────────────────────
-function MapsManager({ allMaps, customMaps, onEdit, onCreate, onDeleteCustom, onTogglePublish }) {
+function MapsManager({ allMaps, customMaps, onEdit, onCreate, onDeleteCustom, onTogglePublish, onExportMap }) {
   return (
     <div className="maps-manager">
       <div className="maps-manager-header">
         <div>
           <div className="maps-manager-title">Admin · Concept Maps</div>
-          <div className="maps-manager-sub">Create and edit chapter maps with the visual builder.</div>
+          <div className="maps-manager-sub">Create and edit chapter maps with the visual builder. Exported files should replace data/maps/{`{mapId}`}.json in the repo.</div>
         </div>
       </div>
       <div className="maps-grid">
@@ -465,6 +477,17 @@ function MapsManager({ allMaps, customMaps, onEdit, onCreate, onDeleteCustom, on
               </div>
               {isCustom && (
                 <div className="maps-grid-card-actions">
+                  {typeof onExportMap === 'function' && (
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onExportMap(m.id);
+                      }}
+                    >
+                      Export JSON
+                    </button>
+                  )}
                   <button
                     className="btn btn-ghost btn-sm"
                     onClick={(e) => {

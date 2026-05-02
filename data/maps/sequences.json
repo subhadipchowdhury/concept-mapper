@@ -1,0 +1,561 @@
+﻿{
+  "id": "sequences",
+  "title": "Sequences of Real Numbers",
+  "description": "Module 1 \u2014 From the \u03B5\u2013N definition to Cauchy completeness",
+  "color": "#4f8ef7",
+  "accentColor": "#a78bfa",
+  "nodes": [
+    {
+      "id": "seq",
+      "label": "Sequence\\n\\(\\{a_n\\}: \\mathbb{N} \\to \\mathbb{R}\\)",
+      "x": 480,
+      "y": 60,
+      "color": "#4f8ef7",
+      "isStart": true
+    },
+    {
+      "id": "gp",
+      "label": "Geometric Progression\\n\\(a_n = ar^{n-1}\\)",
+      "x": 200,
+      "y": 60,
+      "color": "#4f8ef7"
+    },
+    {
+      "id": "limpt",
+      "label": "Limit Point of a Set\\n\\((x-\\varepsilon, x+\\varepsilon) \\cap A \\setminus\\{x\\} \\ne \\emptyset\\)",
+      "x": 760,
+      "y": 60,
+      "color": "#4f8ef7"
+    },
+    {
+      "id": "enconv",
+      "label": "\u03B5\u2013N Convergence\\n\\(\\lim a_n = L\\)",
+      "x": 480,
+      "y": 200,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "div",
+      "label": "Divergence",
+      "x": 760,
+      "y": 200,
+      "color": "#fb7185"
+    },
+    {
+      "id": "unique",
+      "label": "Uniqueness of Limit",
+      "x": 250,
+      "y": 200,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "algebra",
+      "label": "Algebra of Limits\\n(sum, product, quotient)",
+      "x": 480,
+      "y": 350,
+      "color": "#34d399"
+    },
+    {
+      "id": "squeeze",
+      "label": "Squeeze Theorem",
+      "x": 760,
+      "y": 350,
+      "color": "#34d399"
+    },
+    {
+      "id": "order",
+      "label": "Order Limit Theorem\\n\\(a_n \\le b_n \\Rightarrow \\lim a_n \\le \\lim b_n\\)",
+      "x": 940,
+      "y": 200,
+      "color": "#34d399"
+    },
+    {
+      "id": "shift",
+      "label": "Shift Theorem\\n\\(\\lim a_{n+k} = \\lim a_n\\)",
+      "x": 940,
+      "y": 350,
+      "color": "#34d399"
+    },
+    {
+      "id": "bdd",
+      "label": "Bounded Sequence\\n\\(|a_n| \\le M\\)",
+      "x": 200,
+      "y": 350,
+      "color": "#a78bfa"
+    },
+    {
+      "id": "mono",
+      "label": "Monotone Sequence\\n(\u2197 or \u2198)",
+      "x": 200,
+      "y": 500,
+      "color": "#a78bfa"
+    },
+    {
+      "id": "conv_imp_bdd",
+      "label": "Convergent \u27F9 Bounded",
+      "x": 480,
+      "y": 500,
+      "color": "#34d399"
+    },
+    {
+      "id": "completeness",
+      "label": "Completeness of \\(\\mathbb{R}\\)\\n(LUB property)",
+      "x": 760,
+      "y": 500,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "amgm",
+      "label": "AM\u2013GM Inequality\\n\\(\\sqrt{ab} \\le (a+b)/2\\)",
+      "x": 940,
+      "y": 500,
+      "color": "#fcd34d"
+    },
+    {
+      "id": "mct",
+      "label": "Monotone Convergence\\nTheorem",
+      "x": 480,
+      "y": 650,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "babylonian",
+      "label": "Babylonian Iteration\\n\\(x_{n+1} = \\tfrac{1}{2}(x_n + c/x_n) \\to \\sqrt{c}\\)",
+      "x": 760,
+      "y": 650,
+      "color": "#fcd34d"
+    },
+    {
+      "id": "agm",
+      "label": "Arithmetic\u2013Geometric\\nMean (AGM)",
+      "x": 940,
+      "y": 650,
+      "color": "#fcd34d"
+    },
+    {
+      "id": "subseq",
+      "label": "Subsequence\\n\\(\\{a_{n_k}\\}\\)",
+      "x": 200,
+      "y": 800,
+      "color": "#f472b6"
+    },
+    {
+      "id": "sublim",
+      "label": "Subsequential Limit",
+      "x": 480,
+      "y": 800,
+      "color": "#f472b6"
+    },
+    {
+      "id": "eo",
+      "label": "Even\u2013Odd\\nSubsequence Criterion",
+      "x": 760,
+      "y": 800,
+      "color": "#f472b6"
+    },
+    {
+      "id": "cesaro",
+      "label": "Ces\u00E0ro Mean\\n\\(\\sigma_n = \\tfrac{a_1+\\cdots+a_n}{n}\\)",
+      "x": 940,
+      "y": 800,
+      "color": "#fcd34d"
+    },
+    {
+      "id": "peak",
+      "label": "Peak Point",
+      "x": 200,
+      "y": 950,
+      "color": "#f472b6"
+    },
+    {
+      "id": "monlemma",
+      "label": "Monotone Subsequence\\nLemma",
+      "x": 480,
+      "y": 950,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "bw",
+      "label": "Bolzano\u2013Weierstrass\\nTheorem",
+      "x": 760,
+      "y": 950,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "cauchy",
+      "label": "Cauchy Sequence\\n\\(|a_m - a_n| \\to 0\\)",
+      "x": 480,
+      "y": 1100,
+      "color": "#fb7185"
+    },
+    {
+      "id": "cauchy_bdd",
+      "label": "Cauchy \u27F9 Bounded",
+      "x": 200,
+      "y": 1100,
+      "color": "#fb7185"
+    },
+    {
+      "id": "cc",
+      "label": "Cauchy Convergence\\nCriterion",
+      "x": 480,
+      "y": 1250,
+      "color": "#f59e0b"
+    },
+    {}
+  ],
+  "edges": [
+    {
+      "id": "s_e1",
+      "from": "seq",
+      "to": "gp",
+      "label": "in \\(a_n = ar^{n-1}\\), the ratio between consecutive terms is \\_\\_\\_",
+      "answer": "r",
+      "type": "fillin",
+      "hint": "Compute \\(a_{n+1}/a_n\\). The constant you get plays the role of common ___."
+    },
+    {
+      "id": "s_e2",
+      "from": "seq",
+      "to": "enconv",
+      "label": "\"\\(\\forall \\varepsilon > 0\\,\\, \\exists N\\,\\, \\forall n>N\\,\\, |a_n - L| < \\varepsilon\\)\" defines the \\_\\_\\_",
+      "answer": "limit",
+      "type": "fillin",
+      "hint": "This formal statement is the \u03B5\u2013N definition of the ___."
+    },
+    {
+      "id": "s_e3",
+      "from": "seq",
+      "to": "div",
+      "label": "no real \\(L\\) makes \\(|a_n - L|\\) eventually small \u2014 the seq fails to \\_\\_\\_",
+      "answer": "converge",
+      "type": "fillin",
+      "hint": "The OPPOSITE of what we want \u2014 the seq fails to ___."
+    },
+    {
+      "id": "s_e4",
+      "from": "seq",
+      "to": "limpt",
+      "label": "a point every \\(\\varepsilon\\)-nbhd of which contains \\_\\_\\_ many points of \\(A\\)",
+      "answer": "infinitely",
+      "type": "dropdown",
+      "options": [
+        "finitely",
+        "infinitely",
+        "countably",
+        "uncountably"
+      ],
+      "hint": "Equivalent characterization: every neighborhood contains ___ many points of \\(A\\)."
+    },
+    {
+      "id": "s_e5",
+      "from": "enconv",
+      "to": "unique",
+      "label": "a convergent sequence has \\_\\_\\_ limit",
+      "answer": "one",
+      "type": "dropdown",
+      "options": [
+        "no",
+        "one",
+        "two",
+        "infinitely many"
+      ],
+      "hint": "How many limits can a convergent sequence have?"
+    },
+    {
+      "id": "s_e6",
+      "from": "enconv",
+      "to": "algebra",
+      "label": "\\(\\lim(a_n + b_n) = \\lim a_n + \\lim b_n\\) is the \\_\\_\\_ rule",
+      "answer": "sum",
+      "type": "dropdown",
+      "options": [
+        "sum",
+        "product",
+        "quotient",
+        "power"
+      ],
+      "hint": "Which limit law is this?"
+    },
+    {
+      "id": "s_e7",
+      "from": "algebra",
+      "to": "squeeze",
+      "label": "if \\(b_n \\le a_n \\le c_n\\) and \\(b_n, c_n \\to L\\), then \\(a_n \\to\\) \\_\\_\\_",
+      "answer": "L",
+      "type": "fillin",
+      "hint": "The two outer sequences pin down the middle one."
+    },
+    {
+      "id": "s_e8",
+      "from": "enconv",
+      "to": "order",
+      "label": "if \\(a_n \\le b_n\\) for all \\(n\\), then \\(\\lim a_n\\) \\_\\_\\_ \\(\\lim b_n\\)",
+      "answer": "\u2264",
+      "type": "dropdown",
+      "options": [
+        "<",
+        "\u2264",
+        "=",
+        "\u2265"
+      ],
+      "hint": "Strict inequality is NOT preserved in the limit; only the weak one is."
+    },
+    {
+      "id": "s_e9",
+      "from": "enconv",
+      "to": "shift",
+      "label": "dropping the first \\(k\\) terms \\_\\_\\_ the limit",
+      "answer": "preserves",
+      "type": "dropdown",
+      "options": [
+        "changes",
+        "preserves",
+        "doubles",
+        "negates"
+      ],
+      "hint": "Finitely many terms cannot affect the tail behavior."
+    },
+    {
+      "id": "s_e10",
+      "from": "enconv",
+      "to": "conv_imp_bdd",
+      "label": "past some \\(N\\), every \\(a_n\\) lies in \\((L-1, L+1)\\) \u2014 so \\(\\{a_n\\}\\) is \\_\\_\\_",
+      "answer": "bounded",
+      "type": "fillin",
+      "hint": "There is a single \\(M\\) with \\(|a_n| \\le M\\) for all \\(n\\) \u2014 call this property ___."
+    },
+    {
+      "id": "s_e11",
+      "from": "conv_imp_bdd",
+      "to": "bdd",
+      "label": "so it satisfies \\(|a_n| \\le\\) \\_\\_\\_",
+      "answer": "M",
+      "type": "fillin",
+      "hint": "A constant upper bound \u2014 call it \\(M\\)."
+    },
+    {
+      "id": "s_e12",
+      "from": "bdd",
+      "to": "mono",
+      "label": "always-increasing OR always-decreasing \u2014 one Greek word for \"one direction\": \\_\\_\\_",
+      "answer": "monotone",
+      "type": "fillin",
+      "hint": "mono- = \"one\", -tone = \"direction/tension\"."
+    },
+    {
+      "id": "s_e13",
+      "from": "completeness",
+      "to": "mct",
+      "label": "every nonempty bounded-above subset of \\(\\mathbb{R}\\) has a \\_\\_\\_",
+      "answer": "supremum",
+      "type": "dropdown",
+      "options": [
+        "minimum",
+        "maximum",
+        "supremum",
+        "infimum"
+      ],
+      "hint": "AKA \"least upper bound\"."
+    },
+    {
+      "id": "s_e14",
+      "from": "bdd",
+      "to": "mct",
+      "label": "MCT conclusion: bounded + monotone \\(\\Rightarrow\\) \\_\\_\\_",
+      "answer": "convergent",
+      "type": "fillin",
+      "hint": "What MCT GIVES us, given the two hypotheses."
+    },
+    {
+      "id": "s_e15",
+      "from": "mono",
+      "to": "mct",
+      "label": "MCT hypothesis: monotone \\(+\\) \\_\\_\\_ \\(\\Rightarrow\\) convergent",
+      "answer": "bounded",
+      "type": "fillin",
+      "hint": "The OTHER hypothesis MCT needs."
+    },
+    {
+      "id": "s_e16",
+      "from": "amgm",
+      "to": "babylonian",
+      "label": "AM\u2013GM forces \\(x_{n+1} \\ge\\) \\_\\_\\_",
+      "answer": "\u221Ac",
+      "type": "fillin",
+      "hint": "Apply AM\u2013GM to \\(x_n\\) and \\(c/x_n\\): their geometric mean is \\(\\sqrt{c}\\)."
+    },
+    {
+      "id": "s_e17",
+      "from": "mct",
+      "to": "babylonian",
+      "label": "iteration converges because it is decreasing and bounded \\_\\_\\_",
+      "answer": "below",
+      "type": "dropdown",
+      "options": [
+        "above",
+        "below",
+        "on both sides",
+        "nowhere"
+      ],
+      "hint": "It's bounded below by \\(\\sqrt{c}\\) \u2014 so MCT applies."
+    },
+    {
+      "id": "s_e18",
+      "from": "amgm",
+      "to": "agm",
+      "label": "iterating arith. and geom. means of \\(a_1,b_1\\) gives sequences with the \\_\\_\\_ limit",
+      "answer": "same",
+      "type": "dropdown",
+      "options": [
+        "same",
+        "reciprocal",
+        "opposite",
+        "unrelated"
+      ],
+      "hint": "\\(b_{n+1} - a_{n+1} \\to 0\\), so they share their limit."
+    },
+    {
+      "id": "s_e19",
+      "from": "seq",
+      "to": "subseq",
+      "label": "pick STRICTLY \\_\\_\\_ indices \\(n_1 < n_2 < \\cdots\\) to extract a subsequence",
+      "answer": "increasing",
+      "type": "fillin",
+      "hint": "The indices must go in one direction only \u2014 strictly ___."
+    },
+    {
+      "id": "s_e20",
+      "from": "subseq",
+      "to": "sublim",
+      "label": "a sequence may have \\_\\_\\_ subsequential limits, e.g. \\((-1)^n\\) has two",
+      "answer": "multiple",
+      "type": "dropdown",
+      "options": [
+        "no",
+        "one",
+        "multiple",
+        "no real"
+      ],
+      "hint": "\\((-1)^n\\) has subsequential limits \\(+1\\) and \\(-1\\) \u2014 so a sequence can have ___ of them."
+    },
+    {
+      "id": "s_e21",
+      "from": "enconv",
+      "to": "eo",
+      "label": "\\(\\{a_n\\}\\) converges \\(\\iff\\) \\(\\{a_{2k}\\}\\) and \\(\\{a_{2k+1}\\}\\) share the \\_\\_\\_ limit",
+      "answer": "same",
+      "type": "fillin",
+      "hint": "Both even-indexed and odd-indexed subsequences must converge to the ___ value."
+    },
+    {
+      "id": "s_e22",
+      "from": "cesaro",
+      "to": "enconv",
+      "label": "if \\(a_n \\to L\\), then \\(\\sigma_n \\to\\) \\_\\_\\_",
+      "answer": "L",
+      "type": "fillin",
+      "hint": "Averaging preserves the limit (HW 2004, Ces\u00E0ro)."
+    },
+    {
+      "id": "s_e23",
+      "from": "subseq",
+      "to": "peak",
+      "label": "index \\(n\\) such that NO later term exceeds \\(a_n\\) \u2014 visualize a mountain \\_\\_\\_",
+      "answer": "peak",
+      "type": "fillin",
+      "hint": "Highest point with nothing taller to its right \u2014 a mountain ___."
+    },
+    {
+      "id": "s_e24",
+      "from": "peak",
+      "to": "monlemma",
+      "label": "inf-many peaks \u27F9 \u2198 subseq; finitely many \u27F9 \u2197 subseq \u2014 so EVERY seq has one going \\_\\_\\_",
+      "answer": "one direction",
+      "type": "dropdown",
+      "options": [
+        "nowhere",
+        "one direction",
+        "both directions",
+        "in circles"
+      ],
+      "hint": "Either way, you get a subsequence that consistently goes ___."
+    },
+    {
+      "id": "s_e25",
+      "from": "monlemma",
+      "to": "bw",
+      "label": "monotone subseq + boundedness + \\_\\_\\_ \\(\\Rightarrow\\) BW",
+      "answer": "MCT",
+      "type": "dropdown",
+      "options": [
+        "MCT",
+        "Squeeze",
+        "Cauchy Criterion",
+        "Order Limit"
+      ],
+      "hint": "Apply this theorem to the monotone subsequence to extract a convergent one."
+    },
+    {
+      "id": "s_e26",
+      "from": "bdd",
+      "to": "bw",
+      "label": "BW hypothesis: every \\_\\_\\_ sequence has a convergent subsequence",
+      "answer": "bounded",
+      "type": "fillin",
+      "hint": "The single hypothesis BW needs."
+    },
+    {
+      "id": "s_e27",
+      "from": "enconv",
+      "to": "cauchy",
+      "label": "if \\(a_n \\to L\\), then \\(|a_m - a_n|\\) can be made \\_\\_\\_",
+      "answer": "arbitrarily small",
+      "type": "dropdown",
+      "options": [
+        "zero",
+        "arbitrarily small",
+        "less than 1",
+        "bounded"
+      ],
+      "hint": "Both terms hug \\(L\\), so their distance is at most \\(2\\varepsilon\\)."
+    },
+    {
+      "id": "s_e28",
+      "from": "cauchy",
+      "to": "cauchy_bdd",
+      "label": "fix \\(\\varepsilon=1\\) and \\(N\\): all terms past \\(N\\) lie in an interval of length \\_\\_\\_",
+      "answer": "2",
+      "type": "fillin",
+      "hint": "Centered at \\(a_N\\), radius \\(1\\) \u2014 total length is ___."
+    },
+    {
+      "id": "s_e29",
+      "from": "cauchy_bdd",
+      "to": "bw",
+      "label": "so we can extract a \\_\\_\\_ subsequence",
+      "answer": "convergent",
+      "type": "fillin",
+      "hint": "BW guarantees this kind of subsequence from a bounded sequence."
+    },
+    {
+      "id": "s_e30",
+      "from": "bw",
+      "to": "cc",
+      "label": "if subseq \\(a_{n_k} \\to L\\) AND seq is Cauchy, the FULL seq has limit \\_\\_\\_",
+      "answer": "L",
+      "type": "fillin",
+      "hint": "Triangle inequality: \\(|a_n - L| \\le |a_n - a_{n_k}| + |a_{n_k} - L|\\). Both small \u27F9 \\(a_n \\to\\) ___."
+    },
+    {
+      "id": "s_e31",
+      "from": "cauchy",
+      "to": "cc",
+      "label": "in \\(\\mathbb{R}\\): Cauchy \\(\\iff\\) \\_\\_\\_",
+      "answer": "convergent",
+      "type": "fillin",
+      "hint": "The two notions coincide in \\(\\mathbb{R}\\)."
+    },
+    {}
+  ]
+}

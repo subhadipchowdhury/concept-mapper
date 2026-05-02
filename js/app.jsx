@@ -27,8 +27,11 @@ function deserializeProgress(progressObj) {
 function App() {
   const [view, setView] = useStateApp('student'); // 'student' | 'admin' | 'admin-edit'
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useStateApp(false);
-  const [activeMapId, setActiveMapId] = useStateApp('sequences');
+  const [activeMapId, setActiveMapId] = useStateApp(null);
   const [editingMapId, setEditingMapId] = useStateApp(null);
+  const [builtInMaps, setBuiltInMaps] = useStateApp({});
+  const [mapsLoading, setMapsLoading] = useStateApp(true);
+  const [mapsLoadError, setMapsLoadError] = useStateApp('');
   const [allProgress, setAllProgress] = useStateApp(() => loadProgress());
   const [customMaps, setCustomMaps] = useStateApp(() => loadCustomMaps());
   const [positions, setPositions] = useStateApp(() => loadPositions());
@@ -38,8 +41,29 @@ function App() {
   const publishedCustomMaps = Object.fromEntries(
     Object.entries(customMaps).filter(([, m]) => !!m._published)
   );
-  const studentMaps = { ...CONCEPT_MAPS, ...publishedCustomMaps };
-  const adminMaps = { ...CONCEPT_MAPS, ...customMaps };
+  const studentMaps = { ...builtInMaps, ...publishedCustomMaps };
+  const adminMaps = { ...builtInMaps, ...customMaps };
+
+  useEffectApp(() => {
+    let cancelled = false;
+    async function hydrateBuiltInMaps() {
+      try {
+        const { maps, failures } = await loadBuiltInMaps();
+        if (cancelled) return;
+        setBuiltInMaps(maps);
+        if (failures.length > 0) {
+          setMapsLoadError(`Some maps failed to load: ${failures.join(' | ')}`);
+        }
+      } catch (err) {
+        if (cancelled) return;
+        setMapsLoadError(err?.message || 'Failed to load built-in maps.');
+      } finally {
+        if (!cancelled) setMapsLoading(false);
+      }
+    }
+    hydrateBuiltInMaps();
+    return () => { cancelled = true; };
+  }, []);
 
   function getProgress(mapId) {
     if (!allProgress[mapId]) return { answeredEdges: new Set() };
@@ -78,6 +102,12 @@ function App() {
     handleSaveCustomMap(id, newMap);
     setEditingMapId(id);
     setView('admin-edit');
+  }
+
+  function handleExportMapJSON(mapId) {
+    const m = adminMaps[mapId];
+    if (!m) return;
+    downloadMapJSON(mapId, m);
   }
 
   function handleEditMap(mapId) {
@@ -198,7 +228,7 @@ function App() {
 
   useEffectApp(() => {
     if (view === 'student' && !studentMaps[activeMapId]) {
-      const fallback = Object.keys(studentMaps)[0] || 'sequences';
+      const fallback = Object.keys(studentMaps)[0] || null;
       setActiveMapId(fallback);
     }
   }, [view, activeMapId, studentMaps]);
@@ -300,6 +330,18 @@ function App() {
       </aside>
 
       <main className="map-area">
+        {mapsLoading && (
+          <div className="empty-canvas-hint">
+            <div className="empty-canvas-hint-title">Loading maps...</div>
+            <div>Fetching chapter files from manifest.</div>
+          </div>
+        )}
+        {!mapsLoading && mapsLoadError && (
+          <div className="empty-canvas-hint">
+            <div className="empty-canvas-hint-title">Map load warning</div>
+            <div>{mapsLoadError}</div>
+          </div>
+        )}
         {view === 'student' && mapData && (
           <ConceptMap
             key={activeMapId}
@@ -318,6 +360,7 @@ function App() {
             onCreate={handleCreateNewMap}
             onDeleteCustom={handleDeleteCustomMap}
             onTogglePublish={handleTogglePublish}
+            onExportMap={handleExportMapJSON}
           />
         )}
         {view === 'admin-edit' && editingMap && (
@@ -328,6 +371,7 @@ function App() {
             onBack={() => setView('admin')}
             onDelete={handleDeleteCustomMap}
             onTogglePublish={(published) => handleTogglePublish(editingMapId, published)}
+            onExport={handleExportMapJSON}
           />
         )}
       </main>

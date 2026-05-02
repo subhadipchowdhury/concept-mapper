@@ -1,0 +1,17 @@
+﻿[
+  {
+    "id": "sequences",
+    "title": "Sequences of Real Numbers",
+    "file": "data/maps/sequences.json"
+  },
+  {
+    "id": "series",
+    "title": "Infinite Series",
+    "file": "data/maps/series.json"
+  },
+  {
+    "id": "funcSequences",
+    "title": "Sequences & Series of Functions",
+    "file": "data/maps/funcSequences.json"
+  }
+]
