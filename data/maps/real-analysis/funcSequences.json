@@ -7,7 +7,7 @@
   "nodes": [
     {
       "id": "fseq",
-      "label": "Sequence of Functions\n\\(\\{f_n\\}\\)",
+      "label": "Sequence of Functions\\n\\(\\{f_n\\}\\)",
       "x": 520,
       "y": 60,
       "color": "#34d399",
@@ -15,140 +15,140 @@
     },
     {
       "id": "pw",
-      "label": "Pointwise\nConvergence",
+      "label": "Pointwise\\nConvergence",
       "x": 240,
       "y": 210,
       "color": "#06b6d4"
     },
     {
       "id": "unif",
-      "label": "Uniform\nConvergence \\(f_n \\rightrightarrows f\\)",
+      "label": "Uniform\\nConvergence \\(f_n \\rightrightarrows f\\)",
       "x": 780,
       "y": 210,
       "color": "#34d399"
     },
     {
       "id": "ucrit",
-      "label": "Uniform Criterion\n\\(\\sup_{x\\in E}|f_n(x)-f(x)| \\to 0\\)",
+      "label": "Uniform Criterion\\n\\(\\sup_{x\\in E}|f_n(x)-f(x)| \\to 0\\)",
       "x": 1050,
       "y": 210,
       "color": "#a78bfa"
     },
     {
       "id": "limf",
-      "label": "Limit Function\n\\(f\\)",
+      "label": "Limit Function\\n\\(f\\)",
       "x": 240,
       "y": 370,
       "color": "#a78bfa"
     },
     {
       "id": "cont",
-      "label": "Uniform Limit Theorem\n(preserves continuity)",
+      "label": "Uniform Limit Theorem\\n(preserves continuity)",
       "x": 780,
       "y": 370,
       "color": "#34d399"
     },
     {
       "id": "integ",
-      "label": "Interchange with\nIntegral",
+      "label": "Interchange with\\nIntegral",
       "x": 620,
       "y": 530,
       "color": "#34d399"
     },
     {
       "id": "diffthm",
-      "label": "Differentiation\nTheorem",
+      "label": "Differentiation\\nTheorem",
       "x": 960,
       "y": 530,
       "color": "#f59e0b"
     },
     {
       "id": "fseries",
-      "label": "Series of Functions\n\\(\\sum f_n(x)\\)",
+      "label": "Series of Functions\\n\\(\\sum f_n(x)\\)",
       "x": 250,
       "y": 530,
       "color": "#06b6d4"
     },
     {
       "id": "partial",
-      "label": "Partial Sums\n\\(S_N(x)=\\sum_{n=0}^{N} f_n(x)\\)",
+      "label": "Partial Sums\\n\\(S_N(x)=\\sum_{n=0}^{N} f_n(x)\\)",
       "x": 250,
       "y": 690,
       "color": "#fb923c"
     },
     {
       "id": "mtest",
-      "label": "Weierstrass\nM-Test",
+      "label": "Weierstrass\\nM-Test",
       "x": 90,
       "y": 860,
       "color": "#f59e0b"
     },
     {
       "id": "power",
-      "label": "Power Series\n\\(\\sum a_n(x-c)^n\\)",
+      "label": "Power Series\\n\\(\\sum a_n(x-c)^n\\)",
       "x": 470,
       "y": 860,
       "color": "#f472b6"
     },
     {
       "id": "center",
-      "label": "Center\n\\(c\\)",
+      "label": "Center\\n\\(c\\)",
       "x": 330,
       "y": 1010,
       "color": "#fb7185"
     },
     {
       "id": "radius",
-      "label": "Radius of\nConvergence \\(R\\)",
+      "label": "Radius of\\nConvergence \\(R\\)",
       "x": 540,
       "y": 1010,
       "color": "#fb7185"
     },
     {
       "id": "interval",
-      "label": "Interval of\nConvergence",
+      "label": "Interval of\\nConvergence",
       "x": 540,
       "y": 1160,
       "color": "#fb7185"
     },
     {
       "id": "compact",
-      "label": "Absolute and Uniform\non Compact Subintervals",
+      "label": "Absolute and Uniform\\non Compact Subintervals",
       "x": 330,
       "y": 1160,
       "color": "#34d399"
     },
     {
       "id": "termops",
-      "label": "Termwise Differentiation\nand Integration",
+      "label": "Termwise Differentiation\\nand Integration",
       "x": 860,
       "y": 1010,
       "color": "#f59e0b"
     },
     {
       "id": "tseries",
-      "label": "Taylor Series\n\\(\\sum f^{(n)}(c)(x-c)^n/n!\\)",
+      "label": "Taylor Series\\n\\(\\sum f^{(n)}(c)(x-c)^n/n!\\)",
       "x": 1030,
       "y": 1160,
       "color": "#a78bfa"
     },
     {
       "id": "tpoly",
-      "label": "Taylor Polynomial\n\\(T_n\\)",
+      "label": "Taylor Polynomial\\n\\(T_n\\)",
       "x": 860,
       "y": 1310,
       "color": "#a78bfa"
     },
     {
       "id": "maclaurin",
-      "label": "Maclaurin Series\n\\(c=0\\)",
+      "label": "Maclaurin Series\\n\\(c=0\\)",
       "x": 1180,
       "y": 1310,
       "color": "#a78bfa"
     },
     {
       "id": "remainder",
-      "label": "Remainder\n\\(R_n(x)=f(x)-T_n(x)\\)",
+      "label": "Remainder\\n\\(R_n(x)=f(x)-T_n(x)\\)",
       "x": 860,
       "y": 1460,
       "color": "#fb923c"
@@ -169,35 +169,35 @@
     },
     {
       "id": "xnexample",
-      "label": "Example\n\\(f_n(x)=x^n\\) on \\([0,1]\\)",
+      "label": "Example\\n\\(f_n(x)=x^n\\) on \\([0,1]\\)",
       "x": 70,
       "y": 210,
       "color": "#fb7185"
     },
     {
       "id": "xnlimit",
-      "label": "Limit: 0 on \\([0,1)\\),\n1 at \\(x=1\\)",
+      "label": "Limit: 0 on \\([0,1)\\),\\n1 at \\(x=1\\)",
       "x": 70,
       "y": 370,
       "color": "#fb7185"
     },
     {
       "id": "expseries",
-      "label": "Example\n\\(e^x=\\sum x^n/n!\\)",
+      "label": "Example\\n\\(e^x=\\sum x^n/n!\\)",
       "x": 70,
       "y": 1010,
       "color": "#34d399"
     },
     {
       "id": "logseries",
-      "label": "Example\n\\(\\ln(1+x)=\\sum (-1)^{n+1}x^n/n\\)",
+      "label": "Example\\n\\(\\ln(1+x)=\\sum (-1)^{n+1}x^n/n\\)",
       "x": 370,
       "y": 1310,
       "color": "#fb923c"
     },
     {
       "id": "flatcounter",
-      "label": "Counterexample\n\\(f(x)=e^{-1/x^2},\\ f(0)=0\\)",
+      "label": "Counterexample\\n\\(f(x)=e^{-1/x^2},\\ f(0)=0\\)",
       "x": 1400,
       "y": 1460,
       "color": "#fb7185"
@@ -208,19 +208,21 @@
       "id": "f_e1",
       "from": "fseq",
       "to": "pw",
-      "label": "if you fix \\(x\\) first and then let \\(n\\to\\infty\\), what type of convergence is this?",
-      "answer": "pointwise",
-      "type": "fillin",
-      "hint": "The index threshold may depend on the point \\(x\\)."
+      "label": "in this mode of convergence, the index threshold \\(N\\) may depend on which variable?",
+      "answer": "x",
+      "type": "dropdown",
+      "options": ["x", "n", "the domain size", "the derivative order"],
+      "hint": "The point is fixed first, and the required tail bound can vary from point to point."
     },
     {
       "id": "f_e2",
       "from": "fseq",
       "to": "unif",
-      "label": "if one \\(N\\) works for every \\(x\\in E\\), what type of convergence is this?",
-      "answer": "uniform",
-      "type": "fillin",
-      "hint": "The same index bound works across the whole domain."
+      "label": "in this stronger mode, one \\(N\\) must work for how many points \\(x\\in E\\)?",
+      "answer": "all of them",
+      "type": "dropdown",
+      "options": ["all of them", "one fixed point", "only the endpoints", "only rational x"],
+      "hint": "The same tail bound must hold across the entire domain."
     },
     {
       "id": "f_e3",
@@ -235,10 +237,11 @@
       "id": "f_e4",
       "from": "pw",
       "to": "limf",
-      "label": "the function \\(f(x)=\\lim_n f_n(x)\\) is called the ___ function; fill in the missing word.",
-      "answer": "limit",
-      "type": "fillin",
-      "hint": "It is defined point by point from the sequence."
+      "label": "for each fixed \\(x\\), the real-number sequence whose limit defines \\(f(x)\\) is ___",
+      "answer": "f_n(x)",
+      "type": "dropdown",
+      "options": ["f_n(x)", "f'(x)", "\\sup_x f_n(x)", "\\int_E f_n"],
+      "hint": "Pointwise convergence first turns the problem into an ordinary sequence of real numbers."
     },
     {
       "id": "f_e5",
@@ -277,19 +280,21 @@
       "id": "f_e8",
       "from": "fseq",
       "to": "fseries",
-      "label": "a sum \\(\\sum f_n(x)\\) is called a ___ of functions; fill in the term.",
-      "answer": "series",
-      "type": "fillin",
-      "hint": "Its convergence is defined through partial sums."
+      "label": "for each fixed \\(x\\), the object \\(\\sum f_n(x)\\) becomes what familiar kind of object?",
+      "answer": "a numerical series",
+      "type": "dropdown",
+      "options": ["a numerical series", "a derivative", "a single coefficient", "a compact set"],
+      "hint": "Fixing \\(x\\) turns each term into a real number."
     },
     {
       "id": "f_e9",
       "from": "fseries",
       "to": "partial",
-      "label": "the sequence used to test convergence is the sequence of ___ sums; fill in the term.",
-      "answer": "partial",
-      "type": "fillin",
-      "hint": "Stop the infinite sum at a finite index \\(N\\)."
+      "label": "the truncation \\(S_N(x)\\) keeps terms only through which final index?",
+      "answer": "N",
+      "type": "dropdown",
+      "options": ["N", "\\infty", "N^2", "0 only"],
+      "hint": "A partial sum stops at a finite cutoff."
     },
     {
       "id": "f_e10",
@@ -310,19 +315,21 @@
       "id": "f_e11",
       "from": "fseries",
       "to": "power",
-      "label": "a power series has terms of the form coefficient times what?",
-      "answer": "(x-c)^n",
-      "type": "fillin",
-      "hint": "The exponent is the varying part; the center stays fixed."
+      "label": "in a power series, which shifted quantity is raised to the nth power?",
+      "answer": "x-c",
+      "type": "dropdown",
+      "options": ["x-c", "x+c", "a_n", "R-x"],
+      "hint": "The powers are measured relative to the center point."
     },
     {
       "id": "f_e12",
       "from": "power",
       "to": "center",
-      "label": "in \\(\\sum a_n(x-c)^n\\), the constant \\(c\\) is called the ___ of the series.",
-      "answer": "center",
-      "type": "fillin",
-      "hint": "The powers are measured relative to this point."
+      "label": "in \\(\\sum a_n(x-c)^n\\), which symbol denotes the expansion point?",
+      "answer": "c",
+      "type": "dropdown",
+      "options": ["c", "R", "n", "x"],
+      "hint": "The powers are taken relative to this fixed point."
     },
     {
       "id": "f_e13",
@@ -346,82 +353,91 @@
       "id": "f_e15",
       "from": "radius",
       "to": "compact",
-      "label": "on every closed interval strictly inside \\(|x-c|<R\\), convergence is absolute and what kind of convergence?",
-      "answer": "uniform",
-      "type": "fillin",
-      "hint": "This is the local uniformity that makes power series well behaved."
+      "label": "on every closed interval strictly inside \\(|x-c|<R\\), does one \\(N\\) work for all \\(x\\) in that interval?",
+      "answer": "yes",
+      "type": "dropdown",
+      "options": ["yes", "no", "only at the midpoint", "only when R=1"],
+      "hint": "Power-series convergence is locally uniform on compact subintervals."
     },
     {
       "id": "f_e16",
       "from": "power",
       "to": "termops",
-      "label": "inside the interval of convergence, power series can be differentiated and integrated ___ by term.",
-      "answer": "term",
-      "type": "fillin",
-      "hint": "The operation is applied one summand at a time."
+      "label": "inside the interval of convergence, differentiating a power series term by term preserves the same radius of convergence: true or false?",
+      "answer": "true",
+      "type": "dropdown",
+      "options": ["true", "false"],
+      "hint": "Power series remain well behaved under termwise differentiation and integration."
     },
     {
       "id": "f_e17",
       "from": "termops",
       "to": "tseries",
-      "label": "if \\(a_n=f^{(n)}(c)/n!\\), the power series is the ___ series of \\(f\\).",
-      "answer": "Taylor",
-      "type": "fillin",
-      "hint": "Its coefficients come from derivatives at the center."
+      "label": "in the Taylor expansion, the coefficient of \\((x-c)^n\\) is \\(f^{(n)}(c)\\) divided by ___",
+      "answer": "n!",
+      "type": "dropdown",
+      "options": ["n!", "n", "R", "c^n"],
+      "hint": "The factorial normalizes the nth derivative term."
     },
     {
       "id": "f_e18",
       "from": "tseries",
       "to": "tpoly",
-      "label": "the finite truncation of a Taylor series is called the Taylor ___.",
-      "answer": "polynomial",
-      "type": "fillin",
-      "hint": "It is the partial sum through degree \\(n\\)."
+      "label": "the nth Taylor polynomial keeps terms only through degree ___",
+      "answer": "n",
+      "type": "dropdown",
+      "options": ["n", "n+1", "2n", "\\infty"],
+      "hint": "It is the finite truncation up to the nth-degree term."
     },
     {
       "id": "f_e19",
       "from": "tseries",
       "to": "maclaurin",
-      "label": "a Taylor series centered at \\(0\\) is called a ___ series.",
-      "answer": "Maclaurin",
-      "type": "fillin",
-      "hint": "It is the special case centered at the origin."
+      "label": "a Maclaurin expansion is the special Taylor case with center \\(c=\\) ___",
+      "answer": "0",
+      "type": "dropdown",
+      "options": ["0", "1", "R", "n"],
+      "hint": "Maclaurin means the expansion is centered at the origin."
     },
     {
       "id": "f_e20",
       "from": "tpoly",
       "to": "remainder",
-      "label": "the approximation error \\(f(x)-T_n(x)\\) is called the ___ term.",
-      "answer": "remainder",
-      "type": "fillin",
-      "hint": "It measures what the polynomial approximation leaves out."
+      "label": "the quantity \\(f(x)-T_n(x)\\) measures the approximation ___",
+      "answer": "error",
+      "type": "dropdown",
+      "options": ["error", "radius", "center", "coefficient"],
+      "hint": "It is what remains after subtracting the polynomial approximation."
     },
     {
       "id": "f_e21",
       "from": "remainder",
       "to": "taylorthm",
-      "label": "Taylor's theorem gives a formula or bound for the ___ term.",
-      "answer": "remainder",
-      "type": "fillin",
-      "hint": "This is the quantitative control of approximation error."
+      "label": "Taylor's theorem gives a formula or bound for the approximation ___",
+      "answer": "error",
+      "type": "dropdown",
+      "options": ["error", "center", "radius", "domain"],
+      "hint": "The theorem quantifies how far the polynomial is from the function."
     },
     {
       "id": "f_e22",
       "from": "taylorthm",
       "to": "analytic",
-      "label": "if a function equals its Taylor series on a neighborhood, it is ___.",
-      "answer": "analytic",
-      "type": "fillin",
-      "hint": "Smoothness alone is not enough; equality with the series is the key."
+      "label": "if a function equals its Taylor series on a neighborhood, it has a local power-series ___",
+      "answer": "representation",
+      "type": "dropdown",
+      "options": ["representation", "bound", "period", "discontinuity"],
+      "hint": "Analyticity means the function is genuinely given by a power series nearby."
     },
     {
       "id": "f_e23",
       "from": "pw",
       "to": "xnexample",
-      "label": "classic example separating modes: \\(f_n(x)=x^n\\) on \\([0,1]\\) converges in what sense?",
-      "answer": "pointwise",
-      "type": "fillin",
-      "hint": "The threshold depends on how close \\(x\\) is to 1."
+      "label": "for \\(f_n(x)=x^n\\) on \\([0,1]\\), the required tail index depends strongly on how close \\(x\\) is to ___",
+      "answer": "1",
+      "type": "dropdown",
+      "options": ["1", "0", "-1", "\\infty"],
+      "hint": "Near \\(x=1\\), the powers decay very slowly, which blocks uniform convergence on the whole interval."
     },
     {
       "id": "f_e24",

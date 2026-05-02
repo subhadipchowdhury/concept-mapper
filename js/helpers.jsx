@@ -278,7 +278,7 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
         )}
 
         <div className="popup-label">
-          The label reads: <em>"{displayLabel}"</em>
+            The label reads: <em><MathNode text={displayLabel} /></em>
         </div>
 
         {edge.type === 'fillin' ? (

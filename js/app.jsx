@@ -335,6 +335,27 @@ function App() {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
   }, []);
 
+  useEffectApp(() => {
+    try {
+      const media = window.matchMedia('(max-width: 760px)');
+      const syncSidebarForViewport = (event) => {
+        if (event.matches) setIsSidebarCollapsed(true);
+      };
+
+      syncSidebarForViewport(media);
+
+      if (typeof media.addEventListener === 'function') {
+        media.addEventListener('change', syncSidebarForViewport);
+        return () => media.removeEventListener('change', syncSidebarForViewport);
+      }
+
+      media.addListener(syncSidebarForViewport);
+      return () => media.removeListener(syncSidebarForViewport);
+    } catch {
+      return undefined;
+    }
+  }, []);
+
   // Display short-lived status feedback in the top-right toast area.
   function showToast(message, type = 'info', durationMs = 2600) {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);

@@ -105,11 +105,11 @@
       "id": "rk_e1",
       "from": "reaction",
       "to": "rate",
-      "label": "the quantity that measures how fast reactants are consumed is the ___",
-      "answer": "reaction rate",
+      "label": "if a reactant concentration drops from 0.80 M to 0.50 M in 10 s, the average reaction rate is ___",
+      "answer": "0.03 M/s",
       "type": "dropdown",
-      "options": ["reaction rate", "rate constant", "activation energy", "reaction order"],
-      "hint": "Units are usually mol L^-1 s^-1."
+      "options": ["0.03 M/s", "0.30 M/s", "-0.03 M/s", "3.0 M/s"],
+      "hint": "Average rate uses the positive quantity -Δ[A]/Δt = -(0.50 - 0.80)/10."
     },
     {
       "id": "rk_e2",
@@ -145,21 +145,21 @@
       "id": "rk_e5",
       "from": "rateLaw",
       "to": "order",
-      "label": "the sum of exponents m + n in \\(rate = k[A]^m[B]^n\\) is the overall ___",
-      "answer": "reaction order",
+      "label": "if a rate law is \\(rate = k[A]^1[B]^2\\), the overall order is ___",
+      "answer": "3",
       "type": "dropdown",
-      "options": ["reaction order", "rate constant", "stoichiometric coefficient", "activation energy"],
-      "hint": "Overall order is the sum of concentration exponents."
+      "options": ["3", "2", "1", "1 + 2[AB]"],
+      "hint": "Overall order is the sum of the exponents on concentration terms: 1 + 2 = 3."
     },
     {
       "id": "rk_e6",
       "from": "rateLaw",
       "to": "rateConstant",
-      "label": "the factor k in \\(rate = k[A]^m[B]^n\\), whose units depend on reaction order, is the ___",
-      "answer": "rate constant",
+      "label": "for a first-order rate law \\(rate = k[A]\\), the units of k are ___",
+      "answer": "s^-1",
       "type": "dropdown",
-      "options": ["rate constant", "reaction order", "pre-exponential factor", "activation energy"],
-      "hint": "Its units depend on overall reaction order."
+      "options": ["s^-1", "M/s", "M^-1 s^-1", "mol/L"],
+      "hint": "Rate has units of concentration per time, so for first order k must have units of inverse time."
     },
     {
       "id": "rk_e7",
@@ -175,10 +175,11 @@
       "id": "rk_e8",
       "from": "arrhenius",
       "to": "activationEnergy",
-      "label": "in a plot of ln(k) vs 1/T, slope gives minus ___ over R",
-      "answer": "activation energy",
-      "type": "fillin",
-      "hint": "Slope = -E_a/R."
+      "label": "on a plot of \\ln(k)\\ versus \\1/T\\, a larger activation barrier gives a ___ slope",
+      "answer": "more negative",
+      "type": "dropdown",
+      "options": ["more negative", "more positive", "zero", "horizontal"],
+      "hint": "Since slope = -E_a/R, increasing E_a makes the slope decrease further below zero."
     },
     {
       "id": "rk_e9",
@@ -234,10 +235,11 @@
       "id": "rk_e14",
       "from": "catalyst",
       "to": "activationEnergy",
-      "label": "a catalyst speeds reaction by providing a pathway with lower ___",
-      "answer": "activation energy",
-      "type": "fillin",
-      "hint": "Catalysts change kinetics, not the reaction enthalpy or equilibrium constant."
+      "label": "a catalyst speeds reaction by making the Arrhenius exponent less ___ at the same temperature",
+      "answer": "negative",
+      "type": "dropdown",
+      "options": ["negative", "positive", "constant", "undefined"],
+      "hint": "Lowering E_a makes -E_a/(RT) less negative, so k increases."
     }
   ]
 }

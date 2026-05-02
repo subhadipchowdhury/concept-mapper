@@ -314,16 +314,16 @@
       "id": "sc_e7",
       "from": "seq",
       "to": "bdd",
-      "label": "all terms lying in some interval \\( [-M,M] \\) is the property called:",
-      "answer": "bounded",
+      "label": "which statement is the correct formal meaning of boundedness for a sequence?",
+      "answer": "|a_n| ≤ M for some M and all n",
       "type": "dropdown",
       "options": [
-        "bounded",
-        "monotone",
-        "Cauchy",
-        "divergent"
+        "|a_n| ≤ M for some M and all n",
+        "a_{n+1} ≥ a_n for all n",
+        "a_n → 0",
+        "|a_m-a_n|<ε eventually"
       ],
-      "hint": "This is a size restriction, not an order restriction."
+      "hint": "Boundedness means all terms stay inside one fixed interval centered at 0."
     },
     {
       "id": "sc_e7b",
@@ -366,16 +366,16 @@
       "id": "sc_e10",
       "from": "subseq",
       "to": "sublim",
-      "label": "if some extracted terms \\(a_{n_k}\\) converge to \\(L\\), then \\(L\\) is a:",
-      "answer": "subsequential limit",
+      "label": "if some extracted terms \\(a_{n_k}\\) converge to \\(L\\), then \\(L\\) is the limit of a ___",
+      "answer": "subsequence",
       "type": "dropdown",
       "options": [
-        "subsequential limit",
+        "subsequence",
+        "partial sum",
         "bound",
-        "period",
-        "partial sum"
+        "derivative"
       ],
-      "hint": "The name reflects the kind of sequence used to obtain the limit."
+      "hint": "The extracted indices \(n_k\) define the smaller sequence whose limit is \(L\)."
     },
     {
       "id": "sc_e11",
@@ -414,31 +414,31 @@
       "id": "sc_e13",
       "from": "subseq",
       "to": "peak",
-      "label": "an index with no later term larger than \\(a_n\\) is called a:",
-      "answer": "peak point",
+      "label": "an index \(n\) is a peak point if no later term is ___ than \\(a_n\\)",
+      "answer": "larger",
       "type": "dropdown",
       "options": [
-        "peak point",
-        "cluster point",
-        "fixed point",
-        "Cauchy point"
+        "larger",
+        "smaller",
+        "equal",
+        "closer to 0"
       ],
-      "hint": "Think of skyline maxima."
+      "hint": "A peak is a skyline maximum among all later terms."
     },
     {
       "id": "sc_e14",
       "from": "peak",
       "to": "monlemma",
-      "label": "the peak/no-peak dichotomy guarantees some subsequence is:",
-      "answer": "monotone",
+      "label": "the peak/no-peak dichotomy guarantees a subsequence that is either nonincreasing or ___",
+      "answer": "nondecreasing",
       "type": "dropdown",
       "options": [
-        "periodic",
-        "monotone",
+        "nondecreasing",
+        "bounded",
         "constant",
-        "random"
+        "Cauchy"
       ],
-      "hint": "This is the content of the monotone subsequence lemma."
+      "hint": "The lemma produces a monotone subsequence in one of the two order directions."
     },
     {
       "id": "sc_e14b",
@@ -549,16 +549,16 @@
       "id": "sc_e21",
       "from": "cauchy",
       "to": "cauchy_bdd",
-      "label": "taking \\(\\varepsilon=1\\) shows every Cauchy sequence is:",
-      "answer": "bounded",
+      "label": "taking \\(\\varepsilon=1\\) shows the tail of a Cauchy sequence lies in an interval of length ___",
+      "answer": "2",
       "type": "dropdown",
       "options": [
-        "bounded",
-        "monotone",
-        "eventually constant",
-        "strictly decreasing"
+        "2",
+        "1",
+        "\\varepsilon",
+        "infinity"
       ],
-      "hint": "The tail fits inside one fixed interval."
+      "hint": "If \(|a_n-a_N|<1\), then all tail terms lie within distance 1 of \(a_N\)."
     },
     {
       "id": "sc_e21b",
