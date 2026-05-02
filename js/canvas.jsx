@@ -36,7 +36,14 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
-function computeAutoNodeLayout(mapData) {
+const EDGE_LABEL_T_PRESETS = [1 / 3, 0.4, 0.5];
+
+function getMapEdgeLabelT(mapData) {
+  const raw = Number(mapData && mapData.edgeLabelT);
+  return Number.isFinite(raw) ? clamp(raw, 0.2, 0.8) : (1 / 3);
+}
+
+function computeAutoNodeLayout(mapData, edgeLabelT = getMapEdgeLabelT(mapData)) {
   const nodes = (mapData.nodes || []).filter((n) => (
     n &&
     typeof n.id === 'string' &&
@@ -134,12 +141,10 @@ function computeAutoNodeLayout(mapData) {
       const to = pos[edge.to];
       const fromSize = sizes[edge.from];
       const toSize = sizes[edge.to];
-      const hasReverseEdge = edge.from !== edge.to && edgeDirectionSet.has(`${edge.to}->${edge.from}`);
-      const pairSign = String(edge.from) < String(edge.to) ? 1 : -1;
       const path = computeEdgePath(
         { x: from.x, y: from.y, w: fromSize.w, h: fromSize.h },
         { x: to.x, y: to.y, w: toSize.w, h: toSize.h },
-        { portOffset: hasReverseEdge ? pairSign * 18 : 0 }
+        { labelT: edgeLabelT }
       );
       return { edge, x: path.midX, y: path.midY };
     });
@@ -426,6 +431,10 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   const [activeEdge, setActiveEdge] = useState2(null);
   const [showComplete, setShowComplete] = useState2(false);
   const [isHelpOpen, setIsHelpOpen] = useState2(false);
+  const [edgeLabelT, setEdgeLabelT] = useState2(() => {
+    const saved = Number(window.localStorage.getItem(`cm:edgeLabelT:${mapData.id}`));
+    return Number.isFinite(saved) ? clamp(saved, 0.2, 0.8) : getMapEdgeLabelT(mapData);
+  });
   const viewportRef = useRef2(null);
   const { t, setT, onWheel, startPan, onTouchStart, onTouchMove, onTouchEnd } = usePanZoom();
 
@@ -439,7 +448,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
 
   // local node positions: positions[mapId][nodeId] = {x, y}
   const mapPositions = positions[mapData.id] || {};
-  const autoLayout = useMemo2(() => computeAutoNodeLayout(mapData), [mapData]);
+  const autoLayout = useMemo2(() => computeAutoNodeLayout(mapData, edgeLabelT), [mapData, edgeLabelT]);
   // Effective node coords: stored override, else from data
   function nodeXY(node) {
     const p = mapPositions[node.id];
@@ -482,6 +491,12 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
 
   function fitToScreen() {
     setT({ x: 60, y: 80, scale: 1 });
+  }
+
+  function cycleEdgeLabelT() {
+    const currentIdx = EDGE_LABEL_T_PRESETS.findIndex((v) => Math.abs(v - edgeLabelT) < 0.0001);
+    const next = EDGE_LABEL_T_PRESETS[(currentIdx + 1) % EDGE_LABEL_T_PRESETS.length];
+    setEdgeLabelT(next);
   }
 
   function spreadNodes() {
@@ -558,6 +573,16 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   const toNode = activeEdge ? validNodes.find(n => n.id === activeEdge.to) : null;
 
   useEffect2(() => {
+    const saved = Number(window.localStorage.getItem(`cm:edgeLabelT:${mapData.id}`));
+    const next = Number.isFinite(saved) ? clamp(saved, 0.2, 0.8) : getMapEdgeLabelT(mapData);
+    setEdgeLabelT(next);
+  }, [mapData.id]);
+
+  useEffect2(() => {
+    window.localStorage.setItem(`cm:edgeLabelT:${mapData.id}`, String(edgeLabelT));
+  }, [mapData.id, edgeLabelT]);
+
+  useEffect2(() => {
     let cancelled = false;
     let attempts = 0;
 
@@ -600,6 +625,13 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
           <button className="icon-btn" onClick={spreadNodes} title="Spread nodes apart">⊕</button>
           <button className="icon-btn" onClick={compactNodes} title="Pull nodes inward">⊖</button>
           <button className="icon-btn" onClick={resetLayout} title="Reset node layout to auto placement">⟲</button>
+          <button
+            className="icon-btn"
+            onClick={cycleEdgeLabelT}
+            title={`Label anchor: ${edgeLabelT.toFixed(2)} (click to cycle)`}
+          >
+            {`L${edgeLabelT.toFixed(2)}`}
+          </button>
         </div>
       </div>
 
@@ -633,9 +665,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
               if (!f || !to) return null;
               const isAnswered = answeredEdges.has(edge.id);
               const fromUnlocked = unlockedNodes.has(edge.from);
-              const hasReverseEdge = edge.from !== edge.to && edgeDirectionSet.has(`${edge.to}->${edge.from}`);
-              const pairSign = String(edge.from) < String(edge.to) ? 1 : -1;
-              const path = computeEdgePath(f, to, { portOffset: hasReverseEdge ? pairSign * 18 : 0 });
+              const path = computeEdgePath(f, to, { labelT: edgeLabelT });
               const fromN = mapData.nodes.find(n => n.id === edge.from);
               const stroke = !fromUnlocked ? 'rgba(255,255,255,0.08)'
                            : isAnswered ? (fromN.color || '#34d399')
@@ -660,9 +690,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
             const isAnswered = answeredEdges.has(edge.id);
             const fromUnlocked = unlockedNodes.has(edge.from);
             if (!fromUnlocked && !isAnswered) return null;
-            const hasReverseEdge = edge.from !== edge.to && edgeDirectionSet.has(`${edge.to}->${edge.from}`);
-            const pairSign = String(edge.from) < String(edge.to) ? 1 : -1;
-            const path = computeEdgePath(f, to, { portOffset: hasReverseEdge ? pairSign * 18 : 0 });
+            const path = computeEdgePath(f, to, { labelT: edgeLabelT });
             return (
               <div
                 key={edge.id}
