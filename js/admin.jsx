@@ -1,7 +1,7 @@
 // Admin Canvas — visual drag-and-drop concept map builder
 // Exposes: AdminCanvas, MapsManager
 
-const { useState: useStateA, useEffect: useEffectA, useRef: useRefA, useCallback: useCallbackA } = React;
+const { useState: useStateA, useRef: useRefA } = React;
 
 const NODE_COLOR_PALETTE = [
   '#4f8ef7', // blue
