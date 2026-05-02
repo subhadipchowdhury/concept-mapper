@@ -638,13 +638,13 @@ body {
 
 .icon-btn:hover { color: var(--text); border-color: var(--border-2); background: var(--bg3); }
 
-.icon-btn-layout-reset {
+.icon-btn-auto-arrange {
   color: rgba(110, 203, 246, 0.86);
   border-color: rgba(110, 203, 246, 0.32);
   background: rgba(110, 203, 246, 0.08);
 }
 
-.icon-btn-layout-reset-icon {
+.icon-btn-auto-arrange-icon {
   width: 16px;
   height: 16px;
   background-color: currentColor;
@@ -652,7 +652,7 @@ body {
   mask: url('assets/icons/reset-layout.svg') center / contain no-repeat;
 }
 
-.icon-btn-layout-reset:hover {
+.icon-btn-auto-arrange:hover {
   color: #8ddbff;
   border-color: rgba(141, 219, 255, 0.5);
   background: rgba(110, 203, 246, 0.18);

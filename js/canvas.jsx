@@ -578,7 +578,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   }
 
   // Remove manual node positions so auto-layout takes over again.
-  function resetLayout() {
+  function autoArrange() {
     const next = { ...positions };
     delete next[mapData.id];
     onPositions(next);
@@ -656,8 +656,8 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
           <button className="icon-btn" onClick={compactNodes} title="Pull nodes inward" aria-label="Pull nodes inward">
             <span className="icon-btn-compact-nodes-icon" aria-hidden="true"></span>
           </button>
-          <button className="icon-btn icon-btn-layout-reset" onClick={resetLayout} title="Reset node layout to auto placement" aria-label="Reset node layout">
-            <span className="icon-btn-layout-reset-icon" aria-hidden="true"></span>
+          <button className="icon-btn icon-btn-auto-arrange" onClick={autoArrange} title="Auto arrange nodes" aria-label="Auto arrange">
+            <span className="icon-btn-auto-arrange-icon" aria-hidden="true"></span>
           </button>
           <label className="edge-label-slider" title={`Label anchor: ${edgeLabelT.toFixed(2)}`}>
             <span className="edge-label-slider-text">Label</span>
