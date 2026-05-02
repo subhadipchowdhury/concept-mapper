@@ -2,19 +2,21 @@
 const { useState: useStateApp, useEffect: useEffectApp, useRef: useRefApp } = React;
 
 const ADMIN_UNLOCK_KEY = 'conceptmapper_teacher_unlocked_v1';
-const ADMIN_STATIC_PASSPHRASE = 'SECRETPHRASE';
+const ADMIN_STATIC_PASSPHRASE = 'SECRET';
 const SUBJECTS_KEY = 'conceptmapper_subjects_v1';
 const SUBJECT_ORDER_KEY = 'conceptmapper_subject_order_v1';
 const SIDEBAR_FOLDER_COLLAPSE_KEY = 'conceptmapper_sidebar_folder_collapse_v1';
 const DEFAULT_SUBJECT_ID = 'general';
 const DEFAULT_SUBJECT_TITLE = 'General';
 
+// Normalize any incoming subject id into a stable non-empty value.
 function normalizeSubjectId(subjectId) {
   if (typeof subjectId !== 'string') return DEFAULT_SUBJECT_ID;
   const cleaned = subjectId.trim();
   return cleaned || DEFAULT_SUBJECT_ID;
 }
 
+// Generate a readable fallback title from a slug-like subject id.
 function fallbackSubjectTitleFromId(subjectId) {
   const source = normalizeSubjectId(subjectId);
   if (source === DEFAULT_SUBJECT_ID) return DEFAULT_SUBJECT_TITLE;
@@ -26,6 +28,7 @@ function fallbackSubjectTitleFromId(subjectId) {
   return words.join(' ') || DEFAULT_SUBJECT_TITLE;
 }
 
+// Resolve the canonical subject id/title pair for a map record.
 function getSubjectInfo(mapData) {
   const id = normalizeSubjectId(mapData?.subjectId);
   const title = typeof mapData?.subjectTitle === 'string' && mapData.subjectTitle.trim()
@@ -34,6 +37,7 @@ function getSubjectInfo(mapData) {
   return { id, title };
 }
 
+// Convert a folder title into a URL-safe identifier.
 function slugifySubjectId(title) {
   const raw = (title || '')
     .toLowerCase()
@@ -43,6 +47,7 @@ function slugifySubjectId(title) {
   return raw || 'subject';
 }
 
+// Ensure a subject id is unique by appending an incrementing suffix.
 function uniqueSubjectId(baseId, existingIds) {
   if (!existingIds.has(baseId)) return baseId;
   let n = 2;
@@ -50,6 +55,7 @@ function uniqueSubjectId(baseId, existingIds) {
   return `${baseId}-${n}`;
 }
 
+// Read custom subject definitions from local storage.
 function loadCustomSubjects() {
   try {
     const raw = localStorage.getItem(SUBJECTS_KEY);
@@ -60,10 +66,12 @@ function loadCustomSubjects() {
   }
 }
 
+// Persist custom subject definitions to local storage.
 function saveCustomSubjects(subjects) {
   localStorage.setItem(SUBJECTS_KEY, JSON.stringify(subjects || {}));
 }
 
+// Read saved subject ordering preference.
 function loadSubjectOrder() {
   try {
     const raw = localStorage.getItem(SUBJECT_ORDER_KEY);
@@ -74,10 +82,12 @@ function loadSubjectOrder() {
   }
 }
 
+// Persist subject ordering preference.
 function saveSubjectOrder(order) {
   localStorage.setItem(SUBJECT_ORDER_KEY, JSON.stringify(Array.isArray(order) ? order : []));
 }
 
+// Read sidebar folder collapse state for student view.
 function loadSidebarFolderCollapse() {
   try {
     const raw = localStorage.getItem(SIDEBAR_FOLDER_COLLAPSE_KEY);
@@ -88,10 +98,12 @@ function loadSidebarFolderCollapse() {
   }
 }
 
+// Persist sidebar folder collapse state.
 function saveSidebarFolderCollapse(value) {
   localStorage.setItem(SIDEBAR_FOLDER_COLLAPSE_KEY, JSON.stringify(value || {}));
 }
 
+// Convert in-memory Set-based progress into JSON-safe arrays.
 function serializeProgress(progressObj) {
   const serializable = {};
   Object.entries(progressObj || {}).forEach(([mapId, p]) => {
@@ -102,6 +114,7 @@ function serializeProgress(progressObj) {
   return serializable;
 }
 
+// Convert persisted array-based progress into Set-based runtime state.
 function deserializeProgress(progressObj) {
   const restored = {};
   Object.entries(progressObj || {}).forEach(([mapId, p]) => {
@@ -112,6 +125,7 @@ function deserializeProgress(progressObj) {
   return restored;
 }
 
+// Compare primitive arrays by value and order.
 function arraysEqual(a, b) {
   if (a === b) return true;
   if (!Array.isArray(a) || !Array.isArray(b)) return false;
@@ -122,6 +136,7 @@ function arraysEqual(a, b) {
   return true;
 }
 
+// Normalize map payloads prior to equivalence checks.
 function normalizeForCompare(value) {
   if (Array.isArray(value)) return value.map(normalizeForCompare);
   if (value && typeof value === 'object') {
@@ -136,6 +151,7 @@ function normalizeForCompare(value) {
   return value;
 }
 
+// Compare maps while ignoring metadata fields that should not trigger overrides.
 function mapsEquivalent(a, b) {
   try {
     return JSON.stringify(normalizeForCompare(a)) === JSON.stringify(normalizeForCompare(b));
@@ -144,6 +160,7 @@ function mapsEquivalent(a, b) {
   }
 }
 
+// Build a stable ordered id list: preferred order first, then unseen ids.
 function buildOrderedIds(preferredOrder, mapsObj) {
   const ids = [];
   const seen = new Set();
@@ -166,6 +183,7 @@ function buildOrderedIds(preferredOrder, mapsObj) {
   return ids;
 }
 
+// Build the subject catalog used by both student and admin views.
 function buildSubjectCatalog(preferredOrder, mapsObj, customSubjects) {
   const byId = {
     [DEFAULT_SUBJECT_ID]: {
@@ -195,6 +213,7 @@ function buildSubjectCatalog(preferredOrder, mapsObj, customSubjects) {
   return orderedIds.map((id) => byId[id]).filter(Boolean);
 }
 
+// Group ordered maps into subject sections for sidebar and admin lists.
 function buildSubjectSections(orderedMapIds, mapsObj, subjects) {
   const sectionsById = {};
   const baseOrder = [];
@@ -227,6 +246,7 @@ function buildSubjectSections(orderedMapIds, mapsObj, subjects) {
   return baseOrder.map((id) => sectionsById[id]).filter(Boolean);
 }
 
+// Root application component coordinating student and admin workflows.
 function App() {
   const [view, setView] = useStateApp('student'); // 'student' | 'admin' | 'admin-edit'
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useStateApp(() => {
@@ -309,6 +329,7 @@ function App() {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
   }, []);
 
+  // Display short-lived status feedback in the top-right toast area.
   function showToast(message, type = 'info', durationMs = 2600) {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToast({ message, type });
@@ -332,11 +353,13 @@ function App() {
     saveCustomMaps(next);
   }, [builtInMaps, customMaps]);
 
+  // Return progress for a map, always providing a Set-based default.
   function getProgress(mapId) {
     if (!allProgress[mapId]) return { answeredEdges: new Set() };
     return allProgress[mapId];
   }
 
+  // Count maps that are fully completed in student-visible sections.
   function getCompletedMapCount() {
     return studentSections.reduce((count, section) => {
       const completedInSection = section.maps.filter(m => {
@@ -349,21 +372,25 @@ function App() {
     }, 0);
   }
 
+  // Count all student-visible maps.
   function getTotalMapCount() {
     return studentSections.reduce((count, section) => count + section.maps.length, 0);
   }
 
+  // Persist progress updates for a specific map.
   function handleProgress(mapId, prog) {
     const updated = { ...allProgress, [mapId]: prog };
     setAllProgress(updated);
     saveProgress(updated);
   }
 
+  // Persist node-position updates from canvas interactions.
   function handlePositions(p) {
     setPositions(p);
     savePositions(p);
   }
 
+  // Save or update a custom/admin map with normalized subject metadata.
   function handleSaveCustomMap(mapId, mapData) {
     const subject = getSubjectInfo(mapData);
     const resolvedTitle = subjectTitleById[subject.id] || subject.title;
@@ -377,6 +404,7 @@ function App() {
     saveCustomMaps(updated);
   }
 
+  // Create a new subject folder and append it to subject ordering.
   function handleCreateSubject(title) {
     const cleanedTitle = (title || '').trim();
     if (!cleanedTitle) return null;
@@ -399,6 +427,7 @@ function App() {
     return subjectId;
   }
 
+  // Create a blank custom map in the requested subject and open the editor.
   function handleCreateNewMap(subjectId) {
     const safeSubjectId = normalizeSubjectId(subjectId || allSubjects[0]?.id || DEFAULT_SUBJECT_ID);
     const safeSubjectTitle = subjectTitleById[safeSubjectId] || fallbackSubjectTitleFromId(safeSubjectId);
@@ -420,12 +449,14 @@ function App() {
     setView('admin-edit');
   }
 
+  // Export a single map payload as JSON.
   function handleExportMapJSON(mapId) {
     const m = adminMaps[mapId];
     if (!m) return;
     downloadMapJSON(mapId, m);
   }
 
+  // Reorder map cards after drag-drop within the admin manager.
   function handleReorderMaps(draggedId, targetId) {
     if (!draggedId || !targetId || draggedId === targetId) return;
     setMapOrder((prev) => {
@@ -441,6 +472,7 @@ function App() {
     });
   }
 
+  // Move a map into a different subject folder.
   function handleMoveMapToSubject(mapId, subjectId) {
     const mapData = adminMaps[mapId];
     if (!mapData) return;
@@ -453,6 +485,7 @@ function App() {
     });
   }
 
+  // Export a manifest JSON from current admin ordering and published state.
   function handleExportManifestJSON() {
     const orderedIds = buildOrderedIds(mapOrder, adminMaps);
     const entries = orderedIds
@@ -477,15 +510,18 @@ function App() {
     showToast('Manifest exported. Repo manager should replace data/maps/manifest.json.', 'success');
   }
 
+  // Open a map in admin edit mode.
   function handleEditMap(mapId) {
     setEditingMapId(mapId);
     setView('admin-edit');
   }
 
+  // Apply map changes emitted by the admin editor canvas.
   function handleAdminMapChange(updatedMap) {
     handleSaveCustomMap(updatedMap.id, updatedMap);
   }
 
+  // Toggle whether a custom map appears in student sidebar.
   function handleTogglePublish(mapId, published) {
     const existing = customMaps[mapId];
     if (!existing) return;
@@ -493,10 +529,12 @@ function App() {
     showToast(published ? 'Map published to student sidebar.' : 'Map moved to draft.', 'info');
   }
 
+  // Open hidden file input for custom map import.
   function triggerImportCustomMap() {
     if (importCustomMapInputRef.current) importCustomMapInputRef.current.click();
   }
 
+  // Validate shape of imported map JSON.
   function isValidMapPayload(map) {
     return !!(
       map &&
@@ -509,6 +547,7 @@ function App() {
     );
   }
 
+  // Import a custom map JSON and open it in admin edit mode.
   function handleImportCustomMap(e) {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -544,6 +583,7 @@ function App() {
     reader.readAsText(file);
   }
 
+  // Delete a custom map and related local progress/position data.
   function handleDeleteCustomMap(mapId) {
     if (!customMaps[mapId]) return;
     if (!confirm('Delete this custom map permanently? This removes student progress for this map too.')) return;
@@ -570,11 +610,12 @@ function App() {
     }
   }
 
+  // Prompt for admin passphrase and unlock admin session for this tab.
   function requestAdminAccess() {
-    const entered = prompt('Enter teacher passphrase to access Admin:');
+    const entered = prompt('Enter the admin passphrase to open the map builder and management tools:');
     if (entered === null) return false;
     if (entered !== ADMIN_STATIC_PASSPHRASE) {
-      alert('Incorrect teacher passphrase.');
+      alert('That passphrase did not match. Please try again.');
       return false;
     }
     sessionStorage.setItem(ADMIN_UNLOCK_KEY, '1');
@@ -582,6 +623,7 @@ function App() {
     return true;
   }
 
+  // Navigate to admin mode, enforcing passphrase if needed.
   function openAdmin() {
     if (isAdminUnlocked || requestAdminAccess()) {
       setView('admin');
@@ -593,12 +635,14 @@ function App() {
     }
   }
 
+  // Lock admin mode for the current tab session.
   function lockAdmin() {
     sessionStorage.removeItem(ADMIN_UNLOCK_KEY);
     setIsAdminUnlocked(false);
     if (view.startsWith('admin')) setView('student');
   }
 
+  // Export student progress + positions as a portable JSON backup.
   function exportStudentData() {
     const payload = {
       app: 'Concept Mapper',
@@ -619,10 +663,12 @@ function App() {
     URL.revokeObjectURL(url);
   }
 
+  // Open hidden file input for student progress import.
   function triggerImportStudentData() {
     if (importInputRef.current) importInputRef.current.click();
   }
 
+  // Import student progress JSON and replace current local progress state.
   function handleImportStudentData(e) {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -642,9 +688,9 @@ function App() {
         setPositions(importedPositions);
         savePositions(importedPositions);
 
-        showToast('Progress imported successfully.', 'success');
+        showToast('Progress imported. Your saved answers and node positions have been updated.', 'success');
       } catch {
-        showToast('Could not import file. Please choose a valid Concept Mapper export JSON file.', 'error');
+        showToast('Import failed. Choose a valid Concept Mapper progress export JSON file.', 'error');
       }
     };
     reader.readAsText(file);
@@ -680,6 +726,7 @@ function App() {
     }
   }, [studentSections, collapsedFolders]);
 
+  // Toggle collapse state for a single sidebar subject folder.
   function toggleFolder(sectionId) {
     setCollapsedFolders((prev) => {
       const next = { ...(prev || {}) };
@@ -693,12 +740,14 @@ function App() {
     });
   }
 
+  // Collapse all visible student folders at once.
   function collapseAllFolders() {
     const next = Object.fromEntries(studentSectionIds.map((id) => [id, true]));
     setCollapsedFolders(next);
     saveSidebarFolderCollapse(next);
   }
 
+  // Expand all visible student folders at once.
   function expandAllFolders() {
     const next = {};
     setCollapsedFolders(next);
@@ -733,11 +782,11 @@ function App() {
         <div className="topbar-spacer"></div>
         {view === 'student' && (
           <>
-            <button className="topbar-btn" onClick={exportStudentData} title="Download your progress JSON">
-              ⭳ <span className="topbar-btn-label">Export Progress</span>
+            <button className="topbar-btn" onClick={exportStudentData} title="Download your progress so you can back it up or move it to another browser">
+              ⭳ <span className="topbar-btn-label">Save Progress</span>
             </button>
-            <button className="topbar-btn" onClick={triggerImportStudentData} title="Import progress from a JSON file">
-              ⭱ <span className="topbar-btn-label">Import Progress</span>
+            <button className="topbar-btn" onClick={triggerImportStudentData} title="Load a previously exported progress file">
+              ⭱ <span className="topbar-btn-label">Load Progress</span>
             </button>
             <input
               ref={importInputRef}
@@ -755,8 +804,8 @@ function App() {
           ⚙ <span className="topbar-btn-label">Admin</span>
         </button>
         {isAdminUnlocked && (
-          <button className="topbar-btn" onClick={lockAdmin} title="Lock teacher mode for this tab">
-            🔒 <span className="topbar-btn-label">Lock</span>
+          <button className="topbar-btn" onClick={lockAdmin} title="Lock admin tools again in this tab">
+            🔒 <span className="topbar-btn-label">Lock Admin</span>
           </button>
         )}
       </header>
@@ -852,13 +901,13 @@ function App() {
         )}
         {mapsLoading && (
           <div className="empty-canvas-hint">
-            <div className="empty-canvas-hint-title">Loading maps...</div>
-            <div>Fetching chapter files from manifest.</div>
+            <div className="empty-canvas-hint-title">Loading your maps...</div>
+            <div>Reading the map list and opening each topic file.</div>
           </div>
         )}
         {!mapsLoading && mapsLoadError && (
           <div className="empty-canvas-hint">
-            <div className="empty-canvas-hint-title">Map load warning</div>
+            <div className="empty-canvas-hint-title">Some maps could not be loaded</div>
             <div>{mapsLoadError}</div>
           </div>
         )}
@@ -873,13 +922,13 @@ function App() {
                   <button
                     className="btn btn-ghost breadcrumb-reset-btn"
                     onClick={() => {
-                      if (confirm('Reset progress for this map? Node positions will stay.')) {
+                      if (confirm('Clear your answers for this map? Your custom node positions will stay as they are.')) {
                         handleProgress(activeMapId, { answeredEdges: new Set() });
                       }
                     }}
-                    title="Reset progress"
+                    title="Clear your answers for this map"
                   >
-                    ↺ Reset progress
+                    ↺ Reset answers
                   </button>
                 </div>
               </div>

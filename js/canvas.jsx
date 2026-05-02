@@ -12,6 +12,7 @@ function estimateNodeSize(label) {
   return { w, h };
 }
 
+// Fast deterministic string hash used for layout seeding.
 function hashStringToUint32(str) {
   let h = 2166136261;
   for (let i = 0; i < str.length; i += 1) {
@@ -21,6 +22,7 @@ function hashStringToUint32(str) {
   return h >>> 0;
 }
 
+// Small deterministic PRNG so auto-layout is stable across refreshes.
 function createSeededRandom(seedString) {
   let seed = hashStringToUint32(seedString) || 1;
   return function rand() {
@@ -32,17 +34,20 @@ function createSeededRandom(seedString) {
   };
 }
 
+// Clamp values into a closed range.
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
 const EDGE_LABEL_T_PRESETS = [1 / 3, 0.4, 0.5];
 
+// Resolve label anchor position along edges for the active map.
 function getMapEdgeLabelT(mapData) {
   const raw = Number(mapData && mapData.edgeLabelT);
   return Number.isFinite(raw) ? clamp(raw, 0.2, 0.8) : (1 / 3);
 }
 
+// Compute a force-directed fallback layout when no manual positions are saved.
 function computeAutoNodeLayout(mapData, edgeLabelT = getMapEdgeLabelT(mapData)) {
   const nodes = (mapData.nodes || []).filter((n) => (
     n &&
@@ -456,11 +461,13 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
     return p ? { x: p.x, y: p.y } : a ? { x: a.x, y: a.y } : { x: node.x, y: node.y };
   }
 
+  // Persist a node drag result for this map only.
   function setNodeXY(nodeId, x, y) {
     const newMapPos = { ...mapPositions, [nodeId]: { x, y } };
     onPositions({ ...positions, [mapData.id]: newMapPos });
   }
 
+  // Compute unlocked nodes from starts + correctly answered inbound relationships.
   function getUnlockedNodes(answeredSet) {
     const unlocked = new Set(validNodes.filter(n => n.isStart).map(n => n.id));
     mapData.edges.forEach(e => {
@@ -471,12 +478,14 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
 
   const unlockedNodes = getUnlockedNodes(answeredEdges);
 
+  // Open question popup only when relationship is available and unanswered.
   function handleEdgeClick(edge) {
     if (answeredEdges.has(edge.id)) return;
     if (!unlockedNodes.has(edge.from)) return;
     setActiveEdge(edge);
   }
 
+  // Mark an edge as answered and trigger completion celebration when done.
   function handleCorrect(edgeId) {
     const newAnswered = new Set(answeredEdges);
     newAnswered.add(edgeId);
@@ -489,16 +498,19 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   // node drag
   const dragStart = useNodeDrag((id, x, y) => setNodeXY(id, x, y));
 
+  // Reset camera transform to default framing.
   function fitToScreen() {
     setT({ x: 60, y: 80, scale: 1 });
   }
 
+  // Cycle through predefined edge-label anchor presets.
   function cycleEdgeLabelT() {
     const currentIdx = EDGE_LABEL_T_PRESETS.findIndex((v) => Math.abs(v - edgeLabelT) < 0.0001);
     const next = EDGE_LABEL_T_PRESETS[(currentIdx + 1) % EDGE_LABEL_T_PRESETS.length];
     setEdgeLabelT(next);
   }
 
+  // Push nodes outward from centroid to quickly increase spacing.
   function spreadNodes() {
     if (!validNodes.length) return;
     const points = validNodes.map((n) => {
@@ -523,6 +535,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
     onPositions({ ...positions, [mapData.id]: nextPos });
   }
 
+  // Pull nodes inward toward centroid while keeping minimum spacing.
   function compactNodes() {
     if (!validNodes.length) return;
     const points = validNodes.map((n) => {
@@ -550,6 +563,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
     onPositions({ ...positions, [mapData.id]: nextPos });
   }
 
+  // Remove manual node positions so auto-layout takes over again.
   function resetLayout() {
     const next = { ...positions };
     delete next[mapData.id];
@@ -765,11 +779,11 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
           }}
         >
           <div className="mini-help-title-row">
-            <strong>How to use</strong>
+            <strong>Quick guide</strong>
             <span className="mini-help-caret">{isHelpOpen ? '▾' : '▸'}</span>
           </div>
           <div className="mini-help-body">
-            Tap any glowing label to fill in the relationship. Drag nodes to rearrange. On touch devices, drag to pan and pinch to zoom. On desktop, use mouse wheel to pan and <kbd>⌘/Ctrl</kbd>+wheel to zoom. Use <kbd>⊕</kbd> to spread nodes apart, <kbd>⊖</kbd> to pull them in, and <kbd>⟲</kbd> to recompute auto layout.
+            Select a topic from the sidebar, then tap any glowing relationship label to answer it. Drag nodes to arrange the map in a way that helps you study. On touch devices, drag the background to pan and pinch to zoom. On desktop, use the mouse wheel to pan and <kbd>Ctrl</kbd>+wheel to zoom. Use <kbd>⊕</kbd> to spread nodes out, <kbd>⊖</kbd> to bring them closer together, and <kbd>⟲</kbd> to rebuild the automatic layout.
           </div>
         </div>
       </div>
@@ -790,7 +804,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
             <span className="completion-emoji">🎉</span>
             <div className="completion-title">Map Complete!</div>
             <div className="completion-sub">
-              You've connected all {totalEdges} relationships in<br/>
+              You completed all {totalEdges} relationships in<br/>
               <strong>{mapData.title}</strong>
             </div>
             <div className="stars">
@@ -798,7 +812,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
               <span className="star">⭐</span>
               <span className="star">⭐</span>
             </div>
-            <button className="btn btn-primary" onClick={() => setShowComplete(false)}>Continue Exploring</button>
+            <button className="btn btn-primary" onClick={() => setShowComplete(false)}>Keep exploring</button>
           </div>
         </div>
       )}

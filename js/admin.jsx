@@ -26,16 +26,19 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
   const { t, setT, onWheel, startPan, onTouchStart, onTouchMove, onTouchEnd } = usePanZoom();
 
   // ── Update helpers ──
+  // Patch one node and push updated map to parent state.
   function updateNode(id, patch) {
     const newNodes = mapData.nodes.map(n => n.id === id ? { ...n, ...patch } : n);
     onChange({ ...mapData, nodes: newNodes });
   }
+  // Delete node and any edges connected to it.
   function deleteNode(id) {
     const newNodes = mapData.nodes.filter(n => n.id !== id);
     const newEdges = mapData.edges.filter(e => e.from !== id && e.to !== id);
     onChange({ ...mapData, nodes: newNodes, edges: newEdges });
     setSelectedNodeId(null);
   }
+  // Add a brand-new node at canvas coordinates.
   function addNode(x, y) {
     const id = 'n' + Date.now().toString(36);
     const newNode = {
@@ -47,14 +50,17 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
     setSelectedNodeId(id);
     setTool('select');
   }
+  // Patch one edge and push updated map to parent state.
   function updateEdge(id, patch) {
     const newEdges = mapData.edges.map(e => e.id === id ? { ...e, ...patch } : e);
     onChange({ ...mapData, edges: newEdges });
   }
+  // Delete one edge from map.
   function deleteEdge(id) {
     onChange({ ...mapData, edges: mapData.edges.filter(e => e.id !== id) });
     setSelectedEdgeId(null);
   }
+  // Create a directed edge between two nodes if valid and non-duplicate.
   function addEdge(fromId, toId) {
     if (fromId === toId) return;
     if (mapData.edges.some(e => e.from === fromId && e.to === toId)) return;
@@ -78,6 +84,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
   });
 
   // ── Click handlers ──
+  // Handle empty-canvas clicks based on active admin tool.
   function onCanvasClick(e) {
     if (tool === 'addNode') {
       const rect = viewportRef.current.getBoundingClientRect();
@@ -92,6 +99,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
     }
   }
 
+  // Handle node clicks for select/connect workflows.
   function onNodeClick(e, node) {
     e.stopPropagation();
     if (tool === 'connect') {
@@ -107,6 +115,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
     }
   }
 
+  // Reset camera transform in admin editor.
   function fitToScreen() {
     setT({ x: 60, y: 80, scale: 1 });
   }
@@ -128,7 +137,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
           <div className="map-desc">{mapData.description}</div>
         </div>
         <div className="map-controls">
-          <button className="icon-btn" onClick={onBack} title="Back to maps">←</button>
+          <button className="icon-btn" onClick={onBack} title="Return to the admin map list">←</button>
         </div>
       </div>
 
@@ -148,29 +157,29 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
                 setActiveColor(c);
                 if (selectedNode) updateNode(selectedNode.id, { color: c });
               }}
-              title="Color (applies to new nodes; or to selected node)"
+              title="Choose a color for new nodes, or recolor the selected node"
             ></div>
           ))}
         </div>
         <div className="admin-tool-divider"></div>
-        <button className="admin-tool-btn" onClick={onBack} title="Save and return to map manager">💾 Save & Exit</button>
+        <button className="admin-tool-btn" onClick={onBack} title="Save this map and return to the admin map list">💾 Save & Exit</button>
         {typeof onExport === 'function' && (
           <button
             className="admin-tool-btn"
             onClick={() => onExport(mapData.id, mapData)}
-            title="Download this map as JSON for GitHub promotion"
+            title="Download this map as a JSON file so it can be added to the repository"
           >
             ⭳ Export JSON
           </button>
         )}
         <span style={{ fontSize: 11, opacity: 0.72 }}>
-          Repo path: data/maps/{mapData.id}.json
+          Publish path: data/maps/{mapData.id}.json
         </span>
         {typeof onTogglePublish === 'function' && (
           <button
             className={`admin-tool-btn ${mapData._published ? 'active' : ''}`}
             onClick={() => onTogglePublish(!mapData._published)}
-            title="Control whether this local map is visible in student sidebar"
+            title="Choose whether this local map appears in the student sidebar"
           >
             {mapData._published ? '📣 Published' : '📝 Draft'}
           </button>
@@ -179,7 +188,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
           <button
             className="admin-tool-btn"
             onClick={() => onDelete(mapData.id)}
-            title="Delete this custom map"
+            title="Delete this custom map from local admin storage"
             style={{ color: 'var(--accent-rose)' }}
           >
             🗑 Delete Map
@@ -315,7 +324,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
         {mapData.nodes.length === 0 && (
           <div className="empty-canvas-hint">
             <div className="empty-canvas-hint-title">Empty map</div>
-            <div>Click <strong>+ Node</strong> in the toolbar, then click anywhere on the canvas to add concepts.</div>
+            <div>Choose <strong>+ Node</strong>, then click anywhere on the canvas to place your first concept.</div>
           </div>
         )}
 
@@ -339,11 +348,11 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
           }}
         >
           <div className="mini-help-title-row">
-            <strong>Builder tips</strong>
+            <strong>Builder guide</strong>
             <span className="mini-help-caret">{isHelpOpen ? '▾' : '▸'}</span>
           </div>
           <div className="mini-help-body">
-            <kbd>+ Node</kbd> then click canvas to add. <kbd>→ Connect</kbd> then click two nodes to draw an arrow. <kbd>↖ Select</kbd> to drag, edit and delete. Click an edge to edit its question.
+            Start with <kbd>+ Node</kbd>, then click the canvas to add concepts. Use <kbd>→ Connect</kbd>, then click two nodes to draw a relationship. Switch back to <kbd>↖ Select</kbd> to drag items, open node details, or delete something. Click any edge label to edit the prompt, answer, and hint students will see.
           </div>
         </div>
       </div>
@@ -363,7 +372,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
               onChange={e => updateNode(selectedNode.id, { label: e.target.value })}
               rows={3}
             />
-            <div className="field-help">Use <code>\(…\)</code> for inline math, <code>\\n</code> for line break.</div>
+            <div className="field-help">Use <code>\(…\)</code> for inline math and <code>\\n</code> to split the label across lines.</div>
           </div>
           <div className="field-row">
             <div className="field" style={{flex: 0.6}}>
@@ -391,7 +400,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
             </div>
           </div>
           <div className="field-help">
-            Position: ({Math.round(selectedNode.x)}, {Math.round(selectedNode.y)}) — drag to move
+            Position: ({Math.round(selectedNode.x)}, {Math.round(selectedNode.y)}) - drag the node on the canvas to reposition it
           </div>
           <div className="btn-row">
             <button className="btn btn-ghost btn-sm" onClick={() => deleteNode(selectedNode.id)} style={{flex: 1, color: 'var(--accent-rose)'}}>Delete node</button>
@@ -412,12 +421,12 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
             <strong>{mapData.nodes.find(n => n.id === selectedEdge.to)?.label.split('\\n')[0]}</strong>
           </div>
           <div className="field">
-            <div className="field-label">Edge label (text shown before blank)</div>
+            <div className="field-label">Prompt text (shown before the blank)</div>
             <input
               className="field-input"
               value={selectedEdge.label}
               onChange={e => updateEdge(selectedEdge.id, { label: e.target.value })}
-              placeholder="e.g. 'is an example of'"
+              placeholder="Example: is an example of"
             />
           </div>
           <div className="field">
@@ -437,12 +446,12 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
               className="field-input"
               value={selectedEdge.answer}
               onChange={e => updateEdge(selectedEdge.id, { answer: e.target.value })}
-              placeholder="The correct word/phrase"
+              placeholder="Enter the correct word or phrase"
             />
           </div>
           {selectedEdge.type === 'dropdown' && (
             <div className="field">
-              <div className="field-label">Options (one per line, include correct answer)</div>
+              <div className="field-label">Dropdown options (one per line, including the correct answer)</div>
               <textarea
                 className="field-textarea"
                 rows={4}
@@ -452,13 +461,13 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
             </div>
           )}
           <div className="field">
-            <div className="field-label">Hint (shown after 2 wrong attempts)</div>
+            <div className="field-label">Hint (shown after 2 incorrect attempts)</div>
             <textarea
               className="field-textarea"
               rows={2}
               value={selectedEdge.hint || ''}
               onChange={e => updateEdge(selectedEdge.id, { hint: e.target.value })}
-              placeholder="Optional hint with LaTeX"
+              placeholder="Optional hint; LaTeX is supported"
             />
           </div>
           <div className="btn-row">
@@ -531,9 +540,10 @@ function MapsManager({
     .map((id) => sectionsById[id])
     .filter(Boolean);
 
+  // Prompt for a new subject folder name and create it.
   function createFolderFromPrompt() {
     if (typeof onCreateSubject !== 'function') return;
-    const title = prompt('Folder name (subject):');
+    const title = prompt('Enter a folder name for this subject group:');
     if (title === null) return;
     const cleaned = title.trim();
     if (!cleaned) return;
@@ -545,15 +555,15 @@ function MapsManager({
       <div className="maps-manager-header">
         <div>
           <div className="maps-manager-title">Admin · Concept Maps</div>
-          <div className="maps-manager-sub">Create and edit maps by folder. New maps are created inside a chosen folder, and you can drag cards between folders. Export map JSON plus manifest.json for repo promotion.</div>
+          <div className="maps-manager-sub">Organize maps by subject folder, open any card to edit it, and drag cards to reorder or move them. When you are ready to publish changes, export the map JSON and, if folders changed, export the manifest too.</div>
         </div>
         <div className="maps-manager-actions">
-          <button className="btn btn-ghost btn-sm" onClick={onImportMap}>Import JSON</button>
+          <button className="btn btn-ghost btn-sm" onClick={onImportMap}>Import Map JSON</button>
           {typeof onExportManifest === 'function' && (
-            <button className="btn btn-ghost btn-sm" onClick={onExportManifest}>Export Manifest</button>
+            <button className="btn btn-ghost btn-sm" onClick={onExportManifest}>Export Folder Manifest</button>
           )}
           {typeof onCreateSubject === 'function' && (
-            <button className="btn btn-ghost btn-sm" onClick={createFolderFromPrompt}>New Folder</button>
+            <button className="btn btn-ghost btn-sm" onClick={createFolderFromPrompt}>New Subject Folder</button>
           )}
         </div>
       </div>
@@ -651,7 +661,7 @@ function MapsManager({
                       }}
                       title="Drag to reorder or move maps between folders"
                     >
-                      ⋮⋮ Drag to reorder or move
+                      ⋮⋮ Drag to reorder or move between folders
                     </div>
                     <div className="maps-grid-card-title">{m.title}</div>
                     <div className="maps-grid-card-meta">{m.description}</div>
@@ -686,7 +696,7 @@ function MapsManager({
                               onExportMap(m.id);
                             }}
                           >
-                            Export JSON
+                            Export Map JSON
                           </button>
                         )}
                       </div>
@@ -695,7 +705,7 @@ function MapsManager({
                 );
               })}
               {section.mapIds.length === 0 && (
-                <div className="maps-grid-empty">Drop maps here or create a new map in this folder.</div>
+                <div className="maps-grid-empty">Drop a map here, or create a new map directly inside this folder.</div>
               )}
             </div>
           </div>
@@ -703,7 +713,7 @@ function MapsManager({
 
         <div className="maps-grid-new" onClick={() => onCreate(sectionOrder[0] || 'general')}>
           <div className="maps-grid-new-icon">+</div>
-          <div>New concept map</div>
+          <div>Create a new concept map</div>
         </div>
       </div>
     </div>

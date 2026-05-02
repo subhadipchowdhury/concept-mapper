@@ -3,6 +3,7 @@
 
 const { useState, useEffect, useRef } = React;
 
+// Normalize display text so authored escape sequences render consistently.
 function normalizeDisplayText(rawText) {
   return String(rawText || '')
     // Support JSON-authored escaped newlines.
@@ -356,6 +357,7 @@ const LEGACY_SEQUENCES_MAP_ID = 'sequencesConceptual';
 const CANONICAL_SEQUENCES_MAP_ID = 'sequences';
 const RETIRED_SERIES_V2_MAP_ID = 'seriesV2';
 
+// Normalize map ordering by migrating legacy ids and removing retired entries.
 function migrateLegacyMapIdInOrder(order) {
   const normalized = [];
   const seen = new Set();
@@ -370,6 +372,7 @@ function migrateLegacyMapIdInOrder(order) {
   return normalized;
 }
 
+// Read student progress from local storage and migrate legacy map ids.
 function loadProgress() {
   try {
     const raw = localStorage.getItem(PROGRESS_STORAGE_KEY);
@@ -409,6 +412,7 @@ function loadProgress() {
   } catch { return {}; }
 }
 
+// Persist student progress (Set -> array serialization).
 function saveProgress(allProgress) {
   const serializable = {};
   Object.entries(allProgress).forEach(([mapId, p]) => {
@@ -419,6 +423,7 @@ function saveProgress(allProgress) {
   localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(serializable));
 }
 
+// Read custom maps from local storage and remove retired map records.
 function loadCustomMaps() {
   try {
     const raw = localStorage.getItem(CUSTOM_MAPS_STORAGE_KEY);
@@ -433,10 +438,12 @@ function loadCustomMaps() {
   } catch { return {}; }
 }
 
+// Persist custom map dictionary.
 function saveCustomMaps(maps) {
   localStorage.setItem(CUSTOM_MAPS_STORAGE_KEY, JSON.stringify(maps));
 }
 
+// Read map ordering preference with legacy id migration.
 function loadMapOrder() {
   try {
     const raw = localStorage.getItem(MAP_ORDER_STORAGE_KEY);
@@ -449,10 +456,12 @@ function loadMapOrder() {
   } catch { return []; }
 }
 
+// Persist map ordering preference after migration normalization.
 function saveMapOrder(order) {
   localStorage.setItem(MAP_ORDER_STORAGE_KEY, JSON.stringify(migrateLegacyMapIdInOrder(order)));
 }
 
+// Parse raw map-file text and surface readable source-context errors.
 function parseMapDataText(rawText, sourcePath = '') {
   const text = (rawText || '').trim();
   if (!text) throw new Error(`Map file is empty: ${sourcePath}`);
@@ -463,6 +472,7 @@ function parseMapDataText(rawText, sourcePath = '') {
   }
 }
 
+// Enforce a safe runtime map schema (drop malformed nodes/edges, fill defaults).
 function normalizeMapData(rawMap, fallbackId) {
   const map = rawMap && typeof rawMap === 'object' ? rawMap : {};
   const nodes = Array.isArray(map.nodes) ? map.nodes : [];
@@ -499,6 +509,7 @@ function normalizeMapData(rawMap, fallbackId) {
   };
 }
 
+// Load all built-in maps from manifest and normalize each map payload.
 async function loadBuiltInMaps(manifestPath = MAP_MANIFEST_PATH) {
   const manifestResp = await fetch(manifestPath, { cache: 'no-store' });
   if (!manifestResp.ok) {
@@ -544,6 +555,7 @@ async function loadBuiltInMaps(manifestPath = MAP_MANIFEST_PATH) {
   return { maps: loadedMaps, failures, order };
 }
 
+// Download one map payload as {mapId}.json for repo promotion.
 function downloadMapJSON(mapId, mapData) {
   if (!mapId || !mapData) return;
   const payload = {
@@ -563,6 +575,7 @@ function downloadMapJSON(mapId, mapData) {
   URL.revokeObjectURL(url);
 }
 
+// Download manifest.json from current ordered entry list.
 function downloadManifestJSON(entries) {
   if (!Array.isArray(entries)) return;
   const payload = entries
@@ -586,6 +599,7 @@ function downloadManifestJSON(entries) {
   URL.revokeObjectURL(url);
 }
 
+// Read per-map node positions from local storage with legacy id migration.
 function loadPositions() {
   try {
     const raw = localStorage.getItem(POSITIONS_STORAGE_KEY);
@@ -605,6 +619,7 @@ function loadPositions() {
   } catch { return {}; }
 }
 
+// Persist per-map node positions.
 function savePositions(p) {
   localStorage.setItem(POSITIONS_STORAGE_KEY, JSON.stringify(p));
 }

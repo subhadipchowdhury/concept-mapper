@@ -1,35 +1,56 @@
 # Concept Mapper
 
-A browser-based tool for building and solving concept maps, organized by subject across multiple courses. 
+Concept Mapper is a browser-based study and authoring tool for concept maps. Students can work through maps by answering relationship prompts, and admins can organize maps by subject, edit content, and export files for publishing.
 
 ---
 
-## How it works
+## At a glance
 
-Maps are graphs of concept nodes connected by labeled edges. Each edge represents a relationship between two concepts and has a fill-in-the-blank question attached. Students unlock nodes progressively by answering correctly. Progress is saved to localStorage.
+Each map is a network of concept nodes connected by labeled relationships. Students reveal more of the map as they answer correctly. Their progress and custom node layout are saved in the browser.
 
-Maps are grouped into subject folders (e.g., Real Analysis, Differential Equations). Folders collapse and expand, and the sidebar shows overall completion across all maps.
-
----
-
-## Student view
-
-Select a map from the sidebar. The breadcrumb at the top shows where you are (e.g., `Real Analysis › Sequences`). Nodes and edges become active as you answer questions. You can drag nodes around and pan/zoom the canvas. Progress persists between sessions.
-
-Export and import your progress as JSON if you want to move it between browsers.
+Maps are grouped into subject folders such as Real Analysis or Differential Equations. The sidebar keeps those folders organized and shows overall completion progress.
 
 ---
 
-## Admin mode
+## Student workflow
 
-Click "Admin" and enter the passphrase (`SECRETPHRASE`) to unlock. From there:
+1. Open a topic from the sidebar.
+2. Click or tap a glowing relationship label to answer it.
+3. Drag nodes if you want to reorganize the map while studying.
+4. Pan and zoom to focus on one region at a time.
+5. Use **Save Progress** and **Load Progress** if you want to move your work between browsers or computers.
 
-- **Maps Manager** — all maps grouped by subject folder. Drag maps between folders to reassign them. Create new folders and maps from here.
-- **Map Editor** — add/edit nodes and edges, set labels and answers, adjust colors and positions.
-- **Export JSON** — downloads the current map as `{mapId}.json` for publishing to the repo.
-- **Export Manifest** — downloads `manifest.json` with current folder structure and metadata, for when you've reorganized subjects.
+The breadcrumb at the top shows your current folder and map, for example `Real Analysis › Sequences`.
 
-To publish a map, export it and drop it in `data/maps/`, update the manifest if needed, and commit.
+---
+
+## Admin workflow
+
+Open **Admin** and enter the passphrase (`SECRET`) to unlock the builder tools.
+
+Use **Admin · Concept Maps** to:
+
+- create subject folders
+- create new maps inside a folder
+- drag cards to reorder maps or move them between folders
+- import a saved map JSON file
+- export the folder manifest after reorganizing subjects
+
+Open any map card to use the editor.
+
+Inside the editor you can:
+
+- add nodes, connect them, and drag them into position
+- edit prompt text, answers, hints, colors, and start nodes
+- mark a local map as draft or published for the student sidebar
+- export the current map as `{mapId}.json`
+
+To publish a change to the shared repository:
+
+1. Export the map JSON.
+2. If you changed folder organization, export the folder manifest too.
+3. Replace the matching file in `data/maps/`.
+4. Commit and push the updated files.
 
 ---
 
@@ -101,18 +122,11 @@ Version suffixes (`_v1`, `_v2`, etc.) indicate persisted-data schema versions. W
 
 ---
 
-## Publishing maps
+## Publishing rules
 
-1. Build or edit a map in admin mode
-2. Click "Export JSON" — saves `{mapId}.json`
-3. If you changed folder assignments, also click "Export Manifest"
-4. Drop the files into `data/maps/`
-5. Commit and push — students get the update on next refresh
-
-Rules:
-- Don't change a map's `id` after it's published (it's used as the primary key everywhere)
-- Filename must match the id: `sequences.json` for id `"sequences"`
-- Keep `subjectId` / `subjectTitle` in the manifest consistent with what's in the map files
+- Do not change a published map's `id`; it is the stable key used for progress, ordering, and exports.
+- Keep the filename matched to the map id, for example `sequences.json` for id `"sequences"`.
+- Keep `subjectId` and `subjectTitle` aligned between the manifest and the map file metadata.
 
 ---
 
