@@ -2162,3 +2162,17 @@ body {
     min-width: min(82vw, 250px);
   }
 }
+
+@media (max-width: 420px) {
+  .app-shell.sidebar-collapsed .topbar-progress-bar {
+    display: none;
+  }
+
+  .app-shell.sidebar-collapsed .topbar-progress {
+    padding: 4px 6px;
+  }
+
+  .app-shell.sidebar-collapsed .topbar-progress-value {
+    min-width: 2.1ch;
+  }
+}
