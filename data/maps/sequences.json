@@ -335,7 +335,7 @@
       "id": "s_e11",
       "from": "conv_imp_bdd",
       "to": "bdd",
-      "label": "bounded means \\(\\exists M\\) with \\(|a_n|\\le\\) ___ for all \\(n\\)",
+      "label": "bounded means \\(\\exists M\\) with \\(|a_n| \\le\\) ___ for all \\(n\\)",
       "answer": "M",
       "type": "fillin",
       "hint": "Fill in the bound constant."
@@ -386,7 +386,7 @@
       "id": "s_e16",
       "from": "amgm",
       "to": "babylonian",
-      "label": "for Babylonian iteration, AM-GM gives \\(x_{n+1}\\ge\\) ___",
+      "label": "for Babylonian iteration, AM-GM gives \\(x_{n+1} \\ge\\) ___",
       "answer": "√c",
       "type": "fillin",
       "hint": "Apply AM-GM to \\(x_n\\) and \\(c/x_n\\)."
@@ -419,7 +419,7 @@
       "id": "s_e19",
       "from": "seq",
       "to": "subseq",
-      "label": "a subsequence uses strictly ___ indices \\(n_1<n_2<\\cdots\\)",
+      "label": "a subsequence uses strictly ___ indices \\(n_1 < n_2 < \\cdots\\)",
       "answer": "increasing",
       "type": "fillin",
       "hint": "Indices must move forward through \\(\\mathbb{N}\\)."

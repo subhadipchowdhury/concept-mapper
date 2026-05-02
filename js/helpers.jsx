@@ -28,13 +28,14 @@ function MathNode({ text, className = '' }) {
     return () => { cancelled = true; };
   }, [text]);
   const normalizedText = (text || '').replace(/(?:\\_){2,}/g, (m) => '_'.repeat(m.length / 2));
-  const html = normalizedText.replace(/\\n/g, '<br/>');
   return (
     <span
       ref={ref}
       className={`node-label-text ${className}`}
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+      style={{ whiteSpace: 'pre-line' }}
+    >
+      {normalizedText}
+    </span>
   );
 }
 

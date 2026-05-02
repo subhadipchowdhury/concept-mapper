@@ -151,7 +151,7 @@
     },
     {
       "id": "amgm",
-      "label": "AM–GM Inequality\\n\\(\\sqrt{ab}\\le(a+b)/2\\)",
+      "label": "AM–GM Inequality\\n\\(\\sqrt{ab} \\le (a+b)/2\\)",
       "x": 1030,
       "y": 760,
       "color": "#fcd34d",
@@ -357,7 +357,7 @@
       "id": "sc_e9",
       "from": "seq",
       "to": "subseq",
-      "label": "a subsequence uses strictly ___ indices \\(n_1<n_2<\\cdots\\)",
+      "label": "a subsequence uses strictly ___ indices \\(n_1 < n_2 < \\cdots\\)",
       "answer": "increasing",
       "type": "fillin",
       "hint": "You can skip terms, but you cannot go backward."
