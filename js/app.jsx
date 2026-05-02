@@ -739,11 +739,12 @@ function App() {
   }
 
   useEffectApp(() => {
+    if (mapsLoading) return;
     if (view === 'student' && !studentMaps[activeMapId]) {
       const fallback = buildOrderedIds(mapOrder, studentMaps)[0] || null;
       setActiveMapId(fallback);
     }
-  }, [view, activeMapId, studentMaps, mapOrder]);
+  }, [view, activeMapId, studentMaps, mapOrder, mapsLoading]);
 
   useEffectApp(() => {
     try {
