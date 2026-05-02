@@ -1,7 +1,7 @@
 // Admin Canvas — visual drag-and-drop concept map builder
 // Exposes: AdminCanvas, MapsManager
 
-const { useState: useStateA, useRef: useRefA, useMemo: useMemoA } = React;
+const { useState: useStateA, useRef: useRefA, useEffect: useEffectA, useMemo: useMemoA } = React;
 
 const NODE_COLOR_PALETTE = [
   '#4f8ef7', // blue
@@ -607,6 +607,7 @@ function MapsManager({
   const [dragOverId, setDragOverId] = useStateA(null);
   const [activeFilter, setActiveFilter] = useStateA('all'); // all | builtin | custom | draft
   const [isOverflowOpen, setIsOverflowOpen] = useStateA(false);
+  const overflowWrapRef = useRefA(null);
 
   const activeSubjectId = selectedSubjectId || 'all';
   const allSubjects = Array.isArray(subjects) ? subjects : [];
@@ -646,6 +647,31 @@ function MapsManager({
 
   const subjectIcon = activeSubjectId === 'all' ? '≡' : '•';
 
+  useEffectA(() => {
+    if (!isOverflowOpen) return undefined;
+
+    function handlePointerDown(event) {
+      if (!overflowWrapRef.current) return;
+      if (!overflowWrapRef.current.contains(event.target)) {
+        setIsOverflowOpen(false);
+      }
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') setIsOverflowOpen(false);
+    }
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown, { passive: true });
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOverflowOpen]);
+
   function handleCreateForCurrentSubject() {
     if (typeof onCreate !== 'function') return;
     const createSubjectId = activeSubjectId === 'all'
@@ -669,7 +695,7 @@ function MapsManager({
         <div className="maps-manager-actions">
           <button className="btn btn-ghost btn-sm" onClick={onImportMap}>Import Map JSON</button>
           <button className="btn btn-primary btn-sm" onClick={handleCreateForCurrentSubject}>+ New Map</button>
-          <div className="maps-manager-overflow-wrap">
+          <div className="maps-manager-overflow-wrap" ref={overflowWrapRef}>
             <button
               className="btn btn-ghost btn-sm maps-manager-overflow-btn"
               onClick={() => setIsOverflowOpen((v) => !v)}
