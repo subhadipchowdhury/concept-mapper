@@ -529,6 +529,18 @@ function App() {
     showToast(published ? 'Map published to student sidebar.' : 'Map moved to draft.', 'info');
   }
 
+  // Remove local override and restore the repository version of a built-in map.
+  function handleRevertToBuiltIn(mapId) {
+    if (!customMaps[mapId] || !builtInMaps[mapId]) return;
+    if (!confirm('Revert this map to the built-in repository version? This removes your local override for this map.')) return;
+
+    const next = { ...customMaps };
+    delete next[mapId];
+    setCustomMaps(next);
+    saveCustomMaps(next);
+    showToast('Local override removed. Using built-in map version.', 'success');
+  }
+
   // Open hidden file input for custom map import.
   function triggerImportCustomMap() {
     if (importCustomMapInputRef.current) importCustomMapInputRef.current.click();
@@ -948,6 +960,7 @@ function App() {
         {view === 'admin' && (
           <MapsManager
             allMaps={adminMaps}
+            builtInMaps={builtInMaps}
             subjects={allSubjects}
             orderedMapIds={orderedAdminMapIds}
             customMaps={customMaps}
@@ -960,6 +973,7 @@ function App() {
             onMoveToSubject={handleMoveMapToSubject}
             onImportMap={triggerImportCustomMap}
             onTogglePublish={handleTogglePublish}
+            onRevertToBuiltIn={handleRevertToBuiltIn}
           />
         )}
         {view === 'admin-edit' && editingMap && (

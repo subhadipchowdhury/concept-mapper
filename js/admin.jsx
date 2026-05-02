@@ -482,6 +482,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
 // ─── MapsManager: list + create ───────────────────────────────────────────────
 function MapsManager({
   allMaps,
+  builtInMaps,
   orderedMapIds,
   subjects,
   customMaps,
@@ -494,6 +495,7 @@ function MapsManager({
   onMoveToSubject,
   onImportMap,
   onTogglePublish,
+  onRevertToBuiltIn,
 }) {
   const [draggedId, setDraggedId] = useStateA(null);
   const [dragOverId, setDragOverId] = useStateA(null);
@@ -608,6 +610,7 @@ function MapsManager({
                 const m = allMaps[mapId];
                 if (!m) return null;
                 const isCustom = !!customMaps[m.id];
+                const hasBuiltInVersion = !!builtInMaps?.[m.id];
                 return (
                   <div
                     key={m.id}
@@ -686,6 +689,17 @@ function MapsManager({
                             }}
                           >
                             {m._published ? 'Unpublish' : 'Publish'}
+                          </button>
+                        )}
+                        {hasBuiltInVersion && typeof onRevertToBuiltIn === 'function' && (
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onRevertToBuiltIn(m.id);
+                            }}
+                          >
+                            Revert to built-in
                           </button>
                         )}
                         {typeof onExportMap === 'function' && (
