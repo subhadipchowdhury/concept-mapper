@@ -443,13 +443,12 @@ function usePanZoom(initial = { x: 60, y: 80, scale: 1 }) {
 }
 
 // ─── ZoomControl UI ─────────────────────────────────────────────────────────
-function ZoomControl({ scale, setScale, fitToScreen }) {
+function ZoomControl({ scale, setScale }) {
   return (
     <div className="zoom-control">
       <button onClick={() => setScale(s => Math.max(0.4, s * 0.85))} title="Zoom out">−</button>
       <div className="zoom-control-pct">{Math.round(scale * 100)}%</div>
       <button onClick={() => setScale(s => Math.min(2.5, s * 1.15))} title="Zoom in">+</button>
-      <button onClick={fitToScreen} title="Fit to screen" style={{fontSize: 12}}>⌂</button>
     </div>
   );
 }
@@ -543,9 +542,27 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   // node drag
   const dragStart = useNodeDrag((id, x, y) => setNodeXY(id, x, y));
 
-  // Reset camera transform to default framing.
-  function fitToScreen() {
-    setT({ x: 60, y: 80, scale: 1 });
+  // Reset camera transform and center the viewport on the start node.
+  function resetView() {
+    const targetNode = validNodes.find((n) => n.isStart) || validNodes[0];
+    if (!targetNode) {
+      setT({ x: 60, y: 80, scale: 1 });
+      return;
+    }
+
+    const target = nodeXY(targetNode);
+    const rect = viewportRef.current?.getBoundingClientRect();
+    if (!rect) {
+      setT({ x: 60, y: 80, scale: 1 });
+      return;
+    }
+
+    const scale = 1;
+    setT({
+      x: rect.width / 2 - target.x * scale,
+      y: rect.height / 2 - target.y * scale,
+      scale,
+    });
   }
 
   // Push nodes outward from centroid to quickly increase spacing.
@@ -673,7 +690,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
             </div>
             <span style={{color: mapData.color, fontWeight: 700}}>{progressPct}%</span>
           </div>
-          <button className="icon-btn" onClick={fitToScreen} title="Reset view">⌂</button>
+          <button className="icon-btn" onClick={resetView} title="Reset view">⌂</button>
           <button className="icon-btn" onClick={spreadNodes} title="Spread nodes apart" aria-label="Spread nodes apart">
             <span className="icon-btn-spread-nodes-icon" aria-hidden="true"></span>
           </button>
@@ -815,7 +832,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
           })}
         </div>
 
-        <ZoomControl scale={t.scale} setScale={(fn) => setT(prev => ({...prev, scale: typeof fn === 'function' ? fn(prev.scale) : fn}))} fitToScreen={fitToScreen} />
+        <ZoomControl scale={t.scale} setScale={(fn) => setT(prev => ({...prev, scale: typeof fn === 'function' ? fn(prev.scale) : fn}))} />
 
         <div
           className={`mini-help ${isHelpOpen ? 'open' : 'collapsed'}`}

@@ -184,11 +184,6 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
     }
   }
 
-  // Reset camera transform in admin editor.
-  function fitToScreen() {
-    setT({ x: 60, y: 80, scale: 1 });
-  }
-
   // ── Geometry ──
   const geom = {};
   mapData.nodes.forEach(n => {
@@ -436,7 +431,6 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
         <ZoomControl
           scale={t.scale}
           setScale={(fn) => setT(prev => ({...prev, scale: typeof fn === 'function' ? fn(prev.scale) : fn}))}
-          fitToScreen={fitToScreen}
         />
 
         <div
