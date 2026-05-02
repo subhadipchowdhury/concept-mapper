@@ -110,6 +110,27 @@ function saveSidebarFolderCollapse(value) {
   localStorage.setItem(SIDEBAR_FOLDER_COLLAPSE_KEY, JSON.stringify(value || {}));
 }
 
+// Simple XOR+base64 cipher to obfuscate exported progress files.
+const _CIPHER_KEY = 'CM\u2022Progress\u2022Export';
+function _cipherXB64(str) {
+  const key = _CIPHER_KEY;
+  const bytes = new TextEncoder().encode(str);
+  let raw = '';
+  for (let i = 0; i < bytes.length; i++) {
+    raw += String.fromCharCode(bytes[i] ^ key.charCodeAt(i % key.length));
+  }
+  return btoa(raw);
+}
+function _decipherXB64(encoded) {
+  const key = _CIPHER_KEY;
+  const raw = atob(encoded);
+  const bytes = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) {
+    bytes[i] = raw.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+  }
+  return new TextDecoder().decode(bytes);
+}
+
 // Convert in-memory Set-based progress into JSON-safe arrays.
 function serializeProgress(progressObj) {
   const serializable = {};
@@ -702,13 +723,14 @@ function App() {
       progress: mapProgress,
       positions: mapPositions,
     };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const encoded = _cipherXB64(JSON.stringify(payload));
+    const blob = new Blob([encoded], { type: 'application/octet-stream' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     const stamp = new Date().toISOString().slice(0, 10);
     const safeTitle = (mapData.title || activeMapId).replace(/[^a-z0-9]+/gi, '-').toLowerCase();
     a.href = url;
-    a.download = `cm-progress-${safeTitle}-${stamp}.json`;
+    a.download = `cm-progress-${safeTitle}-${stamp}.cmpr`;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -729,7 +751,14 @@ function App() {
     const reader = new FileReader();
     reader.onload = () => {
       try {
-        const parsed = JSON.parse(reader.result);
+        const raw = reader.result.trim();
+        // Support both encrypted (.cmpr) and legacy plain-JSON exports.
+        let parsed;
+        try {
+          parsed = JSON.parse(_decipherXB64(raw));
+        } catch {
+          parsed = JSON.parse(raw);
+        }
         if (!parsed || typeof parsed !== 'object') throw new Error('Invalid file');
 
         // Determine which map this file targets.
