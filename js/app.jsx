@@ -97,7 +97,10 @@ function App() {
   const importCustomMapInputRef = useRefApp(null);
   const toastTimerRef = useRefApp(null);
 
-  const studentMaps = { ...builtInMaps };
+  const publishedCustomMaps = Object.fromEntries(
+    Object.entries(customMaps).filter(([, m]) => !!m?._published)
+  );
+  const studentMaps = { ...builtInMaps, ...publishedCustomMaps };
   const adminMaps = { ...builtInMaps, ...customMaps };
 
   useEffectApp(() => {
@@ -192,6 +195,7 @@ function App() {
       accentColor: '#a78bfa',
       nodes: [],
       edges: [],
+      _published: false,
     };
     handleSaveCustomMap(id, newMap);
     setEditingMapId(id);
@@ -228,6 +232,13 @@ function App() {
     handleSaveCustomMap(updatedMap.id, updatedMap);
   }
 
+  function handleTogglePublish(mapId, published) {
+    const existing = customMaps[mapId];
+    if (!existing) return;
+    handleSaveCustomMap(mapId, { ...existing, _published: !!published });
+    showToast(published ? 'Map published to student sidebar.' : 'Map moved to draft.', 'info');
+  }
+
   function triggerImportCustomMap() {
     if (importCustomMapInputRef.current) importCustomMapInputRef.current.click();
   }
@@ -262,7 +273,7 @@ function App() {
           if (!ok) return;
         }
 
-        handleSaveCustomMap(parsed.id, parsed);
+        handleSaveCustomMap(parsed.id, { ...parsed, _published: false });
         setEditingMapId(parsed.id);
         setView('admin-edit');
         showToast(`Imported map "${parsed.title}".`, 'success');
@@ -519,6 +530,7 @@ function App() {
             onExportMap={handleExportMapJSON}
             onReorderMap={handleReorderMaps}
             onImportMap={triggerImportCustomMap}
+            onTogglePublish={handleTogglePublish}
           />
         )}
         {view === 'admin-edit' && editingMap && (
@@ -529,6 +541,7 @@ function App() {
             onBack={() => setView('admin')}
             onDelete={handleDeleteCustomMap}
             onExport={handleExportMapJSON}
+            onTogglePublish={customMaps[editingMapId] ? ((published) => handleTogglePublish(editingMapId, published)) : undefined}
           />
         )}
         <input

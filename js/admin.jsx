@@ -14,7 +14,7 @@ const NODE_COLOR_PALETTE = [
 ];
 
 // ─── AdminCanvas: Visual builder for one concept map ──────────────────────────
-function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport }) {
+function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePublish }) {
   const [tool, setTool] = useStateA('select'); // 'select' | 'addNode' | 'connect'
   const [selectedNodeId, setSelectedNodeId] = useStateA(null);
   const [selectedEdgeId, setSelectedEdgeId] = useStateA(null);
@@ -166,6 +166,15 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport }) {
         <span style={{ fontSize: 11, opacity: 0.72 }}>
           Repo path: data/maps/{mapData.id}.json
         </span>
+        {typeof onTogglePublish === 'function' && (
+          <button
+            className={`admin-tool-btn ${mapData._published ? 'active' : ''}`}
+            onClick={() => onTogglePublish(!mapData._published)}
+            title="Control whether this local map is visible in student sidebar"
+          >
+            {mapData._published ? '📣 Published' : '📝 Draft'}
+          </button>
+        )}
         {typeof onDelete === 'function' && (
           <button
             className="admin-tool-btn"
@@ -435,7 +444,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport }) {
 }
 
 // ─── MapsManager: list + create ───────────────────────────────────────────────
-function MapsManager({ allMaps, orderedMapIds, customMaps, onEdit, onCreate, onExportMap, onReorderMap, onImportMap }) {
+function MapsManager({ allMaps, orderedMapIds, customMaps, onEdit, onCreate, onExportMap, onReorderMap, onImportMap, onTogglePublish }) {
   const [draggedId, setDraggedId] = useStateA(null);
   const [dragOverId, setDragOverId] = useStateA(null);
   const displayOrder = (Array.isArray(orderedMapIds) ? orderedMapIds : Object.keys(allMaps))
@@ -510,9 +519,25 @@ function MapsManager({ allMaps, orderedMapIds, customMaps, onEdit, onCreate, onE
                 <div className="maps-grid-card-stat"><span>{m.nodes.length}</span> nodes</div>
                 <div className="maps-grid-card-stat"><span>{m.edges.length}</span> edges</div>
                 {isCustom && <div className="maps-grid-card-stat" style={{color: 'var(--accent-amber)'}}>● local map</div>}
+                {isCustom && (
+                  <div className="maps-grid-card-stat" style={{color: m._published ? 'var(--accent-teal)' : 'var(--text-muted)'}}>
+                    {m._published ? '● published' : '● draft'}
+                  </div>
+                )}
               </div>
               {isCustom && (
                 <div className="maps-grid-card-actions">
+                  {typeof onTogglePublish === 'function' && (
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onTogglePublish(m.id, !m._published);
+                      }}
+                    >
+                      {m._published ? 'Unpublish' : 'Publish'}
+                    </button>
+                  )}
                   {typeof onExportMap === 'function' && (
                     <button
                       className="btn btn-ghost btn-sm"
