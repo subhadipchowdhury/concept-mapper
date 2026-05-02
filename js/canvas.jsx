@@ -50,7 +50,7 @@ function getClosestEdgeLabelTStop(value) {
 // Resolve label anchor position along edges for the active map.
 function getMapEdgeLabelT(mapData) {
   const raw = Number(mapData && mapData.edgeLabelT);
-  return Number.isFinite(raw) ? getClosestEdgeLabelTStop(clamp(raw, 0.2, 0.8)) : (1 / 3);
+  return Number.isFinite(raw) ? getClosestEdgeLabelTStop(clamp(raw, 0.2, 0.8)) : 0.4;
 }
 
 // Compute a force-directed fallback layout when no manual positions are saved.
