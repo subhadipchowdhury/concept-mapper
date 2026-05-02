@@ -168,15 +168,8 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
       setFeedback('wrong');
       // Hint only after 2 wrong attempts (per user request: no tooltip until multiple errors)
       if (newAttempts >= 2 && edge.hint) setShowHint(true);
-      if (newAttempts >= 4) {
-        setTimeout(() => {
-          setFeedback('giveaway');
-          setTimeout(() => { onCorrect(edge.id); onClose(); }, 1800);
-        }, 700);
-      } else {
-        // Quick clear so they can retype
-        setTimeout(() => setFeedback(null), 1200);
-      }
+      // Quick clear so they can retype; do not auto-unlock on repeated misses.
+      setTimeout(() => setFeedback(null), 1200);
     }
   }
 
@@ -221,7 +214,7 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
         )}
 
         <div className="popup-label">
-          The label reads: <em>"{displayLabel} ___"</em>
+          The label reads: <em>"{displayLabel}"</em>
         </div>
 
         {edge.type === 'fillin' ? (
@@ -257,15 +250,9 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
             ✗ Not quite — {attempts >= 2 ? 'check the hint above' : 'try again'}
           </div>
         )}
-        {feedback === 'giveaway' && (
-          <div className="popup-feedback hint">
-            Answer: <strong>{edge.answer}</strong> — moving on…
-          </div>
-        )}
-
         <div className="popup-actions">
           <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
-          {feedback !== 'correct' && feedback !== 'giveaway' && (
+          {feedback !== 'correct' && (
             <button
               className="btn btn-primary"
               onClick={checkAnswer}

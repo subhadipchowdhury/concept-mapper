@@ -472,7 +472,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
                 >
                   {isAnswered
                     ? <>✓ <MathNode text={`${edge.label} ${edge.answer}`} /></>
-                    : <><MathNode text={edge.label} /> <span style={{opacity: 0.7}}>___</span> <span style={{fontSize: 11, marginLeft: 2}}>✏️</span></>
+                    : <><MathNode text={edge.label} /> <span style={{fontSize: 11, marginLeft: 6}}>✏️</span></>
                   }
                 </div>
               </div>
