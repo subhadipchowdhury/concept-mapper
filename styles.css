@@ -1912,6 +1912,7 @@ body {
   .topbar {
     padding: 0 max(10px, env(safe-area-inset-right)) 0 max(10px, env(safe-area-inset-left));
     gap: 7px;
+    overflow: hidden;
   }
 
   .topbar-divider {
@@ -1919,7 +1920,7 @@ body {
   }
 
   .topbar-context {
-    max-width: 46vw;
+    display: none;
   }
 
   .topbar-context-subject,
@@ -1973,6 +1974,18 @@ body {
     top: 12px;
     left: 10px;
     right: 10px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
+  .map-title-block {
+    display: none;
+  }
+
+  .map-controls .topbar-progress {
+    display: none;
   }
 
   .map-title {
@@ -1989,13 +2002,19 @@ body {
   }
 
   .edge-label-slider {
-    width: 100%;
+    width: auto;
+    flex-shrink: 1;
     justify-content: space-between;
   }
 
   .edge-label-slider input[type="range"] {
     flex: 1;
-    min-width: 120px;
+    min-width: 80px;
+  }
+
+  .map-controls {
+    flex-wrap: nowrap;
+    align-items: center;
   }
 
   .edge-label-badge {
