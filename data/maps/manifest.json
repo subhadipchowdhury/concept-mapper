@@ -7,6 +7,13 @@
     "subjectTitle": "Real Analysis"
   },
   {
+    "id": "sequencesConceptual",
+    "title": "Sequences of Real Numbers — Conceptual Spine",
+    "file": "data/maps/sequencesConceptual.json",
+    "subjectId": "real-analysis",
+    "subjectTitle": "Real Analysis"
+  },
+  {
     "id": "series",
     "title": "Infinite Series",
     "file": "data/maps/series.json",

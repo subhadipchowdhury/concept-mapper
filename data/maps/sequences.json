@@ -220,10 +220,10 @@
       "id": "s_e2",
       "from": "seq",
       "to": "enconv",
-      "label": "the statement \\\"\\(\\forall \\varepsilon>0\\,\\exists N\\,\\forall n>N:\\ |a_n-L|<\\varepsilon\\)\\\" defines ___",
-      "answer": "limit",
+      "label": "the epsilon-N condition says that eventually all terms lie ___ every \\(\\varepsilon\\)-tube around \\(L\\)",
+      "answer": "inside",
       "type": "fillin",
-      "hint": "Name the concept encoded by the epsilon-N quantifiers."
+      "hint": "Think geometrically: after some index, the tail stays within the band around \\(L\\)."
     },
     {
       "id": "s_e3",
@@ -322,10 +322,14 @@
       "id": "s_e10",
       "from": "enconv",
       "to": "conv_imp_bdd",
-      "label": "every convergent real sequence is ___",
-      "answer": "bounded",
-      "type": "fillin",
-      "hint": "There exists a global bound \\(M\\) for all terms."
+      "label": "every convergent real sequence fits inside some fixed interval \\( [-M,M] \\): true or false?",
+      "answer": "true",
+      "type": "dropdown",
+      "options": [
+        "true",
+        "false"
+      ],
+      "hint": "This is exactly the content of the theorem at the target node."
     },
     {
       "id": "s_e11",
@@ -340,10 +344,16 @@
       "id": "s_e12",
       "from": "seq",
       "to": "mono",
-      "label": "if terms are always nondecreasing or nonincreasing, the sequence is ___",
+      "label": "a sequence whose terms move only in one order direction is called:",
       "answer": "monotone",
-      "type": "fillin",
-      "hint": "Use the standard one-word property."
+      "type": "dropdown",
+      "options": [
+        "monotone",
+        "bounded",
+        "periodic",
+        "Cauchy"
+      ],
+      "hint": "The key feature is that the order never reverses."
     },
     {
       "id": "s_e13",
@@ -358,10 +368,10 @@
       "id": "s_e14",
       "from": "bdd",
       "to": "mct",
-      "label": "boundedness alone is not enough; MCT also needs the sequence to be ___",
-      "answer": "monotone",
+      "label": "if a bounded sequence is also monotone, MCT says it is ___",
+      "answer": "convergent",
       "type": "fillin",
-      "hint": "A bounded oscillating sequence shows boundedness by itself does not force convergence."
+      "hint": "This edge tests the theorem's conclusion rather than its missing hypothesis."
     },
     {
       "id": "s_e15",
@@ -400,7 +410,7 @@
       "id": "s_e18",
       "from": "amgm",
       "to": "agm",
-      "label": "the arithmetic and geometric mean iterates converge to the same ___",
+      "label": "in AGM iteration, the arithmetic and geometric mean sequences approach the same ___",
       "answer": "limit",
       "type": "fillin",
       "hint": "Their gap shrinks to zero while order is preserved."
@@ -418,16 +428,16 @@
       "id": "s_e20",
       "from": "subseq",
       "to": "sublim",
-      "label": "a sequence can have ___ subsequential limits",
-      "answer": "multiple",
+      "label": "if some extracted indices \\(n_k\\) satisfy \\(a_{n_k}\\to L\\), then \\(L\\) is called a:",
+      "answer": "subsequential limit",
       "type": "dropdown",
       "options": [
-        "no",
-        "one",
-        "multiple",
-        "no real"
+        "subsequential limit",
+        "global maximum",
+        "period",
+        "tail bound"
       ],
-      "hint": "Oscillating sequences can have more than one cluster value."
+      "hint": "The name refers to the kind of limit obtained from an extracted sequence."
     },
     {
       "id": "s_e21",
@@ -442,7 +452,7 @@
       "id": "s_e22",
       "from": "enconv",
       "to": "cesaro",
-      "label": "if \\(a_n\\to L\\), then the Cesaro means have the same ___",
+      "label": "if \\(a_n\\to L\\), then the Cesaro means satisfy \\(\\sigma_n\\to\\) ___",
       "answer": "L",
       "type": "fillin",
       "hint": "Averaging preserves the limit in this direction."
@@ -451,16 +461,22 @@
       "id": "s_e23",
       "from": "subseq",
       "to": "peak",
-      "label": "an index with no later term exceeding \\(a_n\\) is a ___ point",
-      "answer": "peak",
-      "type": "fillin",
+      "label": "an index with no later term exceeding \\(a_n\\) is called a:",
+      "answer": "peak point",
+      "type": "dropdown",
+      "options": [
+        "peak point",
+        "cluster point",
+        "partial sum",
+        "Cauchy index"
+      ],
       "hint": "Think skyline maxima while scanning forward."
     },
     {
       "id": "s_e24",
       "from": "peak",
       "to": "monlemma",
-      "label": "peak-point dichotomy implies every sequence has a ___ subsequence",
+      "label": "from infinitely many peaks you get a decreasing subsequence; otherwise an increasing one, so some subsequence is ___",
       "answer": "monotone",
       "type": "dropdown",
       "options": [
@@ -490,10 +506,16 @@
       "id": "s_e26",
       "from": "bdd",
       "to": "bw",
-      "label": "BW states: every ___ sequence in \\(\\mathbb{R}\\) has a convergent subsequence",
+      "label": "BW states: every sequence contained in some interval \\( [-M,M] \\) has a convergent subsequence. This hypothesis is:",
       "answer": "bounded",
-      "type": "fillin",
-      "hint": "Only one hypothesis appears in the theorem statement."
+      "type": "dropdown",
+      "options": [
+        "bounded",
+        "monotone",
+        "Cauchy",
+        "eventually constant"
+      ],
+      "hint": "The theorem assumes one global size restriction, not any order property."
     },
     {
       "id": "s_e27",
@@ -514,19 +536,31 @@
       "id": "s_e28",
       "from": "cauchy",
       "to": "cauchy_bdd",
-      "label": "with \\(\\varepsilon=1\\), Cauchy tails lie in an interval of length ___",
-      "answer": "2",
-      "type": "fillin",
-      "hint": "Radius 1 gives diameter 2."
+      "label": "taking \\(\\varepsilon=1\\) traps the tail in a fixed interval, which proves a Cauchy sequence is:",
+      "answer": "bounded",
+      "type": "dropdown",
+      "options": [
+        "bounded",
+        "monotone",
+        "periodic",
+        "decreasing"
+      ],
+      "hint": "Once the tail is trapped, only finitely many early terms remain to control."
     },
     {
       "id": "s_e29",
       "from": "cauchy_bdd",
       "to": "bw",
-      "label": "from boundedness, BW gives a ___ subsequence",
-      "answer": "convergent",
-      "type": "fillin",
-      "hint": "Name the guaranteed subsequence property."
+      "label": "once Cauchy gives boundedness, the theorem that yields a convergent subsequence is ___",
+      "answer": "Bolzano-Weierstrass",
+      "type": "dropdown",
+      "options": [
+        "Bolzano-Weierstrass",
+        "Monotone Convergence",
+        "Squeeze Theorem",
+        "Cesaro's Theorem"
+      ],
+      "hint": "Name the bounded-sequence compactness theorem."
     },
     {
       "id": "s_e30",

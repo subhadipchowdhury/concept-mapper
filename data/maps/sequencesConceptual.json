@@ -1,0 +1,471 @@
+{
+  "id": "sequencesConceptual",
+  "title": "Sequences of Real Numbers — Conceptual Spine",
+  "description": "Module 1 variant — theorem structure, subsequences, and completeness",
+  "color": "#0f766e",
+  "accentColor": "#f59e0b",
+  "subjectId": "real-analysis",
+  "subjectTitle": "Real Analysis",
+  "nodes": [
+    {
+      "id": "seq",
+      "label": "Sequence\\n\\(\\{a_n\\}: \\mathbb{N} \\to \\mathbb{R}\\)",
+      "x": 470,
+      "y": 60,
+      "color": "#0f766e",
+      "isStart": true
+    },
+    {
+      "id": "enconv",
+      "label": "ε–N Convergence\\n\\(a_n \\to L\\)",
+      "x": 470,
+      "y": 190,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "div",
+      "label": "Divergence",
+      "x": 760,
+      "y": 190,
+      "color": "#fb7185"
+    },
+    {
+      "id": "unique",
+      "label": "Uniqueness of Limit",
+      "x": 180,
+      "y": 190,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "algebra",
+      "label": "Algebra of Limits",
+      "x": 470,
+      "y": 330,
+      "color": "#34d399"
+    },
+    {
+      "id": "order",
+      "label": "Order Limit Theorem",
+      "x": 760,
+      "y": 330,
+      "color": "#34d399"
+    },
+    {
+      "id": "squeeze",
+      "label": "Squeeze Theorem",
+      "x": 1030,
+      "y": 330,
+      "color": "#34d399"
+    },
+    {
+      "id": "bdd",
+      "label": "Bounded Sequence\\n\\(|a_n| \\le M\\)",
+      "x": 180,
+      "y": 330,
+      "color": "#a78bfa"
+    },
+    {
+      "id": "mono",
+      "label": "Monotone Sequence",
+      "x": 180,
+      "y": 470,
+      "color": "#a78bfa"
+    },
+    {
+      "id": "subseq",
+      "label": "Subsequence\\n\\(\\{a_{n_k}\\}\\)",
+      "x": 470,
+      "y": 470,
+      "color": "#f472b6"
+    },
+    {
+      "id": "substable",
+      "label": "Subsequences Share\\nThe Same Limit",
+      "x": 760,
+      "y": 470,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "eo",
+      "label": "Even–Odd\\nCriterion",
+      "x": 1030,
+      "y": 470,
+      "color": "#f472b6"
+    },
+    {
+      "id": "sublim",
+      "label": "Subsequential Limit",
+      "x": 470,
+      "y": 610,
+      "color": "#f472b6"
+    },
+    {
+      "id": "peak",
+      "label": "Peak Point",
+      "x": 180,
+      "y": 610,
+      "color": "#f472b6"
+    },
+    {
+      "id": "monlemma",
+      "label": "Monotone Subsequence\\nLemma",
+      "x": 180,
+      "y": 760,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "completeness",
+      "label": "Completeness of \\(\\mathbb{R}\\)\\n(LUB property)",
+      "x": 760,
+      "y": 760,
+      "color": "#f59e0b",
+      "isStart": true
+    },
+    {
+      "id": "mct",
+      "label": "Monotone Convergence\\nTheorem",
+      "x": 470,
+      "y": 760,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "bw",
+      "label": "Bolzano–Weierstrass\\nTheorem",
+      "x": 180,
+      "y": 920,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "cauchy",
+      "label": "Cauchy Sequence",
+      "x": 760,
+      "y": 920,
+      "color": "#fb7185"
+    },
+    {
+      "id": "cauchy_bdd",
+      "label": "Cauchy ⟹ Bounded",
+      "x": 1030,
+      "y": 920,
+      "color": "#fb7185"
+    },
+    {
+      "id": "cc",
+      "label": "Cauchy Convergence\\nCriterion",
+      "x": 470,
+      "y": 1080,
+      "color": "#f59e0b"
+    }
+  ],
+  "edges": [
+    {
+      "id": "sc_e1",
+      "from": "seq",
+      "to": "enconv",
+      "label": "the epsilon-N condition says the tail eventually lies ___ every \\(\\varepsilon\\)-tube around \\(L\\)",
+      "answer": "inside",
+      "type": "fillin",
+      "hint": "After some index, every term stays within the band around \\(L\\)."
+    },
+    {
+      "id": "sc_e2",
+      "from": "seq",
+      "to": "div",
+      "label": "if no real number satisfies the epsilon-N condition, the sequence is:",
+      "answer": "divergent",
+      "type": "dropdown",
+      "options": [
+        "divergent",
+        "bounded",
+        "monotone",
+        "Cauchy"
+      ],
+      "hint": "This is the standard opposite of convergent."
+    },
+    {
+      "id": "sc_e3",
+      "from": "enconv",
+      "to": "unique",
+      "label": "a convergent sequence has how many limits?",
+      "answer": "one",
+      "type": "dropdown",
+      "options": [
+        "none",
+        "one",
+        "two",
+        "infinitely many"
+      ],
+      "hint": "Limit is unique in \\(\\mathbb{R}\\)."
+    },
+    {
+      "id": "sc_e4",
+      "from": "enconv",
+      "to": "algebra",
+      "label": "sum, product, and quotient laws belong to the ___ of limits",
+      "answer": "algebra",
+      "type": "dropdown",
+      "options": [
+        "algebra",
+        "geometry",
+        "notation",
+        "ordering"
+      ],
+      "hint": "These are the computation rules for limits."
+    },
+    {
+      "id": "sc_e5",
+      "from": "enconv",
+      "to": "order",
+      "label": "if \\(a_n \\le b_n\\) eventually and both converge, their limits preserve which kind of inequality?",
+      "answer": "weak",
+      "type": "dropdown",
+      "options": [
+        "strict",
+        "weak",
+        "no",
+        "reverse"
+      ],
+      "hint": "Equality of limits can happen even when the terms were strictly ordered."
+    },
+    {
+      "id": "sc_e6",
+      "from": "order",
+      "to": "squeeze",
+      "label": "if the outer sequences both tend to \\(L\\), then the trapped middle sequence also tends to ___",
+      "answer": "L",
+      "type": "fillin",
+      "hint": "The outer bounds force the same limit."
+    },
+    {
+      "id": "sc_e7",
+      "from": "seq",
+      "to": "bdd",
+      "label": "all terms lying in some interval \\( [-M,M] \\) is the property called:",
+      "answer": "bounded",
+      "type": "dropdown",
+      "options": [
+        "bounded",
+        "monotone",
+        "Cauchy",
+        "divergent"
+      ],
+      "hint": "This is a size restriction, not an order restriction."
+    },
+    {
+      "id": "sc_e8",
+      "from": "seq",
+      "to": "mono",
+      "label": "a sequence whose terms never reverse order direction is:",
+      "answer": "monotone",
+      "type": "dropdown",
+      "options": [
+        "bounded",
+        "monotone",
+        "periodic",
+        "Cauchy"
+      ],
+      "hint": "It is either always nondecreasing or always nonincreasing."
+    },
+    {
+      "id": "sc_e9",
+      "from": "seq",
+      "to": "subseq",
+      "label": "a subsequence uses strictly ___ indices \\(n_1<n_2<\\cdots\\)",
+      "answer": "increasing",
+      "type": "fillin",
+      "hint": "You can skip terms, but you cannot go backward."
+    },
+    {
+      "id": "sc_e10",
+      "from": "subseq",
+      "to": "sublim",
+      "label": "if some extracted terms \\(a_{n_k}\\) converge to \\(L\\), then \\(L\\) is a:",
+      "answer": "subsequential limit",
+      "type": "dropdown",
+      "options": [
+        "subsequential limit",
+        "bound",
+        "period",
+        "partial sum"
+      ],
+      "hint": "The name reflects the kind of sequence used to obtain the limit."
+    },
+    {
+      "id": "sc_e11",
+      "from": "enconv",
+      "to": "substable",
+      "label": "if \\(a_n \\to L\\), then every subsequence also converges to ___",
+      "answer": "L",
+      "type": "fillin",
+      "hint": "Passing to a subsequence does not change the tail limit."
+    },
+    {
+      "id": "sc_e12",
+      "from": "substable",
+      "to": "eo",
+      "label": "if the even and odd subsequences approach different numbers, the original sequence is:",
+      "answer": "divergent",
+      "type": "dropdown",
+      "options": [
+        "convergent",
+        "divergent",
+        "bounded",
+        "monotone"
+      ],
+      "hint": "A convergent sequence cannot have two different subsequential limits."
+    },
+    {
+      "id": "sc_e13",
+      "from": "subseq",
+      "to": "peak",
+      "label": "an index with no later term larger than \\(a_n\\) is called a:",
+      "answer": "peak point",
+      "type": "dropdown",
+      "options": [
+        "peak point",
+        "cluster point",
+        "fixed point",
+        "Cauchy point"
+      ],
+      "hint": "Think of skyline maxima."
+    },
+    {
+      "id": "sc_e14",
+      "from": "peak",
+      "to": "monlemma",
+      "label": "the peak/no-peak dichotomy guarantees some subsequence is:",
+      "answer": "monotone",
+      "type": "dropdown",
+      "options": [
+        "periodic",
+        "monotone",
+        "constant",
+        "random"
+      ],
+      "hint": "This is the content of the monotone subsequence lemma."
+    },
+    {
+      "id": "sc_e15",
+      "from": "completeness",
+      "to": "mct",
+      "label": "the proof of MCT relies on the existence of least upper ___",
+      "answer": "bounds",
+      "type": "fillin",
+      "hint": "Completeness enters through the supremum property."
+    },
+    {
+      "id": "sc_e16",
+      "from": "bdd",
+      "to": "mct",
+      "label": "a bounded monotone real sequence is:",
+      "answer": "convergent",
+      "type": "dropdown",
+      "options": [
+        "convergent",
+        "periodic",
+        "eventually constant",
+        "necessarily divergent"
+      ],
+      "hint": "This is the conclusion of MCT."
+    },
+    {
+      "id": "sc_e17",
+      "from": "mono",
+      "to": "mct",
+      "label": "monotonicity by itself is not enough; the missing MCT hypothesis is:",
+      "answer": "boundedness",
+      "type": "dropdown",
+      "options": [
+        "boundedness",
+        "periodicity",
+        "alternation",
+        "summability"
+      ],
+      "hint": "Consider \\(a_n=n\\)."
+    },
+    {
+      "id": "sc_e18",
+      "from": "bdd",
+      "to": "bw",
+      "label": "the theorem saying every bounded real sequence has a convergent subsequence is:",
+      "answer": "Bolzano-Weierstrass",
+      "type": "dropdown",
+      "options": [
+        "Bolzano-Weierstrass",
+        "Monotone Convergence",
+        "Squeeze Theorem",
+        "Cesaro Theorem"
+      ],
+      "hint": "This is the central compactness theorem for sequences in \\(\\mathbb{R}\\)."
+    },
+    {
+      "id": "sc_e19",
+      "from": "monlemma",
+      "to": "bw",
+      "label": "monotone subsequence lemma plus MCT is one standard proof of:",
+      "answer": "Bolzano-Weierstrass",
+      "type": "dropdown",
+      "options": [
+        "Bolzano-Weierstrass",
+        "Order Limit Theorem",
+        "Shift Theorem",
+        "Cesaro Theorem"
+      ],
+      "hint": "Extract a bounded monotone subsequence, then apply MCT."
+    },
+    {
+      "id": "sc_e20",
+      "from": "enconv",
+      "to": "cauchy",
+      "label": "if a sequence converges, distances \\( |a_m-a_n| \\) eventually become:",
+      "answer": "arbitrarily small",
+      "type": "dropdown",
+      "options": [
+        "arbitrarily small",
+        "strictly increasing",
+        "equal to zero",
+        "unbounded"
+      ],
+      "hint": "Use triangle inequality through the common limit."
+    },
+    {
+      "id": "sc_e21",
+      "from": "cauchy",
+      "to": "cauchy_bdd",
+      "label": "taking \\(\\varepsilon=1\\) shows every Cauchy sequence is:",
+      "answer": "bounded",
+      "type": "dropdown",
+      "options": [
+        "bounded",
+        "monotone",
+        "eventually constant",
+        "strictly decreasing"
+      ],
+      "hint": "The tail fits inside one fixed interval."
+    },
+    {
+      "id": "sc_e22",
+      "from": "bw",
+      "to": "cc",
+      "label": "a Cauchy sequence with a convergent subsequence must converge to ___",
+      "answer": "the same limit",
+      "type": "fillin",
+      "hint": "Compare general tail terms to subsequence terms."
+    },
+    {
+      "id": "sc_e23",
+      "from": "cauchy",
+      "to": "cc",
+      "label": "in \\(\\mathbb{R}\\), being Cauchy is equivalent to being:",
+      "answer": "convergent",
+      "type": "dropdown",
+      "options": [
+        "convergent",
+        "bounded",
+        "monotone",
+        "strictly decreasing"
+      ],
+      "hint": "This is exactly the Cauchy convergence criterion."
+    }
+  ]
+}
