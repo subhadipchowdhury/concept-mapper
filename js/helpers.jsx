@@ -3,6 +3,16 @@
 
 const { useState, useEffect, useRef } = React;
 
+function normalizeDisplayText(rawText) {
+  return String(rawText || '')
+    // Support JSON-authored escaped newlines.
+    .replace(/\\r\\n/g, '\n')
+    .replace(/\\n/g, '\n')
+    // Tolerate accidental standalone /n tokens in author text.
+    .replace(/(^|\s)\/n(?=\s|$)/g, '$1\n')
+    .replace(/(?:\\_){2,}/g, (m) => '_'.repeat(m.length / 2));
+}
+
 // MathJax-rendered text (handles \n as <br>)
 function MathNode({ text, className = '' }) {
   const ref = useRef(null);
@@ -27,7 +37,7 @@ function MathNode({ text, className = '' }) {
     typesetWhenReady();
     return () => { cancelled = true; };
   }, [text]);
-  const normalizedText = (text || '').replace(/(?:\\_){2,}/g, (m) => '_'.repeat(m.length / 2));
+  const normalizedText = normalizeDisplayText(text);
   return (
     <span
       ref={ref}
@@ -179,7 +189,7 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
     if (e.key === 'Escape') onClose();
   }
 
-  const displayLabel = (edge.label || '').replace(/(?:\\_){2,}/g, (m) => '_'.repeat(m.length / 2));
+  const displayLabel = normalizeDisplayText(edge.label || '');
   const expectsMathAnswer = edge.type === 'fillin' && /sqrt|\\\\sqrt|√|ε|≤|≥|[<>=+\-*/^()\[\]{}]|\d|^[a-z]$|^[A-Z]$/i.test(edge.answer || '');
   const answerVars = Array.from(new Set(String(edge.answer || '').match(/[a-zA-Z]/g) || [])).slice(0, 4);
   const mathPaletteTokens = ['√()', 'ε', '≤', '≥', '<', '>', '=', '+', '-', '/', '^', '(', ')', ...answerVars];
