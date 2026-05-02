@@ -221,10 +221,16 @@
       "id": "sc_e1",
       "from": "seq",
       "to": "enconv",
-      "label": "the epsilon-N condition says the tail eventually lies ___ every \\(\\varepsilon\\)-tube around \\(L\\)",
-      "answer": "inside",
-      "type": "fillin",
-      "hint": "After some index, every term stays within the band around \\(L\\)."
+      "label": "in the epsilon-N definition, for all \\(n>N\\) we require \\(|a_n-L|\\) ___ \\(\\varepsilon\\)",
+      "answer": "<",
+      "type": "dropdown",
+      "options": [
+        "<",
+        "≤",
+        ">",
+        "="
+      ],
+      "hint": "Convergence requires strict control by every positive epsilon."
     },
     {
       "id": "sc_e2",
@@ -318,6 +324,19 @@
         "divergent"
       ],
       "hint": "This is a size restriction, not an order restriction."
+    },
+    {
+      "id": "sc_e7b",
+      "from": "enconv",
+      "to": "bdd",
+      "label": "every convergent real sequence is bounded: true or false?",
+      "answer": "true",
+      "type": "dropdown",
+      "options": [
+        "true",
+        "false"
+      ],
+      "hint": "The tail is near \\(L\\), and finitely many initial terms are bounded too."
     },
     {
       "id": "sc_e8",
@@ -440,10 +459,16 @@
       "id": "sc_e15",
       "from": "completeness",
       "to": "mct",
-      "label": "the proof of MCT relies on the existence of least upper ___",
-      "answer": "bounds",
-      "type": "fillin",
-      "hint": "Completeness enters through the supremum property."
+      "label": "for an increasing bounded sequence, completeness provides the least upper bound called the:",
+      "answer": "supremum",
+      "type": "dropdown",
+      "options": [
+        "supremum",
+        "infimum",
+        "derivative",
+        "average"
+      ],
+      "hint": "This value is the standard candidate limit in the MCT proof."
     },
     {
       "id": "sc_e16",
@@ -494,16 +519,16 @@
       "id": "sc_e19",
       "from": "monlemma",
       "to": "bw",
-      "label": "monotone subsequence lemma plus MCT is one standard proof of:",
-      "answer": "Bolzano-Weierstrass",
+      "label": "for a bounded sequence, monlemma gives a monotone subsequence; MCT then makes that subsequence:",
+      "answer": "convergent",
       "type": "dropdown",
       "options": [
-        "Bolzano-Weierstrass",
-        "Order Limit Theorem",
-        "Shift Theorem",
-        "Cesaro Theorem"
+        "convergent",
+        "periodic",
+        "unbounded",
+        "constant"
       ],
-      "hint": "Extract a bounded monotone subsequence, then apply MCT."
+      "hint": "This is the key step used to prove BW in \\(\\mathbb{R}\\)."
     },
     {
       "id": "sc_e20",
@@ -572,8 +597,8 @@
       "id": "sc_e22",
       "from": "bw",
       "to": "cc",
-      "label": "a Cauchy sequence with a convergent subsequence must converge to ___",
-      "answer": "the same limit",
+      "label": "if \\(a_{n_k}\\to L\\) and \\(\\{a_n\\}\\) is Cauchy, then the full sequence satisfies \\(a_n\\to\\) ___",
+      "answer": "L",
       "type": "fillin",
       "hint": "Compare general tail terms to subsequence terms."
     },
