@@ -794,7 +794,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
             <span className="mini-help-caret">{isHelpOpen ? '▾' : '▸'}</span>
           </div>
           <div className="mini-help-body">
-            Select a topic from the sidebar, then tap any glowing relationship label to answer it. Drag nodes to arrange the map in a way that helps you study. On touch devices, drag the background to pan and pinch to zoom. On desktop, use the mouse wheel to pan and <kbd>Ctrl</kbd>+wheel to zoom. Use the <strong>Label</strong> slider to move arrow labels along edges in discrete 0.1 steps. Use <kbd>⊕</kbd> to spread nodes out, <kbd>⊖</kbd> to bring them closer together, and <kbd>⟲</kbd> to rebuild the automatic layout.
+            Select a topic from the sidebar, then tap any glowing relationship label to answer it. Drag nodes to arrange the map in a way that helps you study. On touch devices, drag the background to pan and pinch to zoom. On desktop, use the mouse wheel to pan and <kbd>Ctrl</kbd>+wheel to zoom. Use the Label slider to move arrow labels along edges in discrete 0.1 steps. Use <kbd>⊕</kbd> to spread nodes out, <kbd>⊖</kbd> to bring them closer together, and <kbd>⟲</kbd> to rebuild the automatic layout.
           </div>
         </div>
       </div>
