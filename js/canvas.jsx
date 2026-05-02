@@ -120,6 +120,12 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   const { t, setT, onWheel, startPan } = usePanZoom();
 
   const answeredEdges = progress.answeredEdges || new Set();
+  const validNodes = mapData.nodes.filter((n) => (
+    n &&
+    typeof n.id === 'string' &&
+    Number.isFinite(n.x) &&
+    Number.isFinite(n.y)
+  ));
 
   // local node positions: positions[mapId][nodeId] = {x, y}
   const mapPositions = positions[mapData.id] || {};
@@ -135,7 +141,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   }
 
   function getUnlockedNodes(answeredSet) {
-    const unlocked = new Set(mapData.nodes.filter(n => n.isStart).map(n => n.id));
+    const unlocked = new Set(validNodes.filter(n => n.isStart).map(n => n.id));
     mapData.edges.forEach(e => {
       if (answeredSet.has(e.id)) unlocked.add(e.to);
     });
@@ -167,8 +173,8 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   }
 
   function spreadNodes() {
-    if (!mapData.nodes.length) return;
-    const points = mapData.nodes.map((n) => {
+    if (!validNodes.length) return;
+    const points = validNodes.map((n) => {
       const xy = nodeXY(n);
       return { id: n.id, x: xy.x, y: xy.y };
     });
@@ -191,8 +197,8 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   }
 
   function compactNodes() {
-    if (!mapData.nodes.length) return;
-    const points = mapData.nodes.map((n) => {
+    if (!validNodes.length) return;
+    const points = validNodes.map((n) => {
       const xy = nodeXY(n);
       return { id: n.id, x: xy.x, y: xy.y };
     });
@@ -225,7 +231,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
 
   // Build node geometry map for edge routing
   const geom = {};
-  mapData.nodes.forEach(n => {
+  validNodes.forEach(n => {
     const xy = nodeXY(n);
     const sz = estimateNodeSize(n.label);
     geom[n.id] = { x: xy.x, y: xy.y, w: sz.w, h: sz.h };
@@ -235,8 +241,8 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   const completed = answeredEdges.size;
   const progressPct = Math.round((completed / totalEdges) * 100);
 
-  const fromNode = activeEdge ? mapData.nodes.find(n => n.id === activeEdge.from) : null;
-  const toNode = activeEdge ? mapData.nodes.find(n => n.id === activeEdge.to) : null;
+  const fromNode = activeEdge ? validNodes.find(n => n.id === activeEdge.from) : null;
+  const toNode = activeEdge ? validNodes.find(n => n.id === activeEdge.to) : null;
 
   return (
     <>
@@ -343,7 +349,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
           })}
 
           {/* Nodes */}
-          {mapData.nodes.map(node => {
+          {validNodes.map(node => {
             const xy = nodeXY(node);
             const sz = estimateNodeSize(node.label);
             const unlocked = unlockedNodes.has(node.id);

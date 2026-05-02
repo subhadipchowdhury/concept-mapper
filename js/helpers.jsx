@@ -345,6 +345,40 @@ function parseMapDataText(rawText, sourcePath = '') {
   }
 }
 
+function normalizeMapData(rawMap, fallbackId) {
+  const map = rawMap && typeof rawMap === 'object' ? rawMap : {};
+  const nodes = Array.isArray(map.nodes) ? map.nodes : [];
+  const edges = Array.isArray(map.edges) ? map.edges : [];
+
+  const safeNodes = nodes.filter((n) => (
+    n &&
+    typeof n.id === 'string' &&
+    Number.isFinite(n.x) &&
+    Number.isFinite(n.y)
+  ));
+  const nodeIds = new Set(safeNodes.map((n) => n.id));
+
+  const safeEdges = edges.filter((e) => (
+    e &&
+    typeof e.id === 'string' &&
+    typeof e.from === 'string' &&
+    typeof e.to === 'string' &&
+    nodeIds.has(e.from) &&
+    nodeIds.has(e.to)
+  ));
+
+  return {
+    ...map,
+    id: typeof map.id === 'string' ? map.id : fallbackId,
+    title: typeof map.title === 'string' ? map.title : 'Untitled Map',
+    description: typeof map.description === 'string' ? map.description : '',
+    color: typeof map.color === 'string' ? map.color : '#4f8ef7',
+    accentColor: typeof map.accentColor === 'string' ? map.accentColor : '#a78bfa',
+    nodes: safeNodes,
+    edges: safeEdges,
+  };
+}
+
 async function loadBuiltInMaps(manifestPath = MAP_MANIFEST_PATH) {
   const manifestResp = await fetch(manifestPath, { cache: 'no-store' });
   if (!manifestResp.ok) {
@@ -367,8 +401,9 @@ async function loadBuiltInMaps(manifestPath = MAP_MANIFEST_PATH) {
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const rawText = await resp.text();
       const parsed = parseMapDataText(rawText, entry.file);
-      const mapId = parsed?.id || entry.id;
-      loadedMaps[mapId] = { ...parsed, id: mapId };
+      const normalized = normalizeMapData(parsed, entry.id);
+      const mapId = normalized.id || entry.id;
+      loadedMaps[mapId] = normalized;
       order.push(mapId);
     } catch (err) {
       failures.push(`${entry.id}: ${err.message}`);
