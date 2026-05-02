@@ -37,6 +37,12 @@ function getSubjectInfo(mapData) {
   return { id, title };
 }
 
+// Build the repository file path for a map based on its subject folder.
+function mapRepoPath(mapData) {
+  const subject = getSubjectInfo(mapData);
+  return `data/maps/${subject.id}/${mapData.id}.json`;
+}
+
 // Convert a folder title into a URL-safe identifier.
 function slugifySubjectId(title) {
   const raw = (title || '')
@@ -500,7 +506,7 @@ function App() {
         return {
           id: mapData.id,
           title: mapData.title,
-          file: `data/maps/${mapData.id}.json`,
+          file: mapRepoPath(mapData),
           subjectId: subject.id,
           subjectTitle: subjectTitleById[subject.id] || subject.title,
         };

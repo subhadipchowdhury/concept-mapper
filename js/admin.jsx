@@ -13,6 +13,13 @@ const NODE_COLOR_PALETTE = [
   '#f472b6', // pink
 ];
 
+function adminMapPublishPath(mapData) {
+  const subjectId = typeof mapData?.subjectId === 'string' && mapData.subjectId.trim()
+    ? mapData.subjectId.trim()
+    : 'general';
+  return `data/maps/${subjectId}/${mapData.id}.json`;
+}
+
 // ─── AdminCanvas: Visual builder for one concept map ──────────────────────────
 function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePublish }) {
   const [tool, setTool] = useStateA('select'); // 'select' | 'addNode' | 'connect'
@@ -173,7 +180,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
           </button>
         )}
         <span style={{ fontSize: 11, opacity: 0.72 }}>
-          Publish path: data/maps/{mapData.id}.json
+          Publish path: {adminMapPublishPath(mapData)}
         </span>
         {typeof onTogglePublish === 'function' && (
           <button

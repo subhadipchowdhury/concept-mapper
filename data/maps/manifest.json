@@ -2,56 +2,56 @@
   {
     "id": "sequences",
     "title": "Sequences of Real Numbers",
-    "file": "data/maps/sequences.json",
+    "file": "data/maps/real-analysis/sequences.json",
     "subjectId": "real-analysis",
     "subjectTitle": "Real Analysis"
   },
   {
     "id": "series",
     "title": "Infinite Series",
-    "file": "data/maps/series.json",
+    "file": "data/maps/real-analysis/series.json",
     "subjectId": "real-analysis",
     "subjectTitle": "Real Analysis"
   },
   {
     "id": "funcSequences",
     "title": "Sequences & Series of Functions",
-    "file": "data/maps/funcSequences.json",
+    "file": "data/maps/real-analysis/funcSequences.json",
     "subjectId": "real-analysis",
     "subjectTitle": "Real Analysis"
   },
   {
     "id": "firstOrderDE",
     "title": "First-Order Differential Equations",
-    "file": "data/maps/firstOrderDE.json",
+    "file": "data/maps/differential-equations/firstOrderDE.json",
     "subjectId": "differential-equations",
     "subjectTitle": "Differential Equations"
   },
   {
     "id": "secondOrderLaplace",
     "title": "Second-Order ODEs and Laplace Transform",
-    "file": "data/maps/secondOrderLaplace.json",
+    "file": "data/maps/differential-equations/secondOrderLaplace.json",
     "subjectId": "differential-equations",
     "subjectTitle": "Differential Equations"
   },
   {
     "id": "systemsFirstOrder",
     "title": "Systems of First-Order ODEs",
-    "file": "data/maps/systemsFirstOrder.json",
+    "file": "data/maps/differential-equations/systemsFirstOrder.json",
     "subjectId": "differential-equations",
     "subjectTitle": "Differential Equations"
   },
   {
     "id": "pdeHeatEquation",
     "title": "PDEs and the Heat Equation",
-    "file": "data/maps/pdeHeatEquation.json",
+    "file": "data/maps/differential-equations/pdeHeatEquation.json",
     "subjectId": "differential-equations",
     "subjectTitle": "Differential Equations"
   },
   {
     "id": "reactionKinetics",
     "title": "Chemical Kinetics and Rate Laws",
-    "file": "data/maps/chemicalReactions/reactionKinetics.json",
+    "file": "data/maps/chemical-reactions/reactionKinetics.json",
     "subjectId": "chemical-reactions",
     "subjectTitle": "Chemical Reactions"
   }

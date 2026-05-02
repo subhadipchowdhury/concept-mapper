@@ -59,7 +59,7 @@ To publish a change to the shared repository:
 
 1. Export the map JSON.
 2. If you changed folder organization, export the folder manifest too.
-3. Replace the matching file in `data/maps/`.
+3. Replace the matching file in its subject folder under `data/maps/{subjectId}/`.
 4. Commit and push the updated files.
 
 ---
@@ -71,13 +71,17 @@ To publish a change to the shared repository:
 ```
 data/maps/
 ├── manifest.json          # loading order + subject metadata for all built-in maps
-├── sequences.json
-├── series.json
-├── funcSequences.json
-├── firstOrderDE.json
-├── secondOrderLaplace.json
-├── systemsFirstOrder.json
-└── pdeHeatEquation.json
+├── real-analysis/
+│   ├── sequences.json
+│   ├── series.json
+│   └── funcSequences.json
+├── differential-equations/
+│   ├── firstOrderDE.json
+│   ├── secondOrderLaplace.json
+│   ├── systemsFirstOrder.json
+│   └── pdeHeatEquation.json
+└── chemical-reactions/
+  └── reactionKinetics.json
 ```
 
 ### manifest.json
@@ -89,7 +93,7 @@ data/maps/
       "id": "sequences",
       "title": "Sequences",
       "description": "Convergence, limits, and properties",
-      "filePath": "data/maps/sequences.json",
+      "file": "data/maps/real-analysis/sequences.json",
       "subjectId": "real-analysis",
       "subjectTitle": "Real Analysis"
     }
@@ -136,6 +140,7 @@ Version suffixes (`_v1`, `_v2`, etc.) indicate persisted-data schema versions. W
 
 - Do not change a published map's `id`; it is the stable key used for progress, ordering, and exports.
 - Keep the filename matched to the map id, for example `sequences.json` for id `"sequences"`.
+- Keep map files inside `data/maps/{subjectId}/` so the manifest and folder layout stay aligned.
 - Keep `subjectId` and `subjectTitle` aligned between the manifest and the map file metadata.
 
 ---
@@ -148,7 +153,8 @@ concept-mapper/
 ├── styles.css
 ├── data/maps/
 │   ├── manifest.json
-│   └── *.json
+│   └── <subject-id>/
+│       └── *.json
 └── js/
     ├── app.jsx       # main component — layout, state, sidebar, routing
     ├── canvas.jsx    # map canvas — nodes, edges, pan/zoom, interaction
@@ -157,3 +163,15 @@ concept-mapper/
 ```
 
 **Stack:** React (CDN), MathJax, vanilla CSS, no build tools.
+
+---
+
+## Changelog
+
+### 2026-05-02
+
+- Normalized built-in map storage to subject folders: `data/maps/{subjectId}/{mapId}.json`.
+- Updated `data/maps/manifest.json` to point every map entry to the subject-folder path.
+- Updated admin manifest export logic to emit subject-folder file paths.
+- Updated admin editor publish-path hint to show subject-folder destinations.
+- Updated README examples and data-structure documentation to match the normalized layout.

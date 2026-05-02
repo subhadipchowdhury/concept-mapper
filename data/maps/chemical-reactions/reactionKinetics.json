@@ -1,0 +1,237 @@
+{
+  "id": "reactionKinetics",
+  "title": "Chemical Kinetics and Rate Laws",
+  "description": "Pedagogical pathway from measurable rate to mechanism-based rate laws",
+  "color": "#ef4444",
+  "accentColor": "#b91c1c",
+  "subjectId": "chemical-reactions",
+  "subjectTitle": "Chemical Reactions",
+  "nodes": [
+    {
+      "id": "reaction",
+      "label": "Chemical Reaction",
+      "x": 520,
+      "y": 70,
+      "color": "#ef4444",
+      "isStart": true
+    },
+    {
+      "id": "rate",
+      "label": "Reaction Rate",
+      "x": 280,
+      "y": 210,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "concentration",
+      "label": "Concentration vs Time",
+      "x": 520,
+      "y": 210,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "initialRates",
+      "label": "Initial-Rates Experiments",
+      "x": 760,
+      "y": 210,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "rateLaw",
+      "label": "Rate Law\\n\\(rate = k[A]^m[B]^n\\)",
+      "x": 520,
+      "y": 360,
+      "color": "#22c55e"
+    },
+    {
+      "id": "order",
+      "label": "Reaction Order",
+      "x": 300,
+      "y": 520,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "rateConstant",
+      "label": "Rate Constant \\(k\\)",
+      "x": 520,
+      "y": 520,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "temperature",
+      "label": "Temperature",
+      "x": 740,
+      "y": 520,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "arrhenius",
+      "label": "Arrhenius Equation\\n\\(k = Ae^{-E_a/RT}\\)",
+      "x": 740,
+      "y": 680,
+      "color": "#a855f7"
+    },
+    {
+      "id": "activationEnergy",
+      "label": "Activation Energy \\(E_a\\)",
+      "x": 520,
+      "y": 680,
+      "color": "#a855f7"
+    },
+    {
+      "id": "mechanism",
+      "label": "Reaction Mechanism",
+      "x": 280,
+      "y": 680,
+      "color": "#a855f7"
+    },
+    {
+      "id": "rds",
+      "label": "Rate-Determining Step",
+      "x": 300,
+      "y": 840,
+      "color": "#f43f5e"
+    },
+    {
+      "id": "catalyst",
+      "label": "Catalyst",
+      "x": 740,
+      "y": 840,
+      "color": "#f43f5e"
+    }
+  ],
+  "edges": [
+    {
+      "id": "rk_e1",
+      "from": "reaction",
+      "to": "rate",
+      "label": "how fast reactants turn into products is the reaction ___",
+      "answer": "rate",
+      "type": "fillin",
+      "hint": "Units are usually mol L^-1 s^-1."
+    },
+    {
+      "id": "rk_e2",
+      "from": "rate",
+      "to": "concentration",
+      "label": "rate is computed from change in ___ over time",
+      "answer": "concentration",
+      "type": "fillin",
+      "hint": "For a reactant, this change is negative; for a product, positive."
+    },
+    {
+      "id": "rk_e3",
+      "from": "concentration",
+      "to": "initialRates",
+      "label": "to isolate how each reactant affects rate, use ___ method data",
+      "answer": "initial rates",
+      "type": "fillin",
+      "hint": "Compare trials where one reactant concentration changes at a time."
+    },
+    {
+      "id": "rk_e4",
+      "from": "initialRates",
+      "to": "rateLaw",
+      "label": "for overall reactions, the rate law is determined ___",
+      "answer": "experimentally",
+      "type": "dropdown",
+      "options": ["experimentally", "stoichiometrically", "theoretically", "by inspection"],
+      "hint": "It is usually not read directly from overall stoichiometric coefficients."
+    },
+    {
+      "id": "rk_e5",
+      "from": "rateLaw",
+      "to": "order",
+      "label": "exponents in the rate law define the reaction ___",
+      "answer": "order",
+      "type": "fillin",
+      "hint": "Overall order is the sum of concentration exponents."
+    },
+    {
+      "id": "rk_e6",
+      "from": "rateLaw",
+      "to": "rateConstant",
+      "label": "the proportionality factor in a rate law is the rate ___",
+      "answer": "constant",
+      "type": "fillin",
+      "hint": "Its units depend on overall reaction order."
+    },
+    {
+      "id": "rk_e7",
+      "from": "temperature",
+      "to": "arrhenius",
+      "label": "temperature dependence of k is modeled by the ___ equation",
+      "answer": "arrhenius",
+      "type": "fillin",
+      "hint": "In linear form: ln(k) = ln(A) - E_a/(RT)."
+    },
+    {
+      "id": "rk_e8",
+      "from": "arrhenius",
+      "to": "activationEnergy",
+      "label": "in a plot of ln(k) vs 1/T, slope gives minus ___ over R",
+      "answer": "activation energy",
+      "type": "fillin",
+      "hint": "Slope = -E_a/R."
+    },
+    {
+      "id": "rk_e9",
+      "from": "activationEnergy",
+      "to": "rateConstant",
+      "label": "at fixed temperature, lower E_a generally means larger ___",
+      "answer": "k",
+      "type": "dropdown",
+      "options": ["k", "Ea", "A", "reaction order"],
+      "hint": "A larger rate constant corresponds to a faster reaction."
+    },
+    {
+      "id": "rk_e10",
+      "from": "reaction",
+      "to": "mechanism",
+      "label": "many overall reactions proceed through elementary ___",
+      "answer": "steps",
+      "type": "dropdown",
+      "options": ["steps", "stages", "reactants", "intermediates"],
+      "hint": "The summed elementary steps reproduce the net reaction."
+    },
+    {
+      "id": "rk_e11",
+      "from": "mechanism",
+      "to": "rds",
+      "label": "the slowest elementary step is the rate-determining ___",
+      "answer": "step",
+      "type": "dropdown",
+      "options": ["step", "reaction", "mechanism", "process"],
+      "hint": "This step sets the bottleneck for mechanism-based rate prediction."
+    },
+    {
+      "id": "rk_e12",
+      "from": "rds",
+      "to": "rateLaw",
+      "label": "for multistep mechanisms, the final rate law may also include terms from earlier ___",
+      "answer": "equilibria",
+      "type": "dropdown",
+      "options": ["equilibria", "products", "catalysts", "rate constants"],
+      "hint": "A fast pre-equilibrium can introduce concentration terms not visible in the RDS alone."
+    },
+    {
+      "id": "rk_e13",
+      "from": "mechanism",
+      "to": "catalyst",
+      "label": "in a catalytic mechanism, the catalyst is consumed and then ___",
+      "answer": "regenerated",
+      "type": "dropdown",
+      "options": ["regenerated", "destroyed", "decomposed", "consumed permanently"],
+      "hint": "It participates in steps but is not used up overall."
+    },
+    {
+      "id": "rk_e14",
+      "from": "catalyst",
+      "to": "activationEnergy",
+      "label": "a catalyst speeds reaction by providing a pathway with lower ___",
+      "answer": "activation energy",
+      "type": "fillin",
+      "hint": "Catalysts change kinetics, not the reaction enthalpy or equilibrium constant."
+    }
+  ]
+}
