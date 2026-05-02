@@ -650,9 +650,15 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
             <span style={{color: mapData.color, fontWeight: 700}}>{progressPct}%</span>
           </div>
           <button className="icon-btn" onClick={fitToScreen} title="Reset view">⌂</button>
-          <button className="icon-btn" onClick={spreadNodes} title="Spread nodes apart">⊕</button>
-          <button className="icon-btn" onClick={compactNodes} title="Pull nodes inward">⊖</button>
-          <button className="icon-btn" onClick={resetLayout} title="Reset node layout to auto placement">⟲</button>
+          <button className="icon-btn" onClick={spreadNodes} title="Spread nodes apart" aria-label="Spread nodes apart">
+            <span className="icon-btn-spread-nodes-icon" aria-hidden="true"></span>
+          </button>
+          <button className="icon-btn" onClick={compactNodes} title="Pull nodes inward" aria-label="Pull nodes inward">
+            <span className="icon-btn-compact-nodes-icon" aria-hidden="true"></span>
+          </button>
+          <button className="icon-btn icon-btn-layout-reset" onClick={resetLayout} title="Reset node layout to auto placement" aria-label="Reset node layout">
+            <span className="icon-btn-layout-reset-icon" aria-hidden="true"></span>
+          </button>
           <label className="edge-label-slider" title={`Label anchor: ${edgeLabelT.toFixed(2)}`}>
             <span className="edge-label-slider-text">Label</span>
             <input

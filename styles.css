@@ -156,6 +156,14 @@ body {
   height: 16px;
 }
 
+.topbar-context-reset-icon {
+  width: 16px;
+  height: 16px;
+  background-color: currentColor;
+  -webkit-mask: url('assets/icons/reset-progress.svg') center / contain no-repeat;
+  mask: url('assets/icons/reset-progress.svg') center / contain no-repeat;
+}
+
 .topbar-context-reset:hover {
   background: rgba(255,255,255,0.06);
   color: var(--text);
@@ -606,7 +614,49 @@ body {
   display: flex; align-items: center; justify-content: center;
   transition: all 0.15s;
 }
+.icon-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.icon-btn-spread-nodes-icon,
+.icon-btn-compact-nodes-icon {
+  width: 16px;
+  height: 16px;
+  background-color: currentColor;
+}
+
+.icon-btn-spread-nodes-icon {
+  -webkit-mask: url('assets/icons/spread-nodes.svg') center / contain no-repeat;
+  mask: url('assets/icons/spread-nodes.svg') center / contain no-repeat;
+}
+
+.icon-btn-compact-nodes-icon {
+  -webkit-mask: url('assets/icons/compact-nodes.svg') center / contain no-repeat;
+  mask: url('assets/icons/compact-nodes.svg') center / contain no-repeat;
+}
+
 .icon-btn:hover { color: var(--text); border-color: var(--border-2); background: var(--bg3); }
+
+.icon-btn-layout-reset {
+  color: rgba(110, 203, 246, 0.86);
+  border-color: rgba(110, 203, 246, 0.32);
+  background: rgba(110, 203, 246, 0.08);
+}
+
+.icon-btn-layout-reset-icon {
+  width: 16px;
+  height: 16px;
+  background-color: currentColor;
+  -webkit-mask: url('assets/icons/reset-layout.svg') center / contain no-repeat;
+  mask: url('assets/icons/reset-layout.svg') center / contain no-repeat;
+}
+
+.icon-btn-layout-reset:hover {
+  color: #8ddbff;
+  border-color: rgba(141, 219, 255, 0.5);
+  background: rgba(110, 203, 246, 0.18);
+}
 
 /* ─── CANVAS (zoomable, pannable) ─── */
 .map-viewport {

@@ -861,10 +861,7 @@ function App() {
                   title="Clear your answers for this map"
                   aria-label="Reset answers"
                 >
-                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" focusable="false">
-                    <path d="M13 8a5 5 0 1 1-1.46-3.54" />
-                    <path d="M13 3.5V6.5H10" />
-                  </svg>
+                  <span className="topbar-context-reset-icon" aria-hidden="true"></span>
                 </button>
               )}
             </div>
