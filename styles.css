@@ -1896,6 +1896,19 @@ body {
     display: none;
   }
 
+  .app-shell.sidebar-collapsed .topbar-progress {
+    display: flex;
+  }
+
+  .app-shell.sidebar-collapsed .topbar-progress-bar {
+    width: 38px;
+  }
+
+  .app-shell.sidebar-collapsed .topbar-progress-value {
+    min-width: 2.2ch;
+    font-size: 10px;
+  }
+
   .topbar {
     padding: 0 max(10px, env(safe-area-inset-right)) 0 max(10px, env(safe-area-inset-left));
     gap: 7px;
