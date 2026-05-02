@@ -492,6 +492,7 @@ function MapsManager({
   builtInMaps,
   orderedMapIds,
   subjects,
+  selectedSubjectId,
   customMaps,
   onEdit,
   onCreate,
@@ -506,250 +507,249 @@ function MapsManager({
 }) {
   const [draggedId, setDraggedId] = useStateA(null);
   const [dragOverId, setDragOverId] = useStateA(null);
-  const [dragOverSubjectId, setDragOverSubjectId] = useStateA(null);
+  const [activeFilter, setActiveFilter] = useStateA('all'); // all | builtin | custom | draft
+  const [isOverflowOpen, setIsOverflowOpen] = useStateA(false);
+
+  const activeSubjectId = selectedSubjectId || 'all';
+  const allSubjects = Array.isArray(subjects) ? subjects : [];
+  const subjectById = Object.fromEntries(allSubjects.map((subject) => [subject.id, subject]));
 
   const displayOrder = (Array.isArray(orderedMapIds) ? orderedMapIds : Object.keys(allMaps || {}))
-    .filter(id => !!allMaps[id]);
+    .filter(id => !!allMaps[id])
+    .filter((id) => {
+      if (activeSubjectId === 'all') return true;
+      const mapData = allMaps[id];
+      const mapSubjectId = typeof mapData?.subjectId === 'string' && mapData.subjectId.trim()
+        ? mapData.subjectId.trim()
+        : 'general';
+      return mapSubjectId === activeSubjectId;
+    });
 
-  const folderSeed = (Array.isArray(subjects) && subjects.length > 0)
-    ? subjects
-    : [{ id: 'general', title: 'General' }];
-
-  const sectionsById = {};
-  const sectionOrder = [];
-
-  folderSeed.forEach((folder) => {
-    if (!folder || typeof folder.id !== 'string') return;
-    sectionsById[folder.id] = {
-      id: folder.id,
-      title: folder.title || folder.id,
-      mapIds: [],
-    };
-    sectionOrder.push(folder.id);
-  });
-
-  displayOrder.forEach((mapId) => {
+  const visibleMapIds = displayOrder.filter((mapId) => {
     const mapData = allMaps[mapId];
-    if (!mapData) return;
-    const subjectId = typeof mapData.subjectId === 'string' && mapData.subjectId.trim()
-      ? mapData.subjectId.trim()
-      : 'general';
-    if (!sectionsById[subjectId]) {
-      sectionsById[subjectId] = {
-        id: subjectId,
-        title: mapData.subjectTitle || subjectId,
-        mapIds: [],
-      };
-      sectionOrder.push(subjectId);
-    }
-    sectionsById[subjectId].mapIds.push(mapId);
+    if (!mapData) return false;
+    const isCustom = !!customMaps?.[mapId];
+    if (activeFilter === 'builtin') return !isCustom;
+    if (activeFilter === 'custom') return isCustom;
+    if (activeFilter === 'draft') return isCustom && !mapData._published;
+    return true;
   });
 
-  const sections = sectionOrder
-    .map((id) => sectionsById[id])
-    .filter(Boolean);
+  const selectedTitle = activeSubjectId === 'all'
+    ? 'All Maps'
+    : (subjectById[activeSubjectId]?.title || allMaps[displayOrder[0]]?.subjectTitle || 'Subject');
 
-  // Prompt for a new subject folder name and create it.
-  function createFolderFromPrompt() {
-    if (typeof onCreateSubject !== 'function') return;
-    const title = prompt('Enter a folder name for this subject group:');
-    if (title === null) return;
-    const cleaned = title.trim();
-    if (!cleaned) return;
-    onCreateSubject(cleaned);
+  const selectionStats = displayOrder.reduce((acc, mapId) => {
+    const isCustom = !!customMaps?.[mapId];
+    if (isCustom) acc.local += 1;
+    else acc.builtIn += 1;
+    return acc;
+  }, { builtIn: 0, local: 0 });
+
+  const subjectIcon = activeSubjectId === 'all' ? '≡' : '•';
+
+  function handleCreateForCurrentSubject() {
+    if (typeof onCreate !== 'function') return;
+    const createSubjectId = activeSubjectId === 'all'
+      ? (allMaps[displayOrder[0]]?.subjectId || 'general')
+      : activeSubjectId;
+    onCreate(createSubjectId);
   }
 
   return (
-    <div className="maps-manager">
-      <div className="maps-manager-header">
-        <div>
-          <div className="maps-manager-title">Admin · Concept Maps</div>
-          <div className="maps-manager-sub">Organize maps by subject folder, open any card to edit it, and drag cards to reorder or move them. When you are ready to publish changes, export the map JSON and, if folders changed, export the manifest too.</div>
+    <div className="maps-manager option-b">
+      <div className="maps-manager-subject-header">
+        <div className="maps-manager-subject-left">
+          <div className="maps-manager-subject-icon" aria-hidden="true">{subjectIcon}</div>
+          <div>
+            <div className="maps-manager-subject-title">{selectedTitle}</div>
+            <div className="maps-manager-subject-meta">
+              {displayOrder.length} maps · {selectionStats.builtIn} built-in · {selectionStats.local} local
+            </div>
+          </div>
         </div>
         <div className="maps-manager-actions">
           <button className="btn btn-ghost btn-sm" onClick={onImportMap}>Import Map JSON</button>
-          {typeof onExportManifest === 'function' && (
-            <button className="btn btn-ghost btn-sm" onClick={onExportManifest}>Export Folder Manifest</button>
-          )}
-          {typeof onCreateSubject === 'function' && (
-            <button className="btn btn-ghost btn-sm" onClick={createFolderFromPrompt}>New Subject Folder</button>
-          )}
-          <button
-            className="btn btn-ghost btn-sm btn-danger-ghost"
-            onClick={() => {
-              const confirmed = window.confirm(
-                'Reset local storage for this site?\n\nThis will erase all saved progress, custom maps, and settings stored by Concept Mapper in this browser — simulating a first-time visit. Only data for this site is affected.\n\nThis cannot be undone.'
-              );
-              if (confirmed) {
-                localStorage.clear();
-                window.location.reload();
-              }
-            }}
-          >
-            Reset Local Storage
-          </button>
+          <button className="btn btn-primary btn-sm" onClick={handleCreateForCurrentSubject}>+ New Map</button>
+          <div className="maps-manager-overflow-wrap">
+            <button
+              className="btn btn-ghost btn-sm maps-manager-overflow-btn"
+              onClick={() => setIsOverflowOpen((v) => !v)}
+              aria-haspopup="menu"
+              aria-expanded={isOverflowOpen}
+              title="More actions"
+            >
+              ⋯
+            </button>
+            {isOverflowOpen && (
+              <div className="maps-manager-overflow-menu" role="menu">
+                {typeof onExportManifest === 'function' && (
+                  <button
+                    className="maps-manager-overflow-item"
+                    role="menuitem"
+                    onClick={() => {
+                      onExportManifest();
+                      setIsOverflowOpen(false);
+                    }}
+                  >
+                    Export Folder Manifest
+                  </button>
+                )}
+                <div className="maps-manager-overflow-divider" aria-hidden="true"></div>
+                <button
+                  className="maps-manager-overflow-item danger"
+                  role="menuitem"
+                  onClick={() => {
+                    const confirmed = window.confirm(
+                      'Reset local storage for this site?\n\nThis will erase all saved progress, custom maps, and settings stored by Concept Mapper in this browser — simulating a first-time visit. Only data for this site is affected.\n\nThis cannot be undone.'
+                    );
+                    if (confirmed) {
+                      localStorage.clear();
+                      window.location.reload();
+                    }
+                  }}
+                >
+                  Reset Local Storage
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-      <div className="folder-sections">
-        {sections.map((section) => (
-          <div
-            key={section.id}
-            className={`folder-section ${dragOverSubjectId === section.id ? 'drag-over' : ''}`}
-            onDragOver={(e) => {
-              e.preventDefault();
-              e.dataTransfer.dropEffect = 'move';
-              if (dragOverSubjectId !== section.id) setDragOverSubjectId(section.id);
-            }}
-            onDragLeave={(e) => {
-              if (e.currentTarget.contains(e.relatedTarget)) return;
-              if (dragOverSubjectId === section.id) setDragOverSubjectId(null);
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              if (draggedId && typeof onMoveToSubject === 'function') {
-                onMoveToSubject(draggedId, section.id);
-              }
-              setDragOverSubjectId(null);
-              setDragOverId(null);
-              setDraggedId(null);
-            }}
-          >
-            <div className="folder-section-header">
-              <div>
-                <div className="folder-section-title">{section.title}</div>
-                <div className="folder-section-meta">{section.mapIds.length} map{section.mapIds.length === 1 ? '' : 's'}</div>
+
+      <div className="maps-manager-filter-bar">
+        <span className="maps-manager-filter-label">Show:</span>
+        <button
+          className={`maps-manager-filter-chip ${activeFilter === 'all' ? 'active' : ''}`}
+          onClick={() => setActiveFilter('all')}
+        >
+          All
+        </button>
+        <button
+          className={`maps-manager-filter-chip ${activeFilter === 'builtin' ? 'active' : ''}`}
+          onClick={() => setActiveFilter('builtin')}
+        >
+          Built-in
+        </button>
+        <button
+          className={`maps-manager-filter-chip ${activeFilter === 'custom' ? 'active' : ''}`}
+          onClick={() => setActiveFilter('custom')}
+        >
+          Custom
+        </button>
+        <button
+          className={`maps-manager-filter-chip ${activeFilter === 'draft' ? 'active' : ''}`}
+          onClick={() => setActiveFilter('draft')}
+        >
+          Draft
+        </button>
+      </div>
+
+      <div className="maps-manager-rows">
+        {visibleMapIds.map((mapId) => {
+          const m = allMaps[mapId];
+          if (!m) return null;
+          const isCustom = !!customMaps?.[m.id];
+          const hasBuiltInVersion = !!builtInMaps?.[m.id];
+          return (
+            <div
+              key={m.id}
+              className="maps-manager-row"
+              style={{
+                '--row-color': m.color,
+                outline: dragOverId === m.id ? '2px dashed var(--accent-amber)' : 'none',
+                opacity: draggedId === m.id ? 0.58 : 1,
+              }}
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.effectAllowed = 'move';
+                setDraggedId(m.id);
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                if (dragOverId !== m.id) setDragOverId(m.id);
+              }}
+              onDragLeave={() => {
+                if (dragOverId === m.id) setDragOverId(null);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (draggedId && draggedId !== m.id && typeof onReorderMap === 'function') {
+                  onReorderMap(draggedId, m.id);
+                }
+                setDragOverId(null);
+                setDraggedId(null);
+              }}
+              onDragEnd={() => {
+                setDraggedId(null);
+                setDragOverId(null);
+              }}
+              onClick={() => onEdit(m.id)}
+            >
+              <div className="maps-manager-row-drag" title="Drag to reorder maps">
+                <span></span><span></span><span></span>
               </div>
-              {typeof onCreate === 'function' && (
-                <button className="btn btn-ghost btn-sm" onClick={() => onCreate(section.id)}>
-                  New Map
-                </button>
-              )}
-            </div>
 
-            <div className="maps-grid">
-              {section.mapIds.map((mapId) => {
-                const m = allMaps[mapId];
-                if (!m) return null;
-                const isCustom = !!customMaps[m.id];
-                const hasBuiltInVersion = !!builtInMaps?.[m.id];
-                return (
-                  <div
-                    key={m.id}
-                    className="maps-grid-card"
-                    style={{
-                      '--card-color': m.color,
-                      outline: dragOverId === m.id ? '2px dashed var(--accent-amber)' : 'none',
-                      opacity: draggedId === m.id ? 0.55 : 1,
-                    }}
-                    draggable
-                    onDragStart={(e) => {
-                      e.dataTransfer.effectAllowed = 'move';
-                      setDraggedId(m.id);
-                    }}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      e.dataTransfer.dropEffect = 'move';
-                      if (dragOverId !== m.id) setDragOverId(m.id);
-                    }}
-                    onDragLeave={() => {
-                      if (dragOverId === m.id) setDragOverId(null);
-                    }}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      if (draggedId && draggedId !== m.id) {
-                        if (typeof onMoveToSubject === 'function') {
-                          onMoveToSubject(draggedId, section.id);
-                        }
-                        if (typeof onReorderMap === 'function') {
-                          onReorderMap(draggedId, m.id);
-                        }
-                      }
-                      setDragOverSubjectId(null);
-                      setDragOverId(null);
-                      setDraggedId(null);
-                    }}
-                    onDragEnd={() => {
-                      setDraggedId(null);
-                      setDragOverId(null);
-                      setDragOverSubjectId(null);
-                    }}
-                    onClick={() => onEdit(m.id)}
+              <div className="maps-manager-row-dot" style={{ background: m.color }}></div>
+
+              <div className="maps-manager-row-info">
+                <div className="maps-manager-row-title">{m.title}</div>
+                <div className="maps-manager-row-desc">{m.description}</div>
+              </div>
+
+              <div className="maps-manager-row-stats" aria-label="Map stats">
+                <div className="maps-manager-row-stat"><strong>{m.nodes.length}</strong> nodes</div>
+                <div className="maps-manager-row-stat"><strong>{m.edges.length}</strong> edges</div>
+              </div>
+
+              <div className="maps-manager-row-badges">
+                {!isCustom && <span className="maps-manager-status-badge builtin">Built-in</span>}
+                {isCustom && (
+                  <span className={`maps-manager-status-badge ${m._published ? 'published' : 'draft'}`}>
+                    {m._published ? 'Published' : 'Draft'}
+                  </span>
+                )}
+              </div>
+
+              <div className="maps-manager-row-actions" onClick={(e) => e.stopPropagation()}>
+                {isCustom && typeof onTogglePublish === 'function' && (
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => onTogglePublish(m.id, !m._published)}
                   >
-                    <div
-                      style={{
-                        fontSize: 11,
-                        opacity: 0.7,
-                        marginBottom: 6,
-                        userSelect: 'none',
-                        letterSpacing: 0.2,
-                      }}
-                      title="Drag to reorder or move maps between folders"
-                    >
-                      ⋮⋮ Drag to reorder or move between folders
-                    </div>
-                    <div className="maps-grid-card-title">{m.title}</div>
-                    <div className="maps-grid-card-meta">{m.description}</div>
-                    <div className="maps-grid-card-stats">
-                      <div className="maps-grid-card-stat"><span>{m.nodes.length}</span> nodes</div>
-                      <div className="maps-grid-card-stat"><span>{m.edges.length}</span> edges</div>
-                      {isCustom && <div className="maps-grid-card-stat" style={{color: 'var(--accent-amber)'}}>● local map</div>}
-                      {isCustom && (
-                        <div className="maps-grid-card-stat" style={{color: m._published ? 'var(--accent-teal)' : 'var(--text-muted)'}}>
-                          {m._published ? '● published' : '● draft'}
-                        </div>
-                      )}
-                    </div>
-                    {isCustom && (
-                      <div className="maps-grid-card-actions">
-                        {typeof onTogglePublish === 'function' && (
-                          <button
-                            className="btn btn-ghost btn-sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onTogglePublish(m.id, !m._published);
-                            }}
-                          >
-                            {m._published ? 'Unpublish' : 'Publish'}
-                          </button>
-                        )}
-                        {hasBuiltInVersion && typeof onRevertToBuiltIn === 'function' && (
-                          <button
-                            className="btn btn-ghost btn-sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onRevertToBuiltIn(m.id);
-                            }}
-                          >
-                            Revert to built-in
-                          </button>
-                        )}
-                        {typeof onExportMap === 'function' && (
-                          <button
-                            className="btn btn-ghost btn-sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onExportMap(m.id);
-                            }}
-                          >
-                            Export Map JSON
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-              {section.mapIds.length === 0 && (
-                <div className="maps-grid-empty">Drop a map here, or create a new map directly inside this folder.</div>
-              )}
+                    {m._published ? 'Unpublish' : 'Publish'}
+                  </button>
+                )}
+                {isCustom && hasBuiltInVersion && typeof onRevertToBuiltIn === 'function' && (
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => onRevertToBuiltIn(m.id)}
+                  >
+                    Revert
+                  </button>
+                )}
+                {typeof onExportMap === 'function' && (
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => onExportMap(m.id)}
+                  >
+                    Export
+                  </button>
+                )}
+                <button className="btn btn-ghost btn-sm" onClick={() => onEdit(m.id)}>Open</button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
-        <div className="maps-grid-new" onClick={() => onCreate(sectionOrder[0] || 'general')}>
-          <div className="maps-grid-new-icon">+</div>
-          <div>Create a new concept map</div>
-        </div>
+        {visibleMapIds.length === 0 && (
+          <div
+            className="maps-manager-empty"
+          >
+            No maps match this filter in the current subject.
+          </div>
+        )}
       </div>
     </div>
   );

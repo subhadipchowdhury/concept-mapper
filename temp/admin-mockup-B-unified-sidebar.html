@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Unified Sidebar — Student vs Admin Mode</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c12; --bg2: #11141d; --bg3: #181c28; --bg4: #20253a;
+  --border: rgba(255,255,255,0.08); --border-2: rgba(255,255,255,0.14);
+  --text: #e8eaf2; --text-muted: #6b7280; --text-dim: #9ca3af;
+  --accent-blue: #4f8ef7; --accent-teal: #34d399;
+  --accent-amber: #f59e0b; --accent-rose: #fb7185; --accent-purple: #a78bfa;
+  --shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #060810;
+  color: var(--text);
+  padding: 40px 36px 60px;
+}
+
+.page-header { margin-bottom: 36px; }
+.page-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.page-subtitle { font-size: 13px; color: var(--text-muted); line-height: 1.6; max-width: 680px; }
+
+/* ── Side-by-side comparison ── */
+.comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.col-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.col-mode-badge {
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.col-mode-badge.student {
+  background: rgba(52,211,153,0.1);
+  color: #6ee7b7;
+  border: 1px solid rgba(52,211,153,0.2);
+}
+.col-mode-badge.admin {
+  background: rgba(245,158,11,0.1);
+  color: var(--accent-amber);
+  border: 1px solid rgba(245,158,11,0.2);
+}
+
+/* ── App shell (cropped to sidebar + topbar) ── */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--bg);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.55);
+}
+
+/* ── Topbar ── */
+.topbar {
+  height: 56px;
+  background: rgba(17,20,29,0.94);
+  border-bottom: 1px solid rgba(79,142,247,0.12);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 10px;
+  flex-shrink: 0;
+  position: relative;
+}
+.topbar::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, rgba(79,142,247,0.4) 30%, rgba(52,211,153,0.3) 70%, transparent);
+}
+.logo-mark {
+  width: 24px; height: 24px;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  border-radius: 7px;
+  flex-shrink: 0;
+}
+.logo-text { font-size: 12.5px; font-weight: 600; }
+.topbar-div { width: 1px; height: 16px; background: rgba(255,255,255,0.1); }
+.role-switcher {
+  display: flex;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+.role-btn {
+  padding: 4px 11px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-size: 11.5px; font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+}
+.role-btn.active-student {
+  background: rgba(52,211,153,0.15);
+  border-color: rgba(52,211,153,0.3);
+  color: #6ee7b7;
+}
+.role-btn.active-admin {
+  background: rgba(245,158,11,0.15);
+  border-color: rgba(245,158,11,0.3);
+  color: var(--accent-amber);
+}
+.topbar-spacer { flex: 1; }
+.topbar-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.topbar-progress-bar {
+  width: 52px; height: 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px; overflow: hidden;
+}
+.topbar-progress-fill {
+  height: 100%; background: var(--accent-teal); border-radius: 2px;
+}
+
+/* ── Shell body ── */
+.shell-body {
+  display: flex;
+  height: 560px;
+}
+
+/* ── SIDEBAR — shared shell ── */
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: rgba(14,17,26,0.97);
+  border-right: 1px solid rgba(79,142,247,0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* shared header region */
+.sidebar-header {
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.sidebar-section-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(126,180,250,0.55);
+}
+
+/* student mode header extras */
+.sidebar-ctrl-row {
+  display: flex;
+  gap: 5px;
+}
+.sidebar-ctrl-btn {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--text-muted);
+  border-radius: 6px;
+  font-size: 10px;
+  font-family: inherit;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.sidebar-ctrl-btn:hover { background: rgba(255,255,255,0.07); color: var(--text); }
+
+.progress-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(52,211,153,0.07);
+  border: 1px solid rgba(52,211,153,0.15);
+}
+.progress-chip-label {
+  font-size: 11px; font-weight: 500;
+  color: rgba(52,211,153,0.75);
+  white-space: nowrap;
+}
+.progress-chip-bar {
+  flex: 1; height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px; overflow: hidden;
+}
+.progress-chip-fill {
+  height: 100%; background: var(--accent-teal); border-radius: 2px;
+}
+.progress-chip-pct {
+  font-size: 11px; color: var(--text-muted);
+  min-width: 2.6ch; text-align: right;
+}
+
+/* admin mode header: search */
+.sidebar-search {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--text);
+  outline: none;
+}
+.sidebar-search::placeholder { color: var(--text-muted); }
+.sidebar-search:focus { border-color: rgba(79,142,247,0.4); }
+
+/* sidebar body */
+.sidebar-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 8px;
+}
+
+/* ── STUDENT MODE: folder + items ── */
+.folder-title {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(126,180,250,0.5);
+  padding: 10px 8px 5px;
+  font-family: inherit;
+}
+.folder-title:hover { color: rgba(126,180,250,0.8); }
+.folder-caret { font-size: 10px; opacity: 0.5; }
+
+.map-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 10px;
+  margin: 1px 0;
+  cursor: pointer;
+  border-radius: 8px;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+}
+.map-item:hover { background: rgba(255,255,255,0.04); }
+.map-item.active {
+  background: rgba(79,142,247,0.08);
+  border-left-color: var(--item-color, var(--accent-blue));
+  box-shadow: inset 0 0 0 1px rgba(79,142,247,0.12);
+}
+.map-item-title {
+  font-size: 12.5px; font-weight: 600; color: var(--text);
+  display: flex; align-items: center; gap: 6px;
+}
+.item-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--item-color);
+  flex-shrink: 0;
+}
+.map-item-desc {
+  font-size: 11px; color: var(--text-muted);
+  line-height: 1.4; padding-left: 13px;
+}
+.map-item-progress {
+  margin: 4px 0 0 13px;
+  height: 3px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 2px; overflow: hidden;
+}
+.map-item-progress-fill {
+  height: 100%; border-radius: 2px;
+}
+.map-item-stats {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: var(--text-muted);
+  margin-top: 2px; padding-left: 13px;
+}
+
+.sidebar-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.07);
+  margin: 10px 4px;
+}
+
+/* admin sidebar entry (student mode) */
+.admin-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 10px;
+  margin: 1px 0;
+  cursor: pointer;
+  border-radius: 8px;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+}
+.admin-entry:hover { background: rgba(245,158,11,0.06); border-left-color: rgba(245,158,11,0.3); }
+.admin-entry-title {
+  font-size: 12.5px; font-weight: 600; color: var(--text);
+  display: flex; align-items: center; gap: 6px;
+}
+.admin-entry-desc { font-size: 11px; color: var(--text-muted); padding-left: 13px; }
+
+/* ── ADMIN MODE: subject nav items ── */
+.subject-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  cursor: pointer;
+  margin-bottom: 2px;
+  transition: all 0.13s;
+}
+.subject-item:hover { background: rgba(255,255,255,0.04); }
+.subject-item.active {
+  background: rgba(79,142,247,0.1);
+  box-shadow: inset 0 0 0 1px rgba(79,142,247,0.18);
+}
+.subject-icon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.subject-icon.blue { background: rgba(79,142,247,0.12); color: #7eb4fa; }
+.subject-icon.teal { background: rgba(52,211,153,0.1); color: #6ee7b7; }
+.subject-icon.amber { background: rgba(245,158,11,0.1); color: var(--accent-amber); }
+.subject-icon.all { background: rgba(255,255,255,0.06); color: var(--text-dim); }
+.subject-info { flex: 1; min-width: 0; }
+.subject-name {
+  font-size: 12.5px; font-weight: 600; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.subject-item.active .subject-name { color: #a5c8fd; }
+.subject-count { font-size: 10.5px; color: var(--text-muted); }
+
+.subject-nav-divider {
+  height: 1px; background: var(--border); margin: 7px 4px;
+}
+
+/* sidebar footer */
+.sidebar-footer {
+  padding: 10px 8px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-footer-btn {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 9px;
+  border: 1.5px dashed rgba(79,142,247,0.22);
+  background: transparent;
+  color: rgba(79,142,247,0.55);
+  font-family: inherit;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer;
+  transition: all 0.13s;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.sidebar-footer-btn:hover {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  background: rgba(79,142,247,0.05);
+}
+
+/* ── Map area placeholder ── */
+.map-area {
+  flex: 1;
+  background:
+    radial-gradient(circle at 30% 40%, rgba(79,142,247,0.06) 0%, transparent 50%),
+    var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  position: relative;
+}
+.map-area::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.map-area-content {
+  position: relative;
+  text-align: center;
+}
+.map-area-content .big { font-size: 15px; font-weight: 600; color: var(--text-dim); margin-bottom: 5px; }
+
+/* ── Annotation callouts ── */
+.annotated {
+  position: relative;
+}
+.annotation {
+  position: absolute;
+  left: calc(100% + 14px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.annotation-line {
+  width: 30px; height: 1px;
+  background: rgba(245,158,11,0.5);
+  flex-shrink: 0;
+}
+.annotation-text {
+  background: rgba(245,158,11,0.1);
+  border: 1px solid rgba(245,158,11,0.28);
+  border-radius: 7px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-amber);
+  white-space: nowrap;
+}
+.annotation-left {
+  right: calc(100% + 14px);
+  left: auto;
+}
+
+/* ── Shared-shell callout box ── */
+.shared-callout {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.callout-card {
+  padding: 18px 22px;
+  background: rgba(17,20,29,0.85);
+  border-radius: 13px;
+  border: 1px solid var(--border);
+}
+.callout-card h3 {
+  font-size: 13px; font-weight: 700;
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 7px;
+}
+.callout-card ul {
+  list-style: none;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.callout-card li {
+  font-size: 12.5px; color: var(--text-dim); line-height: 1.5;
+  display: flex; align-items: flex-start; gap: 7px;
+}
+.callout-card li::before {
+  content: '→'; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+}
+.card-student li::before { color: var(--accent-teal); }
+.card-admin li::before { color: var(--accent-amber); }
+.callout-full {
+  grid-column: 1 / -1;
+  padding: 18px 22px;
+  background: rgba(17,20,29,0.85);
+  border-radius: 13px;
+  border: 1px solid rgba(79,142,247,0.2);
+}
+.callout-full h3 {
+  font-size: 13px; font-weight: 700; color: #7eb4fa;
+  margin-bottom: 10px;
+}
+.callout-full ul {
+  list-style: none;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 7px 28px;
+}
+.callout-full li {
+  font-size: 12.5px; color: var(--text-dim); line-height: 1.5;
+  display: flex; align-items: flex-start; gap: 7px;
+}
+.callout-full li::before {
+  content: '✓'; color: var(--accent-blue); font-weight: 700; flex-shrink: 0; margin-top: 1px;
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-title">Unified Sidebar — Student &amp; Admin Modes</div>
+  <div class="page-subtitle">
+    The same sidebar shell (same width, same position, same collapse button) serves both views.
+    The <strong style="color:var(--accent-teal)">student mode</strong> shows map items with progress;
+    the <strong style="color:var(--accent-amber)">admin mode</strong> shows the subject folder navigator.
+    Switching roles swaps just the sidebar content — everything else stays consistent.
+  </div>
+</div>
+
+<div class="comparison">
+
+  <!-- ── STUDENT MODE ── -->
+  <div>
+    <div class="col-label">
+      <span class="col-mode-badge student">Student</span>
+      role-btn active → teal
+    </div>
+    <div class="app-shell">
+      <!-- Topbar -->
+      <div class="topbar">
+        <div class="logo-mark"></div>
+        <span class="logo-text">Concept Mapper</span>
+        <div class="topbar-div"></div>
+        <div class="role-switcher">
+          <button class="role-btn active-student">Student</button>
+          <button class="role-btn">Admin</button>
+        </div>
+        <div class="topbar-spacer"></div>
+        <div class="topbar-progress">
+          <span>5 / 9</span>
+          <div class="topbar-progress-bar">
+            <div class="topbar-progress-fill" style="width:55%"></div>
+          </div>
+          <span>55%</span>
+        </div>
+      </div>
+
+      <div class="shell-body">
+        <!-- Sidebar — student content -->
+        <aside class="sidebar">
+          <div class="sidebar-header">
+            <div class="sidebar-header-top">
+              <div class="sidebar-section-label">Topics</div>
+              <div class="sidebar-ctrl-row">
+                <button class="sidebar-ctrl-btn">Collapse</button>
+                <button class="sidebar-ctrl-btn">Expand</button>
+              </div>
+            </div>
+            <div class="progress-chip">
+              <span class="progress-chip-label">5 / 9 maps complete</span>
+              <div class="progress-chip-bar">
+                <div class="progress-chip-fill" style="width:55%"></div>
+              </div>
+              <span class="progress-chip-pct">55%</span>
+            </div>
+          </div>
+
+          <div class="sidebar-body">
+            <!-- Subject folder -->
+            <button class="folder-title">
+              <span>Real Analysis (3)</span>
+              <span class="folder-caret">▾</span>
+            </button>
+            <div class="map-item active" style="--item-color: #4f8ef7;">
+              <div class="map-item-title"><div class="item-dot" style="background:#4f8ef7;"></div>Sequences &amp; Convergence</div>
+              <div class="map-item-desc">Monotone convergence, Cauchy criteria.</div>
+              <div class="map-item-progress"><div class="map-item-progress-fill" style="width:82%;background:#4f8ef7;"></div></div>
+              <div class="map-item-stats"><span>9/11 edges</span><span>82%</span></div>
+            </div>
+            <div class="map-item" style="--item-color: #a78bfa;">
+              <div class="map-item-title"><div class="item-dot" style="background:#a78bfa;"></div>Series &amp; Tests</div>
+              <div class="map-item-desc">Ratio, root, comparison tests.</div>
+              <div class="map-item-progress"><div class="map-item-progress-fill" style="width:46%;background:#a78bfa;"></div></div>
+              <div class="map-item-stats"><span>6/13 edges</span><span>46%</span></div>
+            </div>
+            <div class="map-item" style="--item-color: #34d399;">
+              <div class="map-item-title"><div class="item-dot" style="background:#34d399;"></div>Function Sequences</div>
+              <div class="map-item-desc">Pointwise vs. uniform convergence.</div>
+              <div class="map-item-progress"><div class="map-item-progress-fill" style="width:0%;background:#34d399;"></div></div>
+              <div class="map-item-stats"><span>0/7 edges</span><span>0%</span></div>
+            </div>
+
+            <button class="folder-title">
+              <span>Diff. Equations (4)</span>
+              <span class="folder-caret">▾</span>
+            </button>
+            <div class="map-item" style="--item-color: #06b6d4;">
+              <div class="map-item-title"><div class="item-dot" style="background:#06b6d4;"></div>First-Order ODEs</div>
+              <div class="map-item-desc">Separable, linear, exact equations.</div>
+              <div class="map-item-progress"><div class="map-item-progress-fill" style="width:100%;background:#06b6d4;"></div></div>
+              <div class="map-item-stats"><span>9/9 edges</span><span>100%</span></div>
+            </div>
+            <div class="map-item" style="--item-color: #f59e0b;">
+              <div class="map-item-title"><div class="item-dot" style="background:#f59e0b;"></div>Second-Order via Laplace</div>
+              <div class="map-item-desc">Laplace transforms, IVPs.</div>
+              <div class="map-item-progress"><div class="map-item-progress-fill" style="width:30%;background:#f59e0b;"></div></div>
+              <div class="map-item-stats"><span>3/10 edges</span><span>30%</span></div>
+            </div>
+
+            <!-- Admin section at bottom -->
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-section-label" style="padding: 0 8px 6px; display:block;">Admin</div>
+            <div class="admin-entry">
+              <div class="admin-entry-title">
+                <div class="item-dot" style="background:var(--accent-amber);"></div>
+                Map Builder
+              </div>
+              <div class="admin-entry-desc">Create and edit concept maps</div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Map canvas placeholder -->
+        <div class="map-area">
+          <div class="map-area-content">
+            <div class="big">Sequences &amp; Convergence</div>
+            <div>Map canvas renders here</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ADMIN MODE ── -->
+  <div>
+    <div class="col-label">
+      <span class="col-mode-badge admin">Admin</span>
+      role-btn active → amber
+    </div>
+    <div class="app-shell">
+      <!-- Topbar -->
+      <div class="topbar">
+        <div class="logo-mark"></div>
+        <span class="logo-text">Concept Mapper</span>
+        <div class="topbar-div"></div>
+        <div class="role-switcher">
+          <button class="role-btn">Student</button>
+          <button class="role-btn active-admin">Admin</button>
+        </div>
+        <div class="topbar-spacer"></div>
+      </div>
+
+      <div class="shell-body">
+        <!-- Sidebar — admin content -->
+        <aside class="sidebar">
+          <div class="sidebar-header">
+            <div class="sidebar-header-top">
+              <div class="sidebar-section-label">Subjects</div>
+            </div>
+            <input class="sidebar-search" placeholder="Filter subjects…">
+          </div>
+
+          <div class="sidebar-body">
+            <!-- All Maps entry -->
+            <div class="subject-item">
+              <div class="subject-icon all">≡</div>
+              <div class="subject-info">
+                <div class="subject-name">All Maps</div>
+                <div class="subject-count">9 maps</div>
+              </div>
+            </div>
+
+            <div class="subject-nav-divider"></div>
+
+            <div class="subject-item active">
+              <div class="subject-icon blue">∫</div>
+              <div class="subject-info">
+                <div class="subject-name">Real Analysis</div>
+                <div class="subject-count">3 maps · 2 built-in · 1 local</div>
+              </div>
+            </div>
+            <div class="subject-item">
+              <div class="subject-icon teal">∂</div>
+              <div class="subject-info">
+                <div class="subject-name">Differential Equations</div>
+                <div class="subject-count">4 maps</div>
+              </div>
+            </div>
+            <div class="subject-item">
+              <div class="subject-icon amber">⚗</div>
+              <div class="subject-info">
+                <div class="subject-name">Chemical Reactions</div>
+                <div class="subject-count">2 maps</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-footer">
+            <button class="sidebar-footer-btn">+ New Subject Folder</button>
+          </div>
+        </aside>
+
+        <!-- Admin map list placeholder -->
+        <div class="map-area">
+          <div class="map-area-content">
+            <div class="big">Real Analysis — 3 Maps</div>
+            <div>Map list rows render here</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /comparison -->
+
+<!-- Callout notes -->
+<div class="shared-callout">
+  <div class="callout-card card-student">
+    <h3 style="color: #6ee7b7;">🟢 Student sidebar — what stays</h3>
+    <ul>
+      <li>Same "Topics" label + Collapse/Expand controls</li>
+      <li>Overall progress chip below the header</li>
+      <li>Subject folders (collapsible) with map items + per-map progress bar</li>
+      <li>Admin entry at the bottom (only visible when unlocked)</li>
+      <li>Clicking Admin entry → switches to Admin mode</li>
+    </ul>
+  </div>
+  <div class="callout-card card-admin">
+    <h3 style="color: var(--accent-amber);">🟡 Admin sidebar — what changes</h3>
+    <ul>
+      <li>Label becomes "Subjects" instead of "Topics"</li>
+      <li>Progress chip replaced by subject search input</li>
+      <li>Items become subject nav entries (icon + count)</li>
+      <li>"All Maps" entry at top for unfiltered view</li>
+      <li>Footer gains "+ New Subject Folder" button</li>
+    </ul>
+  </div>
+  <div class="callout-full">
+    <h3>🔵 What's shared / stays identical</h3>
+    <ul>
+      <li>Sidebar width (260px), background color, border</li>
+      <li>Topbar layout — only the role-btn highlight color changes (teal → amber)</li>
+      <li>Collapse/expand behavior (sidebar can still be hidden on small screens)</li>
+      <li>The <code>app-shell</code> grid template doesn't change at all</li>
+      <li>Role switcher in topbar is the toggle — no separate navigation needed</li>
+      <li>Switching back to Student re-shows the last-active map seamlessly</li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>

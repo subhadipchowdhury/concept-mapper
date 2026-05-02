@@ -276,6 +276,8 @@ function App() {
   const [collapsedFolders, setCollapsedFolders] = useStateApp(() => loadSidebarFolderCollapse());
   const [mapOrder, setMapOrder] = useStateApp(() => loadMapOrder());
   const [subjectOrder, setSubjectOrder] = useStateApp(() => loadSubjectOrder());
+  const [adminSubjectId, setAdminSubjectId] = useStateApp('all');
+  const [adminSubjectQuery, setAdminSubjectQuery] = useStateApp('');
   const [manifestOrder, setManifestOrder] = useStateApp([]);
   const [positions, setPositions] = useStateApp(() => loadPositions());
   const [toast, setToast] = useStateApp(null);
@@ -756,6 +758,21 @@ function App() {
   const editingMap = editingMapId ? adminMaps[editingMapId] : null;
   const orderedStudentMapIds = buildOrderedIds(mapOrder, studentMaps);
   const orderedAdminMapIds = buildOrderedIds(mapOrder, adminMaps);
+  const adminMapCountsBySubject = orderedAdminMapIds.reduce((acc, mapId) => {
+    const mapData = adminMaps[mapId];
+    if (!mapData) return acc;
+    const subject = getSubjectInfo(mapData);
+    acc[subject.id] = (acc[subject.id] || 0) + 1;
+    return acc;
+  }, {});
+  const filteredAdminSubjects = allSubjects.filter((subject) => {
+    const q = adminSubjectQuery.trim().toLowerCase();
+    if (!q) return true;
+    return subject.title.toLowerCase().includes(q);
+  });
+  const resolvedAdminSubjectId = adminSubjectId === 'all' || allSubjects.some((s) => s.id === adminSubjectId)
+    ? adminSubjectId
+    : 'all';
   const studentSections = buildSubjectSections(
     orderedStudentMapIds,
     studentMaps,
@@ -784,6 +801,12 @@ function App() {
       saveSidebarFolderCollapse(next);
     }
   }, [studentSections, collapsedFolders]);
+
+  useEffectApp(() => {
+    if (adminSubjectId === 'all') return;
+    const isValid = allSubjects.some((subject) => subject.id === adminSubjectId);
+    if (!isValid) setAdminSubjectId('all');
+  }, [adminSubjectId, allSubjects]);
 
   // Toggle collapse state for a single sidebar subject folder.
   function toggleFolder(sectionId) {
@@ -902,7 +925,7 @@ function App() {
         <div className="topbar-divider" aria-hidden="true"></div>
         <div className="topbar-role-switcher" role="tablist" aria-label="Mode">
           <button
-            className={`topbar-role-btn ${view === 'student' ? 'active' : ''}`}
+            className={`topbar-role-btn ${view === 'student' ? 'active student' : ''}`}
             onClick={() => setView('student')}
             role="tab"
             aria-selected={view === 'student'}
@@ -910,7 +933,7 @@ function App() {
             Student
           </button>
           <button
-            className={`topbar-role-btn ${view.startsWith('admin') ? 'active' : ''}`}
+            className={`topbar-role-btn ${view.startsWith('admin') ? 'active admin' : ''}`}
             onClick={openAdmin}
             role="tab"
             aria-selected={view.startsWith('admin')}
@@ -933,90 +956,160 @@ function App() {
       )}
 
       <aside className="sidebar">
-        <div className="sidebar-header">
-          <div className="sidebar-header-top">
-            <div className="sidebar-section-title">Topics</div>
-            <div className="sidebar-folder-controls">
-              <button type="button" className="sidebar-folder-control-btn" onClick={collapseAllFolders}>Collapse</button>
-              <button type="button" className="sidebar-folder-control-btn" onClick={expandAllFolders}>Expand</button>
-            </div>
-          </div>
-          {studentSections.length > 0 && (
-            <div className="sidebar-progress-chip" aria-label={`Overall progress: ${sidebarPct}%`}>
-              <span className="sidebar-progress-chip-label">{sidebarDoneCount} / {sidebarTotalCount} maps complete</span>
-              <div className="sidebar-progress-chip-bar" aria-hidden="true">
-                <div className="sidebar-progress-chip-fill" style={{ width: `${sidebarPct}%` }}></div>
+        {view.startsWith('admin') ? (
+          <>
+            <div className="sidebar-header">
+              <div className="sidebar-header-top">
+                <div className="sidebar-section-title">Subjects</div>
               </div>
-              <span className="sidebar-progress-chip-pct">{sidebarPct}%</span>
+              <input
+                className="sidebar-search"
+                type="search"
+                value={adminSubjectQuery}
+                onChange={(e) => setAdminSubjectQuery(e.target.value)}
+                placeholder="Filter subjects..."
+                aria-label="Filter subjects"
+              />
             </div>
-          )}
-        </div>
-        <div className="sidebar-body">
-        {studentSections.map((section) => (
-          <React.Fragment key={section.id}>
-            <button
-              className="sidebar-folder-title"
-              type="button"
-              onClick={() => toggleFolder(section.id)}
-              aria-expanded={!collapsedFolders[section.id]}
-            >
-              <span>{section.title} ({section.maps.length})</span>
-              <span className={`sidebar-folder-caret ${collapsedFolders[section.id] ? 'collapsed' : ''}`}>▾</span>
-            </button>
-            {!collapsedFolders[section.id] && section.maps.map((m) => {
-              const prog = getProgress(m.id);
-              const total = m.edges.length;
-              const done = (prog.answeredEdges || new Set()).size;
-              const pct = total > 0 ? (done / total) * 100 : 0;
-              return (
+            <div className="sidebar-body">
+              <div
+                className={`sidebar-subject-item ${resolvedAdminSubjectId === 'all' ? 'active' : ''}`}
+                onClick={() => setAdminSubjectId('all')}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') setAdminSubjectId('all');
+                }}
+              >
+                <div className="sidebar-subject-item-main">
+                  <span className="sidebar-subject-icon">≡</span>
+                  <span className="sidebar-subject-title">All Maps</span>
+                </div>
+                <span className="sidebar-subject-count">{orderedAdminMapIds.length}</span>
+              </div>
+              <div className="sidebar-divider"></div>
+              {filteredAdminSubjects.map((subject) => (
                 <div
-                  key={m.id}
-                  className={`sidebar-item ${activeMapId === m.id && view === 'student' ? 'active' : ''}`}
-                  style={{'--item-color': m.color}}
-                  onClick={() => {
-                    setActiveMapId(m.id);
-                    setView('student');
-                    try {
-                      if (window.matchMedia('(max-width: 760px)').matches) {
-                        setIsSidebarCollapsed(true);
-                      }
-                    } catch {}
+                  key={subject.id}
+                  className={`sidebar-subject-item ${resolvedAdminSubjectId === subject.id ? 'active' : ''}`}
+                  onClick={() => setAdminSubjectId(subject.id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') setAdminSubjectId(subject.id);
                   }}
                 >
-                  <div className="sidebar-item-title">
-                    <div className="sidebar-item-dot" style={{background: m.color}}></div>
-                    {m.title}
+                  <div className="sidebar-subject-item-main">
+                    <span className="sidebar-subject-icon">•</span>
+                    <span className="sidebar-subject-title">{subject.title}</span>
                   </div>
-                  <div className="sidebar-item-desc">{m.description}</div>
-                  <div className="sidebar-item-progress">
-                    <div
-                      className="sidebar-item-progress-fill"
-                      style={{ width: `${pct}%`, background: m.color }}
-                    ></div>
-                  </div>
-                  <div className="sidebar-item-stats">
-                    <span>{done}/{total} edges</span>
-                    <span>{Math.round(pct)}%</span>
-                  </div>
+                  <span className="sidebar-subject-count">{adminMapCountsBySubject[subject.id] || 0}</span>
                 </div>
-              );
-            })}
-          </React.Fragment>
-        ))}
-        {isAdminUnlocked && (
+              ))}
+            </div>
+            <div className="sidebar-footer">
+              <button
+                type="button"
+                className="sidebar-footer-btn"
+                onClick={() => {
+                  const title = prompt('Enter a folder name for this subject group:');
+                  if (title === null) return;
+                  const createdId = handleCreateSubject(title);
+                  if (createdId) setAdminSubjectId(createdId);
+                }}
+              >
+                + New Subject Folder
+              </button>
+            </div>
+          </>
+        ) : (
           <>
-            <div className="sidebar-divider"></div>
-            <div className="sidebar-section-title">Admin</div>
-            <div className={`sidebar-item ${view.startsWith('admin') ? 'active' : ''}`} style={{'--item-color': 'var(--accent-amber)'}} onClick={openAdmin}>
-              <div className="sidebar-item-title">
-                <div className="sidebar-item-dot" style={{background: 'var(--accent-amber)'}}></div>
-                Map Builder
+            <div className="sidebar-header">
+              <div className="sidebar-header-top">
+                <div className="sidebar-section-title">Topics</div>
+                <div className="sidebar-folder-controls">
+                  <button type="button" className="sidebar-folder-control-btn" onClick={collapseAllFolders}>Collapse</button>
+                  <button type="button" className="sidebar-folder-control-btn" onClick={expandAllFolders}>Expand</button>
+                </div>
               </div>
-              <div className="sidebar-item-desc">Create and edit concept maps</div>
+              {studentSections.length > 0 && (
+                <div className="sidebar-progress-chip" aria-label={`Overall progress: ${sidebarPct}%`}>
+                  <span className="sidebar-progress-chip-label">{sidebarDoneCount} / {sidebarTotalCount} maps complete</span>
+                  <div className="sidebar-progress-chip-bar" aria-hidden="true">
+                    <div className="sidebar-progress-chip-fill" style={{ width: `${sidebarPct}%` }}></div>
+                  </div>
+                  <span className="sidebar-progress-chip-pct">{sidebarPct}%</span>
+                </div>
+              )}
+            </div>
+            <div className="sidebar-body">
+            {studentSections.map((section) => (
+              <React.Fragment key={section.id}>
+                <button
+                  className="sidebar-folder-title"
+                  type="button"
+                  onClick={() => toggleFolder(section.id)}
+                  aria-expanded={!collapsedFolders[section.id]}
+                >
+                  <span>{section.title} ({section.maps.length})</span>
+                  <span className={`sidebar-folder-caret ${collapsedFolders[section.id] ? 'collapsed' : ''}`}>▾</span>
+                </button>
+                {!collapsedFolders[section.id] && section.maps.map((m) => {
+                  const prog = getProgress(m.id);
+                  const total = m.edges.length;
+                  const done = (prog.answeredEdges || new Set()).size;
+                  const pct = total > 0 ? (done / total) * 100 : 0;
+                  return (
+                    <div
+                      key={m.id}
+                      className={`sidebar-item ${activeMapId === m.id && view === 'student' ? 'active' : ''}`}
+                      style={{'--item-color': m.color}}
+                      onClick={() => {
+                        setActiveMapId(m.id);
+                        setView('student');
+                        try {
+                          if (window.matchMedia('(max-width: 760px)').matches) {
+                            setIsSidebarCollapsed(true);
+                          }
+                        } catch {}
+                      }}
+                    >
+                      <div className="sidebar-item-title">
+                        <div className="sidebar-item-dot" style={{background: m.color}}></div>
+                        {m.title}
+                      </div>
+                      <div className="sidebar-item-desc">{m.description}</div>
+                      <div className="sidebar-item-progress">
+                        <div
+                          className="sidebar-item-progress-fill"
+                          style={{ width: `${pct}%`, background: m.color }}
+                        ></div>
+                      </div>
+                      <div className="sidebar-item-stats">
+                        <span>{done}/{total} edges</span>
+                        <span>{Math.round(pct)}%</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </React.Fragment>
+            ))}
+            {isAdminUnlocked && (
+              <>
+                <div className="sidebar-divider"></div>
+                <div className="sidebar-section-title">Admin</div>
+                <div className={`sidebar-item ${view.startsWith('admin') ? 'active' : ''}`} style={{'--item-color': 'var(--accent-amber)'}} onClick={openAdmin}>
+                  <div className="sidebar-item-title">
+                    <div className="sidebar-item-dot" style={{background: 'var(--accent-amber)'}}></div>
+                    Map Builder
+                  </div>
+                  <div className="sidebar-item-desc">Create and edit concept maps</div>
+                </div>
+              </>
+            )}
             </div>
           </>
         )}
-        </div>
       </aside>
 
       <main className="map-area">
@@ -1057,6 +1150,7 @@ function App() {
             builtInMaps={builtInMaps}
             subjects={allSubjects}
             orderedMapIds={orderedAdminMapIds}
+            selectedSubjectId={resolvedAdminSubjectId}
             customMaps={customMaps}
             onEdit={handleEditMap}
             onCreate={handleCreateNewMap}
