@@ -284,6 +284,7 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
 const STORAGE_KEY = 'conceptmapper_progress_v2';
 const MAPS_KEY = 'conceptmapper_maps_v2';
 const POSITIONS_KEY = 'conceptmapper_positions_v2';
+const MAP_ORDER_KEY = 'conceptmapper_map_order_v1';
 const MAP_MANIFEST_PATH = 'data/maps/manifest.json';
 
 function loadProgress() {
@@ -322,6 +323,18 @@ function saveCustomMaps(maps) {
   localStorage.setItem(MAPS_KEY, JSON.stringify(maps));
 }
 
+function loadMapOrder() {
+  try {
+    const raw = localStorage.getItem(MAP_ORDER_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch { return []; }
+}
+
+function saveMapOrder(order) {
+  localStorage.setItem(MAP_ORDER_KEY, JSON.stringify(Array.isArray(order) ? order : []));
+}
+
 function parseMapDataText(rawText, sourcePath = '') {
   const text = (rawText || '').trim();
   if (!text) throw new Error(`Map file is empty: ${sourcePath}`);
@@ -345,6 +358,7 @@ async function loadBuiltInMaps(manifestPath = MAP_MANIFEST_PATH) {
 
   const loadedMaps = {};
   const failures = [];
+  const order = [];
 
   await Promise.all(manifest.map(async (entry) => {
     if (!entry || !entry.id || !entry.file) return;
@@ -355,12 +369,13 @@ async function loadBuiltInMaps(manifestPath = MAP_MANIFEST_PATH) {
       const parsed = parseMapDataText(rawText, entry.file);
       const mapId = parsed?.id || entry.id;
       loadedMaps[mapId] = { ...parsed, id: mapId };
+      order.push(mapId);
     } catch (err) {
       failures.push(`${entry.id}: ${err.message}`);
     }
   }));
 
-  return { maps: loadedMaps, failures };
+  return { maps: loadedMaps, failures, order };
 }
 
 function downloadMapJSON(mapId, mapData) {
@@ -403,5 +418,6 @@ Object.assign(window, {
   downloadMapJSON,
   loadProgress, saveProgress,
   loadCustomMaps, saveCustomMaps,
+  loadMapOrder, saveMapOrder,
   loadPositions, savePositions,
 });

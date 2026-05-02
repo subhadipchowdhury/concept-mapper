@@ -24,6 +24,38 @@ function deserializeProgress(progressObj) {
   return restored;
 }
 
+function arraysEqual(a, b) {
+  if (a === b) return true;
+  if (!Array.isArray(a) || !Array.isArray(b)) return false;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i += 1) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
+function buildOrderedIds(preferredOrder, mapsObj) {
+  const ids = [];
+  const seen = new Set();
+  const mapIds = Object.keys(mapsObj || {});
+
+  (preferredOrder || []).forEach((id) => {
+    if (mapsObj[id] && !seen.has(id)) {
+      seen.add(id);
+      ids.push(id);
+    }
+  });
+
+  mapIds.forEach((id) => {
+    if (!seen.has(id)) {
+      seen.add(id);
+      ids.push(id);
+    }
+  });
+
+  return ids;
+}
+
 function App() {
   const [view, setView] = useStateApp('student'); // 'student' | 'admin' | 'admin-edit'
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useStateApp(false);
@@ -34,23 +66,23 @@ function App() {
   const [mapsLoadError, setMapsLoadError] = useStateApp('');
   const [allProgress, setAllProgress] = useStateApp(() => loadProgress());
   const [customMaps, setCustomMaps] = useStateApp(() => loadCustomMaps());
+  const [mapOrder, setMapOrder] = useStateApp(() => loadMapOrder());
+  const [manifestOrder, setManifestOrder] = useStateApp([]);
   const [positions, setPositions] = useStateApp(() => loadPositions());
   const [isAdminUnlocked, setIsAdminUnlocked] = useStateApp(() => sessionStorage.getItem(ADMIN_UNLOCK_KEY) === '1');
   const importInputRef = useRefApp(null);
 
-  const publishedCustomMaps = Object.fromEntries(
-    Object.entries(customMaps).filter(([, m]) => !!m._published)
-  );
-  const studentMaps = { ...builtInMaps, ...publishedCustomMaps };
+  const studentMaps = { ...builtInMaps };
   const adminMaps = { ...builtInMaps, ...customMaps };
 
   useEffectApp(() => {
     let cancelled = false;
     async function hydrateBuiltInMaps() {
       try {
-        const { maps, failures } = await loadBuiltInMaps();
+        const { maps, failures, order } = await loadBuiltInMaps();
         if (cancelled) return;
         setBuiltInMaps(maps);
+        setManifestOrder(order || []);
         if (failures.length > 0) {
           setMapsLoadError(`Some maps failed to load: ${failures.join(' | ')}`);
         }
@@ -64,6 +96,17 @@ function App() {
     hydrateBuiltInMaps();
     return () => { cancelled = true; };
   }, []);
+
+  useEffectApp(() => {
+    const nextOrder = buildOrderedIds(
+      mapOrder.length > 0 ? mapOrder : manifestOrder,
+      { ...builtInMaps, ...customMaps }
+    );
+    if (!arraysEqual(nextOrder, mapOrder)) {
+      setMapOrder(nextOrder);
+      saveMapOrder(nextOrder);
+    }
+  }, [builtInMaps, customMaps, manifestOrder, mapOrder]);
 
   function getProgress(mapId) {
     if (!allProgress[mapId]) return { answeredEdges: new Set() };
@@ -97,7 +140,6 @@ function App() {
       accentColor: '#a78bfa',
       nodes: [],
       edges: [],
-      _published: false,
     };
     handleSaveCustomMap(id, newMap);
     setEditingMapId(id);
@@ -110,6 +152,21 @@ function App() {
     downloadMapJSON(mapId, m);
   }
 
+  function handleReorderMaps(draggedId, targetId) {
+    if (!draggedId || !targetId || draggedId === targetId) return;
+    setMapOrder((prev) => {
+      const ordered = buildOrderedIds(prev, { ...builtInMaps, ...customMaps });
+      const from = ordered.indexOf(draggedId);
+      const to = ordered.indexOf(targetId);
+      if (from < 0 || to < 0) return ordered;
+      const next = [...ordered];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      saveMapOrder(next);
+      return next;
+    });
+  }
+
   function handleEditMap(mapId) {
     setEditingMapId(mapId);
     setView('admin-edit');
@@ -117,12 +174,6 @@ function App() {
 
   function handleAdminMapChange(updatedMap) {
     handleSaveCustomMap(updatedMap.id, updatedMap);
-  }
-
-  function handleTogglePublish(mapId, published) {
-    const existing = customMaps[mapId];
-    if (!existing) return;
-    handleSaveCustomMap(mapId, { ...existing, _published: published });
   }
 
   function handleDeleteCustomMap(mapId) {
@@ -228,13 +279,17 @@ function App() {
 
   useEffectApp(() => {
     if (view === 'student' && !studentMaps[activeMapId]) {
-      const fallback = Object.keys(studentMaps)[0] || null;
+      const fallback = buildOrderedIds(mapOrder, studentMaps)[0] || null;
       setActiveMapId(fallback);
     }
-  }, [view, activeMapId, studentMaps]);
+  }, [view, activeMapId, studentMaps, mapOrder]);
 
   const mapData = studentMaps[activeMapId];
   const editingMap = editingMapId ? adminMaps[editingMapId] : null;
+  const orderedStudentMaps = buildOrderedIds(mapOrder, studentMaps)
+    .map((id) => studentMaps[id])
+    .filter(Boolean);
+  const orderedAdminMapIds = buildOrderedIds(mapOrder, adminMaps);
 
   return (
     <div className={`app-shell ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
@@ -284,7 +339,7 @@ function App() {
 
       <aside className="sidebar">
         <div className="sidebar-section-title">Topics</div>
-        {Object.values(studentMaps).map(m => {
+        {orderedStudentMaps.map(m => {
           const prog = getProgress(m.id);
           const total = m.edges.length;
           const done = (prog.answeredEdges || new Set()).size;
@@ -355,12 +410,13 @@ function App() {
         {view === 'admin' && (
           <MapsManager
             allMaps={adminMaps}
+            orderedMapIds={orderedAdminMapIds}
             customMaps={customMaps}
             onEdit={handleEditMap}
             onCreate={handleCreateNewMap}
             onDeleteCustom={handleDeleteCustomMap}
-            onTogglePublish={handleTogglePublish}
             onExportMap={handleExportMapJSON}
+            onReorderMap={handleReorderMaps}
           />
         )}
         {view === 'admin-edit' && editingMap && (
@@ -370,7 +426,6 @@ function App() {
             onChange={handleAdminMapChange}
             onBack={() => setView('admin')}
             onDelete={handleDeleteCustomMap}
-            onTogglePublish={(published) => handleTogglePublish(editingMapId, published)}
             onExport={handleExportMapJSON}
           />
         )}

@@ -14,7 +14,7 @@ const NODE_COLOR_PALETTE = [
 ];
 
 // ─── AdminCanvas: Visual builder for one concept map ──────────────────────────
-function AdminCanvas({ mapData, onChange, onBack, onDelete, onTogglePublish, onExport }) {
+function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport }) {
   const [tool, setTool] = useStateA('select'); // 'select' | 'addNode' | 'connect'
   const [selectedNodeId, setSelectedNodeId] = useStateA(null);
   const [selectedEdgeId, setSelectedEdgeId] = useStateA(null);
@@ -166,15 +166,6 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onTogglePublish, onE
         <span style={{ fontSize: 11, opacity: 0.72 }}>
           Repo path: data/maps/{mapData.id}.json
         </span>
-        {typeof onTogglePublish === 'function' && (
-          <button
-            className={`admin-tool-btn ${mapData._published ? 'active' : ''}`}
-            onClick={() => onTogglePublish(!mapData._published)}
-            title="Toggle whether this map is visible to students"
-          >
-            {mapData._published ? '📣 Published' : '📝 Draft'}
-          </button>
-        )}
         {typeof onDelete === 'function' && (
           <button
             className="admin-tool-btn"
@@ -444,36 +435,78 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onTogglePublish, onE
 }
 
 // ─── MapsManager: list + create ───────────────────────────────────────────────
-function MapsManager({ allMaps, customMaps, onEdit, onCreate, onDeleteCustom, onTogglePublish, onExportMap }) {
+function MapsManager({ allMaps, orderedMapIds, customMaps, onEdit, onCreate, onDeleteCustom, onExportMap, onReorderMap }) {
+  const [draggedId, setDraggedId] = useStateA(null);
+  const [dragOverId, setDragOverId] = useStateA(null);
+  const displayOrder = (Array.isArray(orderedMapIds) ? orderedMapIds : Object.keys(allMaps))
+    .filter(id => !!allMaps[id]);
+
   return (
     <div className="maps-manager">
       <div className="maps-manager-header">
         <div>
           <div className="maps-manager-title">Admin · Concept Maps</div>
-          <div className="maps-manager-sub">Create and edit chapter maps with the visual builder. Exported files should replace data/maps/{`{mapId}`}.json in the repo.</div>
+          <div className="maps-manager-sub">Create and edit chapter maps with the visual builder. Drag cards here to reorder the left sidebar. Exported files should replace data/maps/{`{mapId}`}.json in the repo.</div>
         </div>
       </div>
       <div className="maps-grid">
-        {Object.values(allMaps).map(m => {
+        {displayOrder.map(mapId => {
+          const m = allMaps[mapId];
           const isCustom = !!customMaps[m.id];
           return (
             <div
               key={m.id}
               className="maps-grid-card"
-              style={{'--card-color': m.color}}
+              style={{
+                '--card-color': m.color,
+                outline: dragOverId === m.id ? '2px dashed var(--accent-amber)' : 'none',
+                opacity: draggedId === m.id ? 0.55 : 1,
+              }}
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.effectAllowed = 'move';
+                setDraggedId(m.id);
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                if (dragOverId !== m.id) setDragOverId(m.id);
+              }}
+              onDragLeave={() => {
+                if (dragOverId === m.id) setDragOverId(null);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (draggedId && draggedId !== m.id && typeof onReorderMap === 'function') {
+                  onReorderMap(draggedId, m.id);
+                }
+                setDragOverId(null);
+                setDraggedId(null);
+              }}
+              onDragEnd={() => {
+                setDraggedId(null);
+                setDragOverId(null);
+              }}
               onClick={() => onEdit(m.id)}
             >
+              <div
+                style={{
+                  fontSize: 11,
+                  opacity: 0.7,
+                  marginBottom: 6,
+                  userSelect: 'none',
+                  letterSpacing: 0.2,
+                }}
+                title="Drag to reorder sidebar topics"
+              >
+                ⋮⋮ Drag to reorder
+              </div>
               <div className="maps-grid-card-title">{m.title}</div>
               <div className="maps-grid-card-meta">{m.description}</div>
               <div className="maps-grid-card-stats">
                 <div className="maps-grid-card-stat"><span>{m.nodes.length}</span> nodes</div>
                 <div className="maps-grid-card-stat"><span>{m.edges.length}</span> edges</div>
                 {isCustom && <div className="maps-grid-card-stat" style={{color: 'var(--accent-amber)'}}>● custom</div>}
-                {isCustom && (
-                  <div className="maps-grid-card-stat" style={{color: m._published ? 'var(--accent-teal)' : 'var(--text-muted)'}}>
-                    {m._published ? '● published' : '● draft'}
-                  </div>
-                )}
               </div>
               {isCustom && (
                 <div className="maps-grid-card-actions">
@@ -488,15 +521,6 @@ function MapsManager({ allMaps, customMaps, onEdit, onCreate, onDeleteCustom, on
                       Export JSON
                     </button>
                   )}
-                  <button
-                    className="btn btn-ghost btn-sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (typeof onTogglePublish === 'function') onTogglePublish(m.id, !m._published);
-                    }}
-                  >
-                    {m._published ? 'Unpublish' : 'Publish'}
-                  </button>
                   <button
                     className="btn btn-ghost btn-sm"
                     style={{ color: 'var(--accent-rose)' }}
