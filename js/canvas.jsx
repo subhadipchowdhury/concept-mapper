@@ -371,6 +371,30 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   const fromNode = activeEdge ? validNodes.find(n => n.id === activeEdge.from) : null;
   const toNode = activeEdge ? validNodes.find(n => n.id === activeEdge.to) : null;
 
+  useEffect2(() => {
+    let cancelled = false;
+    let attempts = 0;
+
+    function typesetViewport() {
+      if (cancelled || !viewportRef.current) return;
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        if (window.MathJax.typesetClear) window.MathJax.typesetClear([viewportRef.current]);
+        window.MathJax.typesetPromise([viewportRef.current]).catch(() => {});
+        return;
+      }
+      if (attempts < 300) {
+        attempts += 1;
+        setTimeout(typesetViewport, 100);
+      }
+    }
+
+    const raf = requestAnimationFrame(typesetViewport);
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+    };
+  }, [mapData.id, validNodes.length, mapData.edges.length, answeredEdges.size]);
+
   return (
     <>
       <div className="map-header">
