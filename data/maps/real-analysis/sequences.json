@@ -375,7 +375,7 @@
         "bound",
         "derivative"
       ],
-      "hint": "The extracted indices \(n_k\) define the smaller sequence whose limit is \(L\)."
+      "hint": "The extracted indices \\(n_k\\) define the smaller sequence whose limit is \\(L\\)."
     },
     {
       "id": "sc_e11",
@@ -414,7 +414,7 @@
       "id": "sc_e13",
       "from": "subseq",
       "to": "peak",
-      "label": "an index \(n\) is a peak point if no later term is ___ than \\(a_n\\)",
+      "label": "an index \\(n\\) is a peak point if no later term is ___ than \\(a_n\\)",
       "answer": "larger",
       "type": "dropdown",
       "options": [
@@ -558,7 +558,7 @@
         "\\varepsilon",
         "infinity"
       ],
-      "hint": "If \(|a_n-a_N|<1\), then all tail terms lie within distance 1 of \(a_N\)."
+      "hint": "If \\(|a_n-a_N|<1\\), then all tail terms lie within distance 1 of \\(a_N\\)."
     },
     {
       "id": "sc_e21b",
