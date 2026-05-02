@@ -142,13 +142,68 @@ body {
   padding: 0 24px 12px;
 }
 
+.sidebar-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 24px;
+}
+
+.sidebar-header-row .sidebar-section-title {
+  padding-bottom: 8px;
+}
+
+.sidebar-folder-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.sidebar-folder-control-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 6px;
+  font-size: 10px;
+  font-family: inherit;
+  padding: 3px 7px;
+  cursor: pointer;
+}
+
+.sidebar-folder-control-btn:hover {
+  color: var(--text);
+  border-color: var(--border-2);
+  background: var(--bg3);
+}
+
 .sidebar-folder-title {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--text-dim);
   padding: 10px 24px 6px;
+}
+
+.sidebar-folder-title:hover {
+  color: var(--text);
+}
+
+.sidebar-folder-caret {
+  font-size: 11px;
+  opacity: 0.75;
+  transition: transform 0.15s ease;
+}
+
+.sidebar-folder-caret.collapsed {
+  transform: rotate(-90deg);
 }
 
 .sidebar-item {

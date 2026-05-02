@@ -5,6 +5,7 @@ const ADMIN_UNLOCK_KEY = 'conceptmapper_teacher_unlocked_v1';
 const ADMIN_STATIC_PASSPHRASE = 'SECRETPHRASE';
 const SUBJECTS_KEY = 'conceptmapper_subjects_v1';
 const SUBJECT_ORDER_KEY = 'conceptmapper_subject_order_v1';
+const SIDEBAR_FOLDER_COLLAPSE_KEY = 'conceptmapper_sidebar_folder_collapse_v1';
 const DEFAULT_SUBJECT_ID = 'general';
 const DEFAULT_SUBJECT_TITLE = 'General';
 
@@ -75,6 +76,20 @@ function loadSubjectOrder() {
 
 function saveSubjectOrder(order) {
   localStorage.setItem(SUBJECT_ORDER_KEY, JSON.stringify(Array.isArray(order) ? order : []));
+}
+
+function loadSidebarFolderCollapse() {
+  try {
+    const raw = localStorage.getItem(SIDEBAR_FOLDER_COLLAPSE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveSidebarFolderCollapse(value) {
+  localStorage.setItem(SIDEBAR_FOLDER_COLLAPSE_KEY, JSON.stringify(value || {}));
 }
 
 function serializeProgress(progressObj) {
@@ -229,6 +244,7 @@ function App() {
   const [allProgress, setAllProgress] = useStateApp(() => loadProgress());
   const [customMaps, setCustomMaps] = useStateApp(() => loadCustomMaps());
   const [customSubjects, setCustomSubjects] = useStateApp(() => loadCustomSubjects());
+  const [collapsedFolders, setCollapsedFolders] = useStateApp(() => loadSidebarFolderCollapse());
   const [mapOrder, setMapOrder] = useStateApp(() => loadMapOrder());
   const [subjectOrder, setSubjectOrder] = useStateApp(() => loadSubjectOrder());
   const [manifestOrder, setManifestOrder] = useStateApp([]);
@@ -634,6 +650,55 @@ function App() {
     studentMaps,
     allSubjects
   ).filter((section) => section.maps.length > 0);
+  const studentSectionIds = studentSections.map((section) => section.id);
+
+  useEffectApp(() => {
+    const valid = new Set(studentSections.map((section) => section.id));
+    const next = {};
+    Object.entries(collapsedFolders || {}).forEach(([id, collapsed]) => {
+      if (valid.has(id) && collapsed) next[id] = true;
+    });
+    if (!arraysEqual(Object.keys(next).sort(), Object.keys(collapsedFolders || {}).sort())) {
+      setCollapsedFolders(next);
+      saveSidebarFolderCollapse(next);
+    }
+  }, [studentSections, collapsedFolders]);
+
+  function toggleFolder(sectionId) {
+    setCollapsedFolders((prev) => {
+      const next = { ...(prev || {}) };
+      if (next[sectionId]) {
+        delete next[sectionId];
+      } else {
+        next[sectionId] = true;
+      }
+      saveSidebarFolderCollapse(next);
+      return next;
+    });
+  }
+
+  function collapseAllFolders() {
+    const next = Object.fromEntries(studentSectionIds.map((id) => [id, true]));
+    setCollapsedFolders(next);
+    saveSidebarFolderCollapse(next);
+  }
+
+  function expandAllFolders() {
+    const next = {};
+    setCollapsedFolders(next);
+    saveSidebarFolderCollapse(next);
+  }
+
+  useEffectApp(() => {
+    if (!activeMapId) return;
+    const activeSection = studentSections.find((section) => section.maps.some((m) => m.id === activeMapId));
+    if (!activeSection) return;
+    if (!collapsedFolders?.[activeSection.id]) return;
+    const next = { ...(collapsedFolders || {}) };
+    delete next[activeSection.id];
+    setCollapsedFolders(next);
+    saveSidebarFolderCollapse(next);
+  }, [activeMapId, studentSections, collapsedFolders]);
 
   return (
     <div className={`app-shell ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
@@ -682,11 +747,25 @@ function App() {
       </header>
 
       <aside className="sidebar">
-        <div className="sidebar-section-title">Topics</div>
+        <div className="sidebar-header-row">
+          <div className="sidebar-section-title">Topics</div>
+          <div className="sidebar-folder-controls">
+            <button type="button" className="sidebar-folder-control-btn" onClick={collapseAllFolders}>Collapse all</button>
+            <button type="button" className="sidebar-folder-control-btn" onClick={expandAllFolders}>Expand all</button>
+          </div>
+        </div>
         {studentSections.map((section) => (
           <React.Fragment key={section.id}>
-            <div className="sidebar-folder-title">{section.title}</div>
-            {section.maps.map((m) => {
+            <button
+              className="sidebar-folder-title"
+              type="button"
+              onClick={() => toggleFolder(section.id)}
+              aria-expanded={!collapsedFolders[section.id]}
+            >
+              <span>{section.title}</span>
+              <span className={`sidebar-folder-caret ${collapsedFolders[section.id] ? 'collapsed' : ''}`}>▾</span>
+            </button>
+            {!collapsedFolders[section.id] && section.maps.map((m) => {
               const prog = getProgress(m.id);
               const total = m.edges.length;
               const done = (prog.answeredEdges || new Set()).size;
