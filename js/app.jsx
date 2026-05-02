@@ -937,20 +937,7 @@ function App() {
                   <div className="topbar-progress-fill" style={{ width: `${completionPct}%` }}></div>
                 </div>
               </div>
-              {mapData && (
-                <button
-                  className="topbar-context-reset"
-                  onClick={() => {
-                    if (confirm('Clear your answers for this map? Your custom node positions will stay as they are.')) {
-                      handleProgress(activeMapId, { answeredEdges: new Set() });
-                    }
-                  }}
-                  title="Clear your answers for this map"
-                  aria-label="Reset answers"
-                >
-                  <span className="topbar-context-reset-icon" aria-hidden="true"></span>
-                </button>
-              )}
+
             </div>
             <div className="topbar-divider" aria-hidden="true"></div>
             <button className="topbar-icon-btn" onClick={exportStudentData} title="Download your progress so you can back it up or move it to another browser" aria-label="Save progress">
@@ -1141,7 +1128,24 @@ function App() {
                       </div>
                       <div className="sidebar-item-stats">
                         <span>{done}/{total} edges</span>
-                        <span>{Math.round(pct)}%</span>
+                        <div className="sidebar-item-stats-right">
+                          <span>{Math.round(pct)}%</span>
+                          {done > 0 && (
+                            <button
+                              className="sidebar-item-reset"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (confirm('Clear your answers for this map? Your custom node positions will stay as they are.')) {
+                                  handleProgress(m.id, { answeredEdges: new Set() });
+                                }
+                              }}
+                              title="Clear answers for this map"
+                              aria-label="Clear answers"
+                            >
+                              <span className="sidebar-item-reset-icon" aria-hidden="true"></span>
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );

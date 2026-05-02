@@ -585,10 +585,51 @@ body {
 .sidebar-item-stats {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 10px;
   color: var(--text-muted);
   margin-top: 3px;
   padding-left: 14px;
+}
+
+.sidebar-item-stats-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sidebar-item-reset {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.sidebar-item:hover .sidebar-item-reset,
+.sidebar-item.active .sidebar-item-reset {
+  opacity: 1;
+}
+
+.sidebar-item-reset:hover {
+  color: var(--text);
+}
+
+.sidebar-item-reset-icon {
+  width: 11px;
+  height: 11px;
+  background-color: currentColor;
+  -webkit-mask: url('assets/icons/reset-progress.svg') center / contain no-repeat;
+  mask: url('assets/icons/reset-progress.svg') center / contain no-repeat;
 }
 
 .sidebar-divider {
