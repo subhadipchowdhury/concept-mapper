@@ -46,108 +46,219 @@ body {
 /* ─── TOPBAR ─── */
 .topbar {
   grid-column: 1 / -1;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
+  background: rgba(17, 20, 29, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(79, 142, 247, 0.12);
   display: flex;
   align-items: center;
-  padding: 0 28px;
-  gap: 14px;
+  height: 60px;
+  padding: 0 20px;
+  gap: 12px;
   z-index: 50;
   position: relative;
+}
+
+.topbar::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(79, 142, 247, 0.4) 30%,
+    rgba(52, 211, 153, 0.3) 70%,
+    transparent
+  );
 }
 
 .topbar-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   min-width: 0;
 }
 
 .topbar-logo-mark-img {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
 }
 
-.topbar-logo-banner {
-  width: 282px;
-  height: auto;
-  display: block;
-  flex-shrink: 1;
-  max-width: min(36vw, 282px);
+.topbar-logo-text {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: var(--text);
+}
+
+.topbar-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
 .topbar-context {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
-  max-width: min(42vw, 540px);
-  padding: 5px 8px 5px 12px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--bg3);
+  max-width: min(38vw, 420px);
+  padding: 5px 10px;
+  border: 1px solid rgba(79, 142, 247, 0.2);
+  border-radius: 8px;
+  background: rgba(79, 142, 247, 0.06);
+}
+
+.topbar-context-subject {
+  font-size: 12px;
+  color: rgba(126, 180, 250, 0.78);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar-context-sep {
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
 }
 
 .topbar-context-path {
   font-size: 12px;
-  color: var(--text-dim);
+  color: var(--text);
+  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .topbar-context-reset {
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-dim);
-  font-family: inherit;
-  font-size: 15px;
-  line-height: 1;
   cursor: pointer;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.topbar-context-reset svg {
+  width: 16px;
+  height: 16px;
 }
 
 .topbar-context-reset:hover {
-  background: var(--bg4);
+  background: rgba(255,255,255,0.06);
   color: var(--text);
-  border-color: var(--border-2);
+  border-color: rgba(255,255,255,0.1);
 }
 
 .topbar-spacer { flex: 1; }
 
-.topbar-btn {
-  padding: 7px 14px;
+.topbar-icon-btn {
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-dim);
-  font-family: inherit;
-  font-size: 12.5px;
-  font-weight: 500;
   cursor: pointer;
   transition: all 0.15s;
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  flex-shrink: 0;
 }
-.topbar-btn:hover { background: var(--bg3); color: var(--text); }
-.topbar-btn.active { background: var(--accent-blue); color: #fff; }
+
+.topbar-icon-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.topbar-icon-btn:hover {
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.topbar-role-switcher {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 9px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.topbar-role-btn {
+  padding: 5px 13px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.topbar-role-btn:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+}
+
+.topbar-role-btn.active {
+  background: rgba(79,142,247,0.22);
+  border-color: rgba(79,142,247,0.32);
+  color: #a5c8fd;
+}
+
+.topbar-progress-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
 
 .topbar-progress {
-  display: flex; align-items: center; gap: 10px;
-  padding: 5px 12px;
-  background: var(--bg3);
-  border-radius: 8px;
-  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 11px;
-  color: var(--text-dim);
+  color: var(--text-muted);
 }
-.topbar-progress-bar { width: 60px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
-.topbar-progress-fill { height: 100%; background: var(--accent-teal); border-radius: 2px; transition: width 0.5s; }
+
+.topbar-progress-value {
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  min-width: 2.6ch;
+  text-align: right;
+}
+
+.topbar-progress-bar {
+  width: 56px;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.topbar-progress-fill {
+  height: 100%;
+  background: var(--accent-teal);
+  border-radius: 2px;
+  transition: width 0.5s;
+}
 
 /* ─── SIDEBAR ─── */
 .sidebar {
@@ -1209,23 +1320,29 @@ body {
     flex-shrink: 0;
   }
 
-  .topbar-logo-banner {
-    width: 240px;
-    max-width: min(40vw, 240px);
+  .topbar-logo-text {
+    font-size: 12px;
   }
 
   .topbar-context {
-    max-width: min(34vw, 380px);
+    max-width: min(30vw, 280px);
+  }
+
+  .topbar-context-subject {
+    display: none;
+  }
+
+  .topbar-divider {
+    height: 16px;
   }
 
   .topbar-context-path {
     font-size: 11.5px;
   }
 
-  .topbar-btn {
-    padding: 7px 10px;
-    font-size: 12px;
-    flex-shrink: 0;
+  .topbar-role-btn {
+    padding: 5px 10px;
+    font-size: 11.5px;
   }
 
   .map-header {
@@ -1299,11 +1416,6 @@ body {
 }
 
 /* Topbar text labels — visible by default, hidden on mobile */
-.topbar-logo-banner,
-.topbar-btn-label {
-  display: inline;
-}
-
 @media (max-width: 760px) {
   .app-shell,
   .app-shell.sidebar-collapsed {
@@ -1335,15 +1447,38 @@ body {
     display: block;
   }
 
-  .topbar-logo-banner,
-  .topbar-btn-label {
+  .topbar-logo-text,
+  .topbar-progress {
     display: none;
   }
 
-  .topbar-btn {
-    padding: 7px 9px;
-    min-width: 36px;
-    justify-content: center;
+  .topbar {
+    padding: 0 10px;
+    gap: 7px;
+  }
+
+  .topbar-context {
+    max-width: 46vw;
+  }
+
+  .topbar-context-subject,
+  .topbar-context-sep {
+    display: none;
+  }
+
+  .topbar-context-path {
+    font-size: 11px;
+  }
+
+  .topbar-role-btn {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+
+  .topbar-icon-btn,
+  .topbar-context-reset {
+    width: 32px;
+    height: 32px;
   }
 
   .map-header {
@@ -1352,36 +1487,12 @@ body {
     right: 10px;
   }
 
-  .topbar-context {
-    max-width: none;
-    margin-left: auto;
-    padding: 0;
-    border: none;
-    background: transparent;
-  }
-
-  .topbar-context-path {
-    display: none;
-  }
-
-  .topbar-context-reset {
-    width: 32px;
-    height: 32px;
-    border-color: var(--border);
-    background: var(--bg3);
-  }
-
   .map-title {
     font-size: 17px;
   }
 
   .map-desc {
     font-size: 11.5px;
-  }
-
-  .topbar-progress {
-    width: 100%;
-    justify-content: space-between;
   }
 
   .icon-btn {

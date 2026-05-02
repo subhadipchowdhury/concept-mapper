@@ -728,6 +728,10 @@ function App() {
   const activeSectionTitle = activeMapId
     ? studentSections.find((section) => section.maps.some((m) => m.id === activeMapId))?.title || 'Maps'
     : 'Maps';
+  const studentProgress = mapData ? getProgress(activeMapId) : { answeredEdges: new Set() };
+  const answeredCount = mapData ? studentProgress.answeredEdges.size : 0;
+  const totalCount = mapData?.edges?.length || 0;
+  const completionPct = totalCount > 0 ? Math.round((answeredCount / totalCount) * 100) : 0;
 
   useEffectApp(() => {
     const valid = new Set(studentSections.map((section) => section.id));
@@ -784,41 +788,70 @@ function App() {
     <div className={`app-shell ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       <header className="topbar">
         <button
-          className="topbar-btn"
+          className="topbar-icon-btn"
           onClick={() => setIsSidebarCollapsed(v => !v)}
           title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          {isSidebarCollapsed ? '▸ ' : '◂ '}<span className="topbar-btn-label">{isSidebarCollapsed ? 'Topics' : 'Topics'}</span>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" focusable="false">
+            <rect x="2" y="3" width="12" height="10" rx="1.5" />
+            <line x1="6" y1="3" x2="6" y2="13" />
+          </svg>
         </button>
         <div className="topbar-logo" aria-label="Concept Mapper">
           <img className="topbar-logo-mark-img" src="assets/brand/concept-mapper-mark.svg" alt="" aria-hidden="true" />
-          <img className="topbar-logo-banner" src="assets/brand/concept-mapper-banner.svg" alt="Concept Mapper. See how ideas connect." />
+          <span className="topbar-logo-text">Concept Mapper</span>
         </div>
+        <div className="topbar-divider" aria-hidden="true"></div>
         {view === 'student' && mapData && (
           <div className="topbar-context" title={`${activeSectionTitle} › ${mapData.title}`}>
-            <span className="topbar-context-path">{activeSectionTitle} › {mapData.title}</span>
-            <button
-              className="topbar-context-reset"
-              onClick={() => {
-                if (confirm('Clear your answers for this map? Your custom node positions will stay as they are.')) {
-                  handleProgress(activeMapId, { answeredEdges: new Set() });
-                }
-              }}
-              title="Clear your answers for this map"
-              aria-label="Reset answers"
-            >
-              ↺
-            </button>
+            <span className="topbar-context-subject">{activeSectionTitle}</span>
+            <span className="topbar-context-sep">›</span>
+            <span className="topbar-context-path">{mapData.title}</span>
           </div>
         )}
         <div className="topbar-spacer"></div>
         {view === 'student' && (
           <>
-            <button className="topbar-btn" onClick={exportStudentData} title="Download your progress so you can back it up or move it to another browser">
-              ⭳ <span className="topbar-btn-label">Save Progress</span>
+            <div className="topbar-progress-group">
+              <div className="topbar-progress" aria-label={`Map progress: ${completionPct}%`}>
+                <span className="topbar-progress-value">{completionPct}%</span>
+                <div className="topbar-progress-bar" aria-hidden="true">
+                  <div className="topbar-progress-fill" style={{ width: `${completionPct}%` }}></div>
+                </div>
+              </div>
+              {mapData && (
+                <button
+                  className="topbar-context-reset"
+                  onClick={() => {
+                    if (confirm('Clear your answers for this map? Your custom node positions will stay as they are.')) {
+                      handleProgress(activeMapId, { answeredEdges: new Set() });
+                    }
+                  }}
+                  title="Clear your answers for this map"
+                  aria-label="Reset answers"
+                >
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" focusable="false">
+                    <path d="M13 8a5 5 0 1 1-1.46-3.54" />
+                    <path d="M13 3.5V6.5H10" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            <div className="topbar-divider" aria-hidden="true"></div>
+            <button className="topbar-icon-btn" onClick={exportStudentData} title="Download your progress so you can back it up or move it to another browser" aria-label="Save progress">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" focusable="false">
+                <path d="M8 2v9" />
+                <path d="M4 7l4 4 4-4" />
+                <line x1="2" y1="14" x2="14" y2="14" />
+              </svg>
             </button>
-            <button className="topbar-btn" onClick={triggerImportStudentData} title="Load a previously exported progress file">
-              ⭱ <span className="topbar-btn-label">Load Progress</span>
+            <button className="topbar-icon-btn" onClick={triggerImportStudentData} title="Load a previously exported progress file" aria-label="Load progress">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" focusable="false">
+                <path d="M8 14V5" />
+                <path d="M4 9l4-4 4 4" />
+                <line x1="2" y1="2" x2="14" y2="2" />
+              </svg>
             </button>
             <input
               ref={importInputRef}
@@ -829,15 +862,31 @@ function App() {
             />
           </>
         )}
-        <button className={`topbar-btn ${view === 'student' ? 'active' : ''}`} onClick={() => setView('student')}>
-          📚 <span className="topbar-btn-label">Student</span>
-        </button>
-        <button className={`topbar-btn ${view.startsWith('admin') ? 'active' : ''}`} onClick={openAdmin}>
-          ⚙ <span className="topbar-btn-label">Admin</span>
-        </button>
+        <div className="topbar-divider" aria-hidden="true"></div>
+        <div className="topbar-role-switcher" role="tablist" aria-label="Mode">
+          <button
+            className={`topbar-role-btn ${view === 'student' ? 'active' : ''}`}
+            onClick={() => setView('student')}
+            role="tab"
+            aria-selected={view === 'student'}
+          >
+            Student
+          </button>
+          <button
+            className={`topbar-role-btn ${view.startsWith('admin') ? 'active' : ''}`}
+            onClick={openAdmin}
+            role="tab"
+            aria-selected={view.startsWith('admin')}
+          >
+            Admin
+          </button>
+        </div>
         {isAdminUnlocked && (
-          <button className="topbar-btn" onClick={lockAdmin} title="Lock admin tools again in this tab">
-            🔒 <span className="topbar-btn-label">Lock Admin</span>
+          <button className="topbar-icon-btn" onClick={lockAdmin} title="Lock admin tools again in this tab" aria-label="Lock admin">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" focusable="false">
+              <rect x="3.5" y="7" width="9" height="6" rx="1" />
+              <path d="M5.5 7V5.5a2.5 2.5 0 0 1 5 0V7" />
+            </svg>
           </button>
         )}
       </header>
