@@ -217,7 +217,8 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
               const f = geom[edge.from], to = geom[edge.to];
               if (!f || !to) return null;
               const hasReverseEdge = edge.from !== edge.to && edgeDirectionSet.has(`${edge.to}->${edge.from}`);
-              const path = computeEdgePath(f, to, { curveOffset: hasReverseEdge ? 28 : 0 });
+              const pairSign = String(edge.from) < String(edge.to) ? 1 : -1;
+              const path = computeEdgePath(f, to, { portOffset: hasReverseEdge ? pairSign * 18 : 0 });
               const fromN = mapData.nodes.find(n => n.id === edge.from);
               const stroke = selectedEdgeId === edge.id ? 'var(--accent-amber)' : (fromN.color || '#818cf8');
               return (
@@ -245,7 +246,8 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
             const f = geom[edge.from], to = geom[edge.to];
             if (!f || !to) return null;
             const hasReverseEdge = edge.from !== edge.to && edgeDirectionSet.has(`${edge.to}->${edge.from}`);
-            const path = computeEdgePath(f, to, { curveOffset: hasReverseEdge ? 28 : 0 });
+            const pairSign = String(edge.from) < String(edge.to) ? 1 : -1;
+            const path = computeEdgePath(f, to, { portOffset: hasReverseEdge ? pairSign * 18 : 0 });
             return (
               <div
                 key={edge.id}

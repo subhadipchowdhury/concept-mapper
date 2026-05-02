@@ -93,7 +93,7 @@ function launchConfetti() {
 
 // Compute orthogonal bezier path between two points (anchored on box edges)
 function computeEdgePath(from, to, options = {}) {
-  const curveOffset = Number.isFinite(options.curveOffset) ? options.curveOffset : 0;
+  const portOffset = Number.isFinite(options.portOffset) ? options.portOffset : 0;
   // from / to: { x, y, w, h }  -- center coords
   const dx = to.x - from.x;
   const dy = to.y - from.y;
@@ -105,6 +105,10 @@ function computeEdgePath(from, to, options = {}) {
     sy = dy > 0 ? from.y + from.h/2 : from.y - from.h/2;
     ex = to.x;
     ey = dy > 0 ? to.y - to.h/2 : to.y + to.h/2;
+    if (portOffset !== 0) {
+      sx += portOffset;
+      ex += portOffset;
+    }
     const midY = (sy + ey) / 2;
     c1x = sx; c1y = midY;
     c2x = ex; c2y = midY;
@@ -113,22 +117,13 @@ function computeEdgePath(from, to, options = {}) {
     sy = from.y;
     ex = dx > 0 ? to.x - to.w/2 : to.x + to.w/2;
     ey = to.y;
+    if (portOffset !== 0) {
+      sy += portOffset;
+      ey += portOffset;
+    }
     const midX = (sx + ex) / 2;
     c1x = midX; c1y = sy;
     c2x = midX; c2y = ey;
-  }
-  if (curveOffset !== 0) {
-    const vx = ex - sx;
-    const vy = ey - sy;
-    const len = Math.hypot(vx, vy) || 1;
-    const nx = -vy / len;
-    const ny = vx / len;
-    const ox = nx * curveOffset;
-    const oy = ny * curveOffset;
-    sx += ox; sy += oy;
-    ex += ox; ey += oy;
-    c1x += ox; c1y += oy;
-    c2x += ox; c2y += oy;
   }
 
   return {

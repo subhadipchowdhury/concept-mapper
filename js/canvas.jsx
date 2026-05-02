@@ -449,7 +449,8 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
               const isAnswered = answeredEdges.has(edge.id);
               const fromUnlocked = unlockedNodes.has(edge.from);
               const hasReverseEdge = edge.from !== edge.to && edgeDirectionSet.has(`${edge.to}->${edge.from}`);
-              const path = computeEdgePath(f, to, { curveOffset: hasReverseEdge ? 28 : 0 });
+              const pairSign = String(edge.from) < String(edge.to) ? 1 : -1;
+              const path = computeEdgePath(f, to, { portOffset: hasReverseEdge ? pairSign * 18 : 0 });
               const fromN = mapData.nodes.find(n => n.id === edge.from);
               const stroke = !fromUnlocked ? 'rgba(255,255,255,0.08)'
                            : isAnswered ? (fromN.color || '#34d399')
@@ -475,7 +476,8 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
             const fromUnlocked = unlockedNodes.has(edge.from);
             if (!fromUnlocked && !isAnswered) return null;
             const hasReverseEdge = edge.from !== edge.to && edgeDirectionSet.has(`${edge.to}->${edge.from}`);
-            const path = computeEdgePath(f, to, { curveOffset: hasReverseEdge ? 28 : 0 });
+            const pairSign = String(edge.from) < String(edge.to) ? 1 : -1;
+            const path = computeEdgePath(f, to, { portOffset: hasReverseEdge ? pairSign * 18 : 0 });
             return (
               <div
                 key={edge.id}
