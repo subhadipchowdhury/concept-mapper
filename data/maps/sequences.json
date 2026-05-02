@@ -25,7 +25,8 @@
       "label": "Limit Point of a Set\\n\\((x-\\varepsilon, x+\\varepsilon) \\cap A \\setminus\\{x\\} \\ne \\emptyset\\)",
       "x": 760,
       "y": 60,
-      "color": "#4f8ef7"
+      "color": "#4f8ef7",
+      "isStart": true
     },
     {
       "id": "enconv",
@@ -102,14 +103,16 @@
       "label": "Completeness of \\(\\mathbb{R}\\)\\n(LUB property)",
       "x": 760,
       "y": 500,
-      "color": "#f59e0b"
+      "color": "#f59e0b",
+      "isStart": true
     },
     {
       "id": "amgm",
       "label": "AM–GM Inequality\\n\\(\\sqrt{ab} \\le (a+b)/2\\)",
       "x": 940,
       "y": 500,
-      "color": "#fcd34d"
+      "color": "#fcd34d",
+      "isStart": true
     },
     {
       "id": "mct",
@@ -247,30 +250,6 @@
       "hint": "Finite exceptions are not enough for this definition."
     },
     {
-      "id": "s_e4b",
-      "from": "seq",
-      "to": "completeness",
-      "label": "in \\(\\mathbb{R}\\), every nonempty set bounded above has a ___",
-      "answer": "supremum",
-      "type": "dropdown",
-      "options": [
-        "maximum",
-        "supremum",
-        "minimum",
-        "derivative"
-      ],
-      "hint": "This is the least-upper-bound property."
-    },
-    {
-      "id": "s_e4c",
-      "from": "seq",
-      "to": "amgm",
-      "label": "the classical mean inequality is ___-GM",
-      "answer": "AM",
-      "type": "fillin",
-      "hint": "It abbreviates arithmetic mean."
-    },
-    {
       "id": "s_e5",
       "from": "enconv",
       "to": "unique",
@@ -359,7 +338,7 @@
     },
     {
       "id": "s_e12",
-      "from": "bdd",
+      "from": "seq",
       "to": "mono",
       "label": "if terms are always nondecreasing or nonincreasing, the sequence is ___",
       "answer": "monotone",
@@ -370,34 +349,28 @@
       "id": "s_e13",
       "from": "completeness",
       "to": "mct",
-      "label": "in MCT proofs, completeness provides a least upper bound used as candidate ___",
-      "answer": "limit",
-      "type": "dropdown",
-      "options": [
-        "limit",
-        "difference",
-        "derivative",
-        "period"
-      ],
-      "hint": "The supremum is then shown to satisfy epsilon-N convergence."
+      "label": "the proof of MCT uses a least upper ___ coming from completeness",
+      "answer": "bound",
+      "type": "fillin",
+      "hint": "Think LUB: the candidate value is the supremum of the set of terms."
     },
     {
       "id": "s_e14",
       "from": "bdd",
       "to": "mct",
-      "label": "MCT requires monotone plus ___",
-      "answer": "bounded",
+      "label": "boundedness alone is not enough; MCT also needs the sequence to be ___",
+      "answer": "monotone",
       "type": "fillin",
-      "hint": "Without this, monotone sequences may diverge to infinity."
+      "hint": "A bounded oscillating sequence shows boundedness by itself does not force convergence."
     },
     {
       "id": "s_e15",
       "from": "mono",
       "to": "mct",
-      "label": "MCT requires bounded plus ___",
-      "answer": "monotone",
+      "label": "monotonicity alone is not enough; MCT also needs the sequence to be ___",
+      "answer": "bounded",
       "type": "fillin",
-      "hint": "This edge comes from the monotonicity node."
+      "hint": "An increasing sequence like \\(a_n=n\\) shows why this extra hypothesis is needed."
     },
     {
       "id": "s_e16",
@@ -427,15 +400,9 @@
       "id": "s_e18",
       "from": "amgm",
       "to": "agm",
-      "label": "AGM iteration gives arithmetic and geometric means with the ___ limit",
-      "answer": "same",
-      "type": "dropdown",
-      "options": [
-        "same",
-        "reciprocal",
-        "opposite",
-        "unrelated"
-      ],
+      "label": "the arithmetic and geometric mean iterates converge to the same ___",
+      "answer": "limit",
+      "type": "fillin",
       "hint": "Their gap shrinks to zero while order is preserved."
     },
     {
@@ -475,7 +442,7 @@
       "id": "s_e22",
       "from": "enconv",
       "to": "cesaro",
-      "label": "if \\(a_n\\to L\\), then Cesaro means satisfy \\(\\sigma_n\\to\\) ___",
+      "label": "if \\(a_n\\to L\\), then the Cesaro means have the same ___",
       "answer": "L",
       "type": "fillin",
       "hint": "Averaging preserves the limit in this direction."
