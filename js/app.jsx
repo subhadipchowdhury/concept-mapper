@@ -6,6 +6,7 @@ const ADMIN_STATIC_PASSPHRASE = 'SECRET';
 const SUBJECTS_KEY = 'conceptmapper_subjects_v1';
 const SUBJECT_ORDER_KEY = 'conceptmapper_subject_order_v1';
 const SIDEBAR_FOLDER_COLLAPSE_KEY = 'conceptmapper_sidebar_folder_collapse_v1';
+const ACTIVE_MAP_KEY = 'conceptmapper_active_map_v1';
 const DEFAULT_SUBJECT_ID = 'general';
 const DEFAULT_SUBJECT_TITLE = 'General';
 
@@ -262,7 +263,9 @@ function App() {
       return false;
     }
   });
-  const [activeMapId, setActiveMapId] = useStateApp(null);
+  const [activeMapId, setActiveMapId] = useStateApp(() => {
+    try { return localStorage.getItem(ACTIVE_MAP_KEY) || null; } catch { return null; }
+  });
   const [editingMapId, setEditingMapId] = useStateApp(null);
   const [builtInMaps, setBuiltInMaps] = useStateApp({});
   const [mapsLoading, setMapsLoading] = useStateApp(true);
@@ -741,6 +744,12 @@ function App() {
       setActiveMapId(fallback);
     }
   }, [view, activeMapId, studentMaps, mapOrder]);
+
+  useEffectApp(() => {
+    try {
+      if (activeMapId) localStorage.setItem(ACTIVE_MAP_KEY, activeMapId);
+    } catch {}
+  }, [activeMapId]);
 
   const mapData = studentMaps[activeMapId];
   const editingMap = editingMapId ? adminMaps[editingMapId] : null;
