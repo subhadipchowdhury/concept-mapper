@@ -578,7 +578,7 @@ function MapsManager({
             className="btn btn-ghost btn-sm btn-danger-ghost"
             onClick={() => {
               const confirmed = window.confirm(
-                'Reset all local storage?\n\nThis will erase all saved progress, custom maps, and settings for every user on this device — just as if they were visiting for the first time.\n\nThis cannot be undone.'
+                'Reset local storage for this site?\n\nThis will erase all saved progress, custom maps, and settings stored by Concept Mapper in this browser — simulating a first-time visit. Only data for this site is affected.\n\nThis cannot be undone.'
               );
               if (confirmed) {
                 localStorage.clear();
