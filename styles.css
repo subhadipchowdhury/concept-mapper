@@ -1898,15 +1898,24 @@ body {
 
   .app-shell.sidebar-collapsed .topbar-progress {
     display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.11);
+    border-radius: 6px;
+    padding: 4px 8px;
   }
 
   .app-shell.sidebar-collapsed .topbar-progress-bar {
-    width: 38px;
+    width: 28px;
+    display: block;
   }
 
   .app-shell.sidebar-collapsed .topbar-progress-value {
-    min-width: 2.2ch;
-    font-size: 10px;
+    min-width: 2.5ch;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--accent-teal);
   }
 
   .topbar {
@@ -1932,9 +1941,13 @@ body {
     font-size: 11px;
   }
 
+  .topbar-role-switcher {
+    margin-left: 6px;
+  }
+
   .topbar-role-btn {
-    min-height: 34px;
-    padding: 6px 10px;
+    min-height: 32px;
+    padding: 5px 9px;
     font-size: 11px;
   }
 
