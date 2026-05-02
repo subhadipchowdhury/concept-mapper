@@ -1,24 +1,6 @@
 <svg width="520" height="72" viewBox="0 0 520 72" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">Concept Mapper banner</title>
-  <desc id="desc">Concept Mapper logo with tagline and a connected node icon.</desc>
-  <defs>
-    <linearGradient id="cmBannerBg" x1="8" y1="8" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#4F8EF7"/>
-      <stop offset="1" stop-color="#34D399"/>
-    </linearGradient>
-    <linearGradient id="cmBannerLine" x1="18" y1="18" x2="54" y2="54" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#EAF1FF"/>
-      <stop offset="1" stop-color="#D1FAE5"/>
-    </linearGradient>
-  </defs>
-  <rect x="8" y="8" width="56" height="56" rx="14" fill="url(#cmBannerBg)"/>
-  <path d="M18 50L26 24L36 42L46 24L54 50" stroke="url(#cmBannerLine)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="18" cy="50" r="4.2" fill="#0A0C12"/>
-  <circle cx="26" cy="24" r="4.2" fill="#0A0C12"/>
-  <circle cx="36" cy="42" r="4.2" fill="#0A0C12"/>
-  <circle cx="46" cy="24" r="4.2" fill="#0A0C12"/>
-  <circle cx="54" cy="50" r="4.2" fill="#0A0C12"/>
-
-  <text x="80" y="35" fill="#E8EAF2" font-family="DM Sans, sans-serif" font-size="26" font-weight="700" letter-spacing="-0.4">Concept Mapper</text>
-  <text x="82" y="54" fill="#9CA3AF" font-family="DM Sans, sans-serif" font-size="12" font-weight="500" letter-spacing="0.25">See how ideas connect.</text>
+  <desc id="desc">Concept Mapper wordmark with tagline.</desc>
+  <text x="0" y="35" fill="#E8EAF2" font-family="DM Sans, sans-serif" font-size="26" font-weight="700" letter-spacing="-0.4">Concept Mapper</text>
+  <text x="2" y="54" fill="#9CA3AF" font-family="DM Sans, sans-serif" font-size="12" font-weight="500" letter-spacing="0.25">See how ideas connect.</text>
 </svg>

@@ -12,10 +12,10 @@
     </linearGradient>
   </defs>
   <rect x="6" y="6" width="84" height="84" rx="22" fill="url(#cmMarkBg)"/>
-  <path d="M20 66L30 28L44 52L58 28L70 66" stroke="url(#cmMarkLine)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="20" cy="66" r="6" fill="#0A0C12"/>
-  <circle cx="30" cy="28" r="6" fill="#0A0C12"/>
-  <circle cx="44" cy="52" r="6" fill="#0A0C12"/>
-  <circle cx="58" cy="28" r="6" fill="#0A0C12"/>
-  <circle cx="70" cy="66" r="6" fill="#0A0C12"/>
+  <path d="M23 67L33 29L47 53L61 29L73 67" stroke="url(#cmMarkLine)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="23" cy="67" r="6" fill="#0A0C12"/>
+  <circle cx="33" cy="29" r="6" fill="#0A0C12"/>
+  <circle cx="47" cy="53" r="6" fill="#0A0C12"/>
+  <circle cx="61" cy="29" r="6" fill="#0A0C12"/>
+  <circle cx="73" cy="67" r="6" fill="#0A0C12"/>
 </svg>
