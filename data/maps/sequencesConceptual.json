@@ -16,11 +16,25 @@
       "isStart": true
     },
     {
+      "id": "gp",
+      "label": "Geometric Progression\\n\\(a_n=ar^{n-1}\\)",
+      "x": 180,
+      "y": 60,
+      "color": "#0f766e"
+    },
+    {
       "id": "enconv",
       "label": "ε–N Convergence\\n\\(a_n \\to L\\)",
       "x": 470,
       "y": 190,
       "color": "#06b6d4"
+    },
+    {
+      "id": "shift",
+      "label": "Shift Theorem\\n\\(a_n\\to L \\Rightarrow a_{n+k}\\to L\\)",
+      "x": 1030,
+      "y": 190,
+      "color": "#34d399"
     },
     {
       "id": "div",
@@ -93,9 +107,23 @@
       "color": "#f472b6"
     },
     {
+      "id": "cesaro",
+      "label": "Cesàro Mean\\n\\(\\sigma_n=\\frac{a_1+\\cdots+a_n}{n}\\)",
+      "x": 1230,
+      "y": 470,
+      "color": "#fcd34d"
+    },
+    {
       "id": "sublim",
       "label": "Subsequential Limit",
       "x": 470,
+      "y": 610,
+      "color": "#f472b6"
+    },
+    {
+      "id": "limpt",
+      "label": "Limit Point of a Set",
+      "x": 760,
       "y": 610,
       "color": "#f472b6"
     },
@@ -119,6 +147,14 @@
       "x": 760,
       "y": 760,
       "color": "#f59e0b",
+      "isStart": true
+    },
+    {
+      "id": "amgm",
+      "label": "AM–GM Inequality\\n\\(\\sqrt{ab}\\le(a+b)/2\\)",
+      "x": 1030,
+      "y": 760,
+      "color": "#fcd34d",
       "isStart": true
     },
     {
@@ -150,6 +186,20 @@
       "color": "#fb7185"
     },
     {
+      "id": "babylonian",
+      "label": "Babylonian Iteration\\n\\(x_{n+1}=\\frac{1}{2}(x_n+c/x_n)\\)",
+      "x": 1230,
+      "y": 920,
+      "color": "#fcd34d"
+    },
+    {
+      "id": "agm",
+      "label": "Arithmetic–Geometric\\nMean (AGM)",
+      "x": 1030,
+      "y": 1080,
+      "color": "#fcd34d"
+    },
+    {
       "id": "cc",
       "label": "Cauchy Convergence\\nCriterion",
       "x": 470,
@@ -158,6 +208,15 @@
     }
   ],
   "edges": [
+    {
+      "id": "sc_e0",
+      "from": "seq",
+      "to": "gp",
+      "label": "for \\(a_n=ar^{n-1}\\), the ratio \\(a_{n+1}/a_n\\) is the constant ___",
+      "answer": "r",
+      "type": "fillin",
+      "hint": "Compute one quotient of consecutive terms."
+    },
     {
       "id": "sc_e1",
       "from": "seq",
@@ -201,31 +260,40 @@
       "id": "sc_e4",
       "from": "enconv",
       "to": "algebra",
-      "label": "sum, product, and quotient laws belong to the ___ of limits",
-      "answer": "algebra",
-      "type": "dropdown",
-      "options": [
-        "algebra",
-        "geometry",
-        "notation",
-        "ordering"
-      ],
-      "hint": "These are the computation rules for limits."
+      "label": "if \\(a_n\\to a\\) and \\(b_n\\to b\\), then \\(a_n+b_n\\to\\) ___",
+      "answer": "a+b",
+      "type": "fillin",
+      "hint": "Use the sum law for limits."
     },
     {
       "id": "sc_e5",
       "from": "enconv",
       "to": "order",
-      "label": "if \\(a_n \\le b_n\\) eventually and both converge, their limits preserve which kind of inequality?",
-      "answer": "weak",
+      "label": "if \\(a_n\\le b_n\\) eventually and both converge, then \\(\\lim a_n\\) ___ \\(\\lim b_n\\)",
+      "answer": "≤",
       "type": "dropdown",
       "options": [
-        "strict",
-        "weak",
-        "no",
-        "reverse"
+        "<",
+        "≤",
+        ">",
+        "="
       ],
-      "hint": "Equality of limits can happen even when the terms were strictly ordered."
+      "hint": "Limit inequalities preserve weak order."
+    },
+    {
+      "id": "sc_e5b",
+      "from": "enconv",
+      "to": "shift",
+      "label": "removing finitely many initial terms ___ the limit",
+      "answer": "preserves",
+      "type": "dropdown",
+      "options": [
+        "preserves",
+        "changes",
+        "reverses",
+        "destroys"
+      ],
+      "hint": "Convergence depends on tail behavior."
     },
     {
       "id": "sc_e6",
@@ -255,16 +323,16 @@
       "id": "sc_e8",
       "from": "seq",
       "to": "mono",
-      "label": "a sequence whose terms never reverse order direction is:",
-      "answer": "monotone",
+      "label": "in the nondecreasing case, monotonicity means \\(a_{n+1}\\) ___ \\(a_n\\)",
+      "answer": "≥",
       "type": "dropdown",
       "options": [
-        "bounded",
-        "monotone",
-        "periodic",
-        "Cauchy"
+        "≥",
+        "≤",
+        "=",
+        "≠"
       ],
-      "hint": "It is either always nondecreasing or always nonincreasing."
+      "hint": "This edge checks the order relation, not the vocabulary word."
     },
     {
       "id": "sc_e9",
@@ -315,6 +383,15 @@
       "hint": "A convergent sequence cannot have two different subsequential limits."
     },
     {
+      "id": "sc_e12b",
+      "from": "enconv",
+      "to": "cesaro",
+      "label": "if \\(a_n\\to L\\), Cesàro means satisfy \\(\\sigma_n\\to\\) ___",
+      "answer": "L",
+      "type": "fillin",
+      "hint": "Averaging preserves the limit in this direction."
+    },
+    {
       "id": "sc_e13",
       "from": "subseq",
       "to": "peak",
@@ -343,6 +420,21 @@
         "random"
       ],
       "hint": "This is the content of the monotone subsequence lemma."
+    },
+    {
+      "id": "sc_e14b",
+      "from": "sublim",
+      "to": "limpt",
+      "label": "a subsequential limit is also an ___ point of the set of sequence values",
+      "answer": "accumulation",
+      "type": "dropdown",
+      "options": [
+        "accumulation",
+        "isolated",
+        "endpoint",
+        "periodic"
+      ],
+      "hint": "Equivalent terminology: cluster point."
     },
     {
       "id": "sc_e15",
@@ -442,6 +534,39 @@
         "strictly decreasing"
       ],
       "hint": "The tail fits inside one fixed interval."
+    },
+    {
+      "id": "sc_e21b",
+      "from": "amgm",
+      "to": "babylonian",
+      "label": "for \\(x_{n+1}=\\frac{1}{2}(x_n+c/x_n)\\), AM-GM gives \\(x_{n+1}\\ge\\) ___",
+      "answer": "√c",
+      "type": "fillin",
+      "hint": "Apply AM-GM to \\(x_n\\) and \\(c/x_n\\)."
+    },
+    {
+      "id": "sc_e21c",
+      "from": "mct",
+      "to": "babylonian",
+      "label": "if the iteration is decreasing and bounded below, MCT gives:",
+      "answer": "convergence",
+      "type": "dropdown",
+      "options": [
+        "convergence",
+        "divergence",
+        "periodicity",
+        "unboundedness"
+      ],
+      "hint": "Monotone + bounded is exactly the MCT hypothesis pattern."
+    },
+    {
+      "id": "sc_e21d",
+      "from": "amgm",
+      "to": "agm",
+      "label": "AGM iteration produces arithmetic/geometric means with the same ___",
+      "answer": "limit",
+      "type": "fillin",
+      "hint": "The two sequences squeeze together."
     },
     {
       "id": "sc_e22",
