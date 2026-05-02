@@ -1,7 +1,7 @@
-﻿{
+{
   "id": "series",
   "title": "Infinite Series",
-  "description": "Module 2 \u2014 Convergence tests, absolute & conditional convergence",
+  "description": "Module 2 — Convergence tests, absolute & conditional convergence",
   "color": "#f59e0b",
   "accentColor": "#fb923c",
   "nodes": [
@@ -19,7 +19,7 @@
       "x": 480,
       "y": 60,
       "color": "#f59e0b",
-      "isStart": true
+      "isStart": false
     },
     {
       "id": "partial",
@@ -160,8 +160,7 @@
       "x": 250,
       "y": 1250,
       "color": "#a78bfa"
-    },
-    {}
+    }
   ],
   "edges": [
     {
@@ -177,7 +176,7 @@
         "dividing",
         "composing"
       ],
-      "hint": "The \u03A3 symbol indicates this operation."
+      "hint": "The Σ symbol indicates this operation."
     },
     {
       "id": "r_e2",
@@ -220,12 +219,12 @@
       "from": "series",
       "to": "cauchyser",
       "label": "\\(\\sum a_n\\) converges \\(\\iff\\) \\(\\forall \\varepsilon > 0\\, \\exists N\\) such that \\(|a_{m+1}+\\cdots+a_n|\\) \\_\\_\\_",
-      "answer": "< \u03B5",
+      "answer": "< ε",
       "type": "dropdown",
       "options": [
         "= 0",
-        "< \u03B5",
-        "> \u03B5",
+        "< ε",
+        "> ε",
         "is bounded"
       ],
       "hint": "Cauchy condition for the partial-sum sequence."
@@ -239,7 +238,7 @@
       "type": "dropdown",
       "options": [
         "<",
-        "\u2264",
+        "≤",
         "=",
         ">"
       ],
@@ -258,7 +257,7 @@
         "jumps",
         "oscillates"
       ],
-      "hint": "\\(a_n \\to 0\\) is necessary but NOT sufficient \u2014 harmonic is the textbook example."
+      "hint": "\\(a_n \\to 0\\) is necessary but NOT sufficient — harmonic is the textbook example."
     },
     {
       "id": "r_e9",
@@ -269,11 +268,11 @@
       "type": "dropdown",
       "options": [
         "<",
-        "\u2264",
+        "≤",
         "=",
         ">"
       ],
-      "hint": "Harmonic (\\(p=1\\)) is the boundary case \u2014 diverges."
+      "hint": "Harmonic (\\(p=1\\)) is the boundary case — diverges."
     },
     {
       "id": "r_e10",
@@ -282,7 +281,7 @@
       "label": "for nonneg terms, \\(\\{s_n\\}\\) is automatically \\_\\_\\_",
       "answer": "monotone",
       "type": "fillin",
-      "hint": "Adding nonneg numbers can only make \\(s_n\\) go \u2191."
+      "hint": "Adding nonneg numbers can only make \\(s_n\\) go ↑."
     },
     {
       "id": "r_e11",
@@ -308,7 +307,7 @@
       "type": "dropdown",
       "options": [
         "<",
-        "\u2264",
+        "≤",
         "=",
         ">"
       ],
@@ -369,7 +368,7 @@
         "cancel",
         "vanish"
       ],
-      "hint": "\\(+, -, +, -, \\ldots\\) \u2014 the signs ___ at each step."
+      "hint": "\\(+, -, +, -, \\ldots\\) — the signs ___ at each step."
     },
     {
       "id": "r_e18",
@@ -393,7 +392,7 @@
         "stronger",
         "unrelated"
       ],
-      "hint": "Implies ordinary convergence, but not the other way \u2014 so it is ___."
+      "hint": "Implies ordinary convergence, but not the other way — so it is ___."
     },
     {
       "id": "r_e20",
@@ -402,13 +401,13 @@
       "label": "if \\(\\sum |a_n|\\) converges, then \\(\\sum a_n\\) automatically \\_\\_\\_",
       "answer": "converges",
       "type": "fillin",
-      "hint": "Absolute convergence is the stronger condition \u2014 the original series inherits convergence."
+      "hint": "Absolute convergence is the stronger condition — the original series inherits convergence."
     },
     {
       "id": "r_e21",
       "from": "abstest",
       "to": "cond",
-      "label": "a series that converges but \\(\\sum |a_n|\\) does NOT \u2014 is called \\_\\_\\_ convergent",
+      "label": "a series that converges but \\(\\sum |a_n|\\) does NOT — is called \\_\\_\\_ convergent",
       "answer": "conditionally",
       "type": "fillin",
       "hint": "The convergence depends on cancellation between positive and negative terms."
@@ -420,7 +419,7 @@
       "label": "classic case: \\(\\sum (-1)^n / n\\) is \\_\\_\\_ convergent",
       "answer": "conditionally",
       "type": "fillin",
-      "hint": "It converges (Leibniz) but \\(\\sum 1/n\\) does not \u2014 so the convergence is ___."
+      "hint": "It converges (Leibniz) but \\(\\sum 1/n\\) does not — so the convergence is ___."
     },
     {
       "id": "r_e23",
@@ -466,7 +465,9 @@
         "harmonic"
       ],
       "hint": "Dirichlet only needs \\(\\{B_n = \\sum b_k\\}\\) to be bounded."
-    },
-    {}
-  ]
+    }
+  ],
+  "_published": true,
+  "updatedAt": "2026-05-02T00:43:52.662Z",
+  "exportedBy": "admin"
 }
