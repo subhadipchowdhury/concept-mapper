@@ -330,12 +330,14 @@ const MAP_ORDER_STORAGE_KEY = 'conceptmapper_map_order_v1';
 const MAP_MANIFEST_PATH = 'data/maps/manifest.json';
 const LEGACY_SEQUENCES_MAP_ID = 'sequencesConceptual';
 const CANONICAL_SEQUENCES_MAP_ID = 'sequences';
+const RETIRED_SERIES_V2_MAP_ID = 'seriesV2';
 
 function migrateLegacyMapIdInOrder(order) {
   const normalized = [];
   const seen = new Set();
   (Array.isArray(order) ? order : []).forEach((id) => {
     const nextId = id === LEGACY_SEQUENCES_MAP_ID ? CANONICAL_SEQUENCES_MAP_ID : id;
+    if (nextId === RETIRED_SERIES_V2_MAP_ID) return;
     if (!seen.has(nextId)) {
       seen.add(nextId);
       normalized.push(nextId);
@@ -350,6 +352,7 @@ function loadProgress() {
     if (!raw) return {};
     const parsed = JSON.parse(raw);
     const migrated = { ...(parsed || {}) };
+    let mutated = false;
     const legacyEntry = migrated[LEGACY_SEQUENCES_MAP_ID];
     if (legacyEntry) {
       const canonicalEdges = Array.isArray(migrated[CANONICAL_SEQUENCES_MAP_ID]?.answeredEdges)
@@ -360,6 +363,15 @@ function loadProgress() {
         answeredEdges: [...new Set([...canonicalEdges, ...legacyEdges])],
       };
       delete migrated[LEGACY_SEQUENCES_MAP_ID];
+      mutated = true;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(migrated, RETIRED_SERIES_V2_MAP_ID)) {
+      delete migrated[RETIRED_SERIES_V2_MAP_ID];
+      mutated = true;
+    }
+
+    if (mutated) {
       localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(migrated));
     }
 
@@ -386,7 +398,14 @@ function saveProgress(allProgress) {
 function loadCustomMaps() {
   try {
     const raw = localStorage.getItem(CUSTOM_MAPS_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : {};
+    const parsed = raw ? JSON.parse(raw) : {};
+    if (parsed && typeof parsed === 'object' && Object.prototype.hasOwnProperty.call(parsed, RETIRED_SERIES_V2_MAP_ID)) {
+      const migrated = { ...parsed };
+      delete migrated[RETIRED_SERIES_V2_MAP_ID];
+      localStorage.setItem(CUSTOM_MAPS_STORAGE_KEY, JSON.stringify(migrated));
+      return migrated;
+    }
+    return parsed && typeof parsed === 'object' ? parsed : {};
   } catch { return {}; }
 }
 
