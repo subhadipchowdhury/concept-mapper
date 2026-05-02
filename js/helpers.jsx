@@ -1,7 +1,7 @@
 // Helpers and shared components
 // Exposes: MathNode, launchConfetti, AnswerPopup
 
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useRef, useMemo } = React;
 
 // Normalize display text so authored escape sequences render consistently.
 function normalizeDisplayText(rawText) {
@@ -153,6 +153,19 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
   const [feedback, setFeedback] = useState(null); // 'correct' | 'wrong' | 'giveaway' | null
   const [showHint, setShowHint] = useState(false);
   const inputRef = useRef(null);
+
+  // Shuffle dropdown options once per popup open (Fisher-Yates with seeded RNG from edge.id)
+  const shuffledOptions = useMemo(() => {
+    const opts = [...(edge.options || [])];
+    // Simple seeded PRNG (mulberry32) so the order is stable for this edge instance
+    let seed = [...(edge.id || 'x')].reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    const rand = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    for (let i = opts.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [opts[i], opts[j]] = [opts[j], opts[i]];
+    }
+    return opts;
+  }, [edge.id]);
   const cardRef = useRef(null);
 
   useEffect(() => {
@@ -316,7 +329,7 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
             onChange={e => { setValue(e.target.value); setFeedback(null); }}
           >
             <option value="">— choose one —</option>
-            {(edge.options || []).map(opt => (
+            {shuffledOptions.map(opt => (
               <option key={opt} value={opt}>{opt}</option>
             ))}
           </select>
