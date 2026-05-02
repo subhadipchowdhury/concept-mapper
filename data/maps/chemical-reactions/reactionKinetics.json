@@ -163,6 +163,16 @@
     },
     {
       "id": "rk_e7",
+      "from": "rateConstant",
+      "to": "temperature",
+      "label": "in the Arrhenius relationship, the rate constant k depends strongly on ___",
+      "answer": "temperature",
+      "type": "dropdown",
+      "options": ["temperature", "pressure", "volume", "reaction order"],
+      "hint": "Arrhenius links k to absolute temperature through an exponential factor."
+    },
+    {
+      "id": "rk_e8",
       "from": "temperature",
       "to": "arrhenius",
       "label": "according to the Arrhenius equation, doubling the absolute temperature causes k to ___",
@@ -172,7 +182,7 @@
       "hint": "Higher T makes the exponent less negative, so the exponential factor grows and k increases."
     },
     {
-      "id": "rk_e8",
+      "id": "rk_e9",
       "from": "arrhenius",
       "to": "activationEnergy",
       "label": "on a plot of \\ln(k)\\ versus \\1/T\\, a larger activation barrier gives a ___ slope",
@@ -180,16 +190,6 @@
       "type": "dropdown",
       "options": ["more negative", "more positive", "zero", "horizontal"],
       "hint": "Since slope = -E_a/R, increasing E_a makes the slope decrease further below zero."
-    },
-    {
-      "id": "rk_e9",
-      "from": "activationEnergy",
-      "to": "rateConstant",
-      "label": "at fixed temperature, lower E_a generally means larger ___",
-      "answer": "k",
-      "type": "dropdown",
-      "options": ["k", "Ea", "A", "reaction order"],
-      "hint": "A larger rate constant corresponds to a faster reaction."
     },
     {
       "id": "rk_e10",

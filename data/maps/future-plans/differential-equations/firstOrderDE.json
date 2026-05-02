@@ -82,8 +82,8 @@
   "edges": [
     {
       "id": "fo_e1",
-      "from": "modeling",
-      "to": "ode",
+      "from": "ode",
+      "to": "modeling",
       "label": "time-dependent systems are often represented by a differential ___",
       "answer": "equation",
       "type": "fillin",

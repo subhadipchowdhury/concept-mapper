@@ -89,8 +89,8 @@
   "edges": [
     {
       "id": "pde_e1",
-      "from": "odevspde",
-      "to": "pde",
+      "from": "pde",
+      "to": "odevspde",
       "label": "equations with partial derivatives are called ___",
       "answer": "pdes",
       "type": "fillin",

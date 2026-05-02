@@ -471,6 +471,23 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
     Number.isFinite(n.x) &&
     Number.isFinite(n.y)
   ));
+  const alwaysUnlockedNodeIds = useMemo2(() => {
+    const startIds = validNodes.filter((n) => n.isStart).map((n) => n.id);
+    const seedIds = startIds.length > 0 ? startIds : (validNodes[0] ? [validNodes[0].id] : []);
+    const reachable = new Set(seedIds);
+    const queue = [...seedIds];
+    while (queue.length > 0) {
+      const current = queue.shift();
+      mapData.edges.forEach((edge) => {
+        if (edge.from !== current) return;
+        if (reachable.has(edge.to)) return;
+        reachable.add(edge.to);
+        queue.push(edge.to);
+      });
+    }
+    // Fallback: if authoring mistakes make a node unreachable, keep it available.
+    return new Set(validNodes.map((n) => n.id).filter((id) => !reachable.has(id)));
+  }, [mapData, validNodes]);
 
   // local node positions: positions[mapId][nodeId] = {x, y}
   const mapPositions = positions[mapData.id] || {};
@@ -494,6 +511,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
     mapData.edges.forEach(e => {
       if (answeredSet.has(e.id)) unlocked.add(e.to);
     });
+    alwaysUnlockedNodeIds.forEach((id) => unlocked.add(id));
     return unlocked;
   }
 

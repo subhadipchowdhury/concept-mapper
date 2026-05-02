@@ -1,7 +1,7 @@
 // Admin Canvas — visual drag-and-drop concept map builder
 // Exposes: AdminCanvas, MapsManager
 
-const { useState: useStateA, useRef: useRefA } = React;
+const { useState: useStateA, useRef: useRefA, useMemo: useMemoA } = React;
 
 const NODE_COLOR_PALETTE = [
   '#4f8ef7', // blue
@@ -20,6 +20,65 @@ function adminMapPublishPath(mapData) {
   return `data/maps/${subjectId}/${mapData.id}.json`;
 }
 
+// Validate graph reachability so authoring mistakes are visible in admin.
+function auditUnlockGraph(mapData) {
+  const nodes = Array.isArray(mapData?.nodes) ? mapData.nodes : [];
+  const edges = Array.isArray(mapData?.edges) ? mapData.edges : [];
+  const nodeById = Object.fromEntries(nodes.map((node) => [node.id, node]));
+  const nodeIds = new Set(nodes.map((node) => node.id));
+  const startIds = nodes.filter((node) => node.isStart).map((node) => node.id);
+  const seedIds = startIds.length > 0 ? startIds : (nodes[0] ? [nodes[0].id] : []);
+
+  const invalidEdges = edges.filter((edge) => !nodeIds.has(edge.from) || !nodeIds.has(edge.to));
+  const validEdges = edges.filter((edge) => nodeIds.has(edge.from) && nodeIds.has(edge.to));
+
+  const reachable = new Set(seedIds);
+  const queue = [...seedIds];
+  while (queue.length > 0) {
+    const current = queue.shift();
+    validEdges.forEach((edge) => {
+      if (edge.from !== current || reachable.has(edge.to)) return;
+      reachable.add(edge.to);
+      queue.push(edge.to);
+    });
+  }
+
+  const unreachableNodes = nodes.filter((node) => !reachable.has(node.id));
+  const likelyReversedEdges = validEdges.filter((edge) => reachable.has(edge.to) && !reachable.has(edge.from));
+
+  const issues = [];
+  if (nodes.length > 0 && startIds.length === 0) {
+    issues.push('No start node is marked. Students can still begin from the first node, but marking a start node is recommended.');
+  }
+  if (invalidEdges.length > 0) {
+    issues.push(`${invalidEdges.length} edge(s) reference missing node ids and will be ignored.`);
+  }
+  if (unreachableNodes.length > 0) {
+    issues.push(`Unreachable node(s): ${unreachableNodes.map((node) => node.label || node.id).join(', ')}.`);
+  }
+  if (likelyReversedEdges.length > 0) {
+    const sample = likelyReversedEdges.slice(0, 4).map((edge) => {
+      const fromLabel = nodeById[edge.from]?.label?.split('\\n')[0] || edge.from;
+      const toLabel = nodeById[edge.to]?.label?.split('\\n')[0] || edge.to;
+      return `${edge.id}: ${fromLabel} -> ${toLabel}`;
+    }).join(' | ');
+    issues.push(`Possible reversed arrow direction on: ${sample}${likelyReversedEdges.length > 4 ? ' | ...' : ''}`);
+  }
+
+  return { issues, unreachableNodes, invalidEdges, likelyReversedEdges };
+}
+
+function getUnlockBlockingIssues(audit) {
+  const blockers = [];
+  if ((audit?.unreachableNodes || []).length > 0) {
+    blockers.push('Map has unreachable nodes.');
+  }
+  if ((audit?.invalidEdges || []).length > 0) {
+    blockers.push('Map has edge(s) pointing to missing node ids.');
+  }
+  return blockers;
+}
+
 // ─── AdminCanvas: Visual builder for one concept map ──────────────────────────
 function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePublish }) {
   const [tool, setTool] = useStateA('select'); // 'select' | 'addNode' | 'connect'
@@ -31,6 +90,9 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
   const [activeColor, setActiveColor] = useStateA(NODE_COLOR_PALETTE[0]);
   const viewportRef = useRefA(null);
   const { t, setT, onWheel, startPan, onTouchStart, onTouchMove, onTouchEnd } = usePanZoom();
+  const unlockAudit = useMemoA(() => auditUnlockGraph(mapData), [mapData]);
+  const unlockBlockingIssues = useMemoA(() => getUnlockBlockingIssues(unlockAudit), [unlockAudit]);
+  const isPublishExportBlocked = unlockBlockingIssues.length > 0;
 
   // ── Update helpers ──
   // Patch one node and push updated map to parent state.
@@ -173,8 +235,15 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
         {typeof onExport === 'function' && (
           <button
             className="admin-tool-btn"
-            onClick={() => onExport(mapData.id, mapData)}
+            onClick={() => {
+              if (isPublishExportBlocked) {
+                window.alert(`Cannot export this map yet:\n\n- ${unlockBlockingIssues.join('\n- ')}`);
+                return;
+              }
+              onExport(mapData.id, mapData);
+            }}
             title="Download this map as a JSON file so it can be added to the repository"
+            disabled={isPublishExportBlocked}
           >
             ⭳ Export JSON
           </button>
@@ -185,8 +254,16 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
         {typeof onTogglePublish === 'function' && (
           <button
             className={`admin-tool-btn ${mapData._published ? 'active' : ''}`}
-            onClick={() => onTogglePublish(!mapData._published)}
+            onClick={() => {
+              const nextPublished = !mapData._published;
+              if (nextPublished && isPublishExportBlocked) {
+                window.alert(`Cannot publish this map yet:\n\n- ${unlockBlockingIssues.join('\n- ')}`);
+                return;
+              }
+              onTogglePublish(nextPublished);
+            }}
             title="Choose whether this local map appears in the student sidebar"
+            disabled={!mapData._published && isPublishExportBlocked}
           >
             {mapData._published ? '📣 Published' : '📝 Draft'}
           </button>
@@ -202,6 +279,27 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
           </button>
         )}
       </div>
+
+      {unlockAudit.issues.length > 0 && (
+        <div
+          className="admin-unlock-audit"
+          style={{
+            margin: '8px 14px 0',
+            padding: '10px 12px',
+            borderRadius: 10,
+            border: '1px solid rgba(245, 158, 11, 0.55)',
+            background: 'rgba(245, 158, 11, 0.12)',
+            color: 'var(--text-primary)'
+          }}
+        >
+          <div style={{ fontWeight: 700, fontSize: 12, marginBottom: 6 }}>Unlock graph warnings</div>
+          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12, lineHeight: 1.35 }}>
+            {unlockAudit.issues.map((issue) => (
+              <li key={issue}>{issue}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div
         className={`map-viewport ${tool === 'addNode' ? 'placing-node' : ''}`}
@@ -649,6 +747,9 @@ function MapsManager({
         {visibleMapIds.map((mapId) => {
           const m = allMaps[mapId];
           if (!m) return null;
+          const rowAudit = auditUnlockGraph(m);
+          const rowBlockers = getUnlockBlockingIssues(rowAudit);
+          const isRowPublishExportBlocked = rowBlockers.length > 0;
           const isCustom = !!customMaps?.[m.id];
           const hasBuiltInVersion = !!builtInMaps?.[m.id];
           return (
@@ -716,7 +817,15 @@ function MapsManager({
                 {isCustom && typeof onTogglePublish === 'function' && (
                   <button
                     className="btn btn-ghost btn-sm"
-                    onClick={() => onTogglePublish(m.id, !m._published)}
+                    onClick={() => {
+                      const nextPublished = !m._published;
+                      if (nextPublished && isRowPublishExportBlocked) {
+                        window.alert(`Cannot publish this map yet:\n\n- ${rowBlockers.join('\n- ')}`);
+                        return;
+                      }
+                      onTogglePublish(m.id, nextPublished);
+                    }}
+                    disabled={!m._published && isRowPublishExportBlocked}
                   >
                     {m._published ? 'Unpublish' : 'Publish'}
                   </button>
@@ -732,7 +841,14 @@ function MapsManager({
                 {typeof onExportMap === 'function' && (
                   <button
                     className="btn btn-ghost btn-sm"
-                    onClick={() => onExportMap(m.id)}
+                    onClick={() => {
+                      if (isRowPublishExportBlocked) {
+                        window.alert(`Cannot export this map yet:\n\n- ${rowBlockers.join('\n- ')}`);
+                        return;
+                      }
+                      onExportMap(m.id);
+                    }}
+                    disabled={isRowPublishExportBlocked}
                   >
                     Export
                   </button>
