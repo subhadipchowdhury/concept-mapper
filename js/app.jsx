@@ -707,7 +707,7 @@ function App() {
     if (view.startsWith('admin')) setView('student');
   }
 
-  // Export student progress + positions for the current map as a portable JSON backup.
+  // Export student progress + positions for the current map as a portable .cmpr backup.
   function exportStudentData() {
     if (!activeMapId || !mapData) return;
     const mapProgress = allProgress[activeMapId]
@@ -742,7 +742,7 @@ function App() {
     if (importInputRef.current) importInputRef.current.click();
   }
 
-  // Import student progress JSON and merge the current map's progress into local state.
+  // Import student progress backup and merge the current map's progress into local state.
   function handleImportStudentData(e) {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -788,7 +788,7 @@ function App() {
 
         showToast('Progress imported. Your saved answers and node positions have been updated.', 'success');
       } catch {
-        showToast('Import failed. Choose a valid Concept Mapper progress export JSON file.', 'error');
+        showToast('Import failed. Choose a valid Concept Mapper progress export file (.cmpr or legacy .json).', 'error');
       }
     };
     reader.readAsText(file);
@@ -970,7 +970,7 @@ function App() {
             <input
               ref={importInputRef}
               type="file"
-              accept="application/json,.json"
+              accept=".cmpr,application/json,.json"
               style={{ display: 'none' }}
               onChange={handleImportStudentData}
             />
