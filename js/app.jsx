@@ -9,6 +9,19 @@ const SIDEBAR_FOLDER_COLLAPSE_KEY = 'conceptmapper_sidebar_folder_collapse_v1';
 const ACTIVE_MAP_KEY = 'conceptmapper_active_map_v1';
 const DEFAULT_SUBJECT_ID = 'general';
 const DEFAULT_SUBJECT_TITLE = 'General';
+const MOBILE_VIEWPORT_QUERY = '(max-width: 760px)';
+
+function isMobileViewport() {
+  try {
+    return window.matchMedia(MOBILE_VIEWPORT_QUERY).matches;
+  } catch {
+    return false;
+  }
+}
+
+function collapseSidebarOnMobile(setSidebarCollapsed) {
+  if (isMobileViewport()) setSidebarCollapsed(true);
+}
 
 // Normalize any incoming subject id into a stable non-empty value.
 function normalizeSubjectId(subjectId) {
@@ -274,16 +287,22 @@ function buildSubjectSections(orderedMapIds, mapsObj, subjects) {
   return baseOrder.map((id) => sectionsById[id]).filter(Boolean);
 }
 
+function isValidMapPayload(map) {
+  return !!(
+    map &&
+    typeof map === 'object' &&
+    typeof map.id === 'string' &&
+    typeof map.title === 'string' &&
+    typeof map.description === 'string' &&
+    Array.isArray(map.nodes) &&
+    Array.isArray(map.edges)
+  );
+}
+
 // Root application component coordinating student and admin workflows.
 function App() {
   const [view, setView] = useStateApp('student'); // 'student' | 'admin' | 'admin-edit'
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useStateApp(() => {
-    try {
-      return window.matchMedia('(max-width: 760px)').matches;
-    } catch {
-      return false;
-    }
-  });
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useStateApp(() => isMobileViewport());
   const [activeMapId, setActiveMapId] = useStateApp(() => {
     try { return localStorage.getItem(ACTIVE_MAP_KEY) || null; } catch { return null; }
   });
@@ -363,7 +382,7 @@ function App() {
 
   useEffectApp(() => {
     try {
-      const media = window.matchMedia('(max-width: 760px)');
+      const media = window.matchMedia(MOBILE_VIEWPORT_QUERY);
       const syncSidebarForViewport = (event) => {
         if (event.matches) setIsSidebarCollapsed(true);
       };
@@ -599,19 +618,6 @@ function App() {
     if (importCustomMapInputRef.current) importCustomMapInputRef.current.click();
   }
 
-  // Validate shape of imported map JSON.
-  function isValidMapPayload(map) {
-    return !!(
-      map &&
-      typeof map === 'object' &&
-      typeof map.id === 'string' &&
-      typeof map.title === 'string' &&
-      typeof map.description === 'string' &&
-      Array.isArray(map.nodes) &&
-      Array.isArray(map.edges)
-    );
-  }
-
   // Import a custom map JSON and open it in admin edit mode.
   function handleImportCustomMap(e) {
     const file = e.target.files?.[0];
@@ -692,11 +698,7 @@ function App() {
   function openAdmin() {
     if (isAdminUnlocked || requestAdminAccess()) {
       setView('admin');
-      try {
-        if (window.matchMedia('(max-width: 760px)').matches) {
-          setIsSidebarCollapsed(true);
-        }
-      } catch {}
+      collapseSidebarOnMobile(setIsSidebarCollapsed);
     }
   }
 
@@ -1108,11 +1110,7 @@ function App() {
                       onClick={() => {
                         setActiveMapId(m.id);
                         setView('student');
-                        try {
-                          if (window.matchMedia('(max-width: 760px)').matches) {
-                            setIsSidebarCollapsed(true);
-                          }
-                        } catch {}
+                        collapseSidebarOnMobile(setIsSidebarCollapsed);
                       }}
                     >
                       <div className="sidebar-item-title">

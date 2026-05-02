@@ -284,6 +284,12 @@ function useNodeDrag(onMove, onEnd) {
 function nodeBg(color)     { return color + '22'; }
 function nodeBorder(color) { return color + 'AA'; }
 
+const PAN_GESTURE_BLOCKER_SELECTOR = '.node-card, .edge-label-badge, .inspector, .admin-toolbar';
+
+function shouldBlockPanGesture(target) {
+  return !!(target && typeof target.closest === 'function' && target.closest(PAN_GESTURE_BLOCKER_SELECTOR));
+}
+
 // ─── Pan / Zoom hook ─────────────────────────────────────────────────────────
 function usePanZoom(initial = { x: 60, y: 80, scale: 1 }) {
   const [t, setT] = useState2(initial);
@@ -319,7 +325,7 @@ function usePanZoom(initial = { x: 60, y: 80, scale: 1 }) {
   }, []);
 
   const startPan = useCallback2((e) => {
-    if (e.target.closest('.node-card') || e.target.closest('.edge-label-badge') || e.target.closest('.inspector') || e.target.closest('.admin-toolbar')) return;
+    if (shouldBlockPanGesture(e.target)) return;
     const start = { x: e.clientX, y: e.clientY, tx: tRef.current.x, ty: tRef.current.y };
     function move(ev) {
       setT(prev => ({ ...prev, x: start.tx + (ev.clientX - start.x), y: start.ty + (ev.clientY - start.y) }));
@@ -348,7 +354,7 @@ function usePanZoom(initial = { x: 60, y: 80, scale: 1 }) {
   }
 
   const onTouchStart = useCallback2((e) => {
-    if (e.target.closest('.node-card') || e.target.closest('.edge-label-badge') || e.target.closest('.inspector') || e.target.closest('.admin-toolbar')) return;
+    if (shouldBlockPanGesture(e.target)) return;
     if (e.touches.length === 2) {
       const center = getTouchCenter(e.touches[0], e.touches[1]);
       touchStateRef.current = {
