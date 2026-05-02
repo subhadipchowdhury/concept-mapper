@@ -26,6 +26,7 @@ function deserializeProgress(progressObj) {
 
 function App() {
   const [view, setView] = useStateApp('student'); // 'student' | 'admin' | 'admin-edit'
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useStateApp(false);
   const [activeMapId, setActiveMapId] = useStateApp('sequences');
   const [editingMapId, setEditingMapId] = useStateApp(null);
   const [allProgress, setAllProgress] = useStateApp(() => loadProgress());
@@ -206,8 +207,15 @@ function App() {
   const editingMap = editingMapId ? adminMaps[editingMapId] : null;
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       <header className="topbar">
+        <button
+          className="topbar-btn"
+          onClick={() => setIsSidebarCollapsed(v => !v)}
+          title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {isSidebarCollapsed ? '▸ Topics' : '◂ Topics'}
+        </button>
         <div className="topbar-logo">
           <div className="topbar-logo-mark">∑</div>
           Concept Mapper

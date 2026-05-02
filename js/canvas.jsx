@@ -166,6 +166,43 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
     setT({ x: 60, y: 80, scale: 1 });
   }
 
+  function explodeLayout() {
+    if (!mapData.nodes.length) return;
+
+    const points = mapData.nodes.map((n) => {
+      const xy = nodeXY(n);
+      return { id: n.id, x: xy.x, y: xy.y };
+    });
+
+    const cx = points.reduce((acc, p) => acc + p.x, 0) / points.length;
+    const cy = points.reduce((acc, p) => acc + p.y, 0) / points.length;
+    const spread = 1.35;
+    const minRadius = 140;
+
+    const nextPos = { ...mapPositions };
+    points.forEach((p, idx) => {
+      const dx = p.x - cx;
+      const dy = p.y - cy;
+      const dist = Math.hypot(dx, dy);
+
+      let nx;
+      let ny;
+      if (dist < 1) {
+        const angle = (idx / Math.max(points.length, 1)) * Math.PI * 2;
+        nx = cx + Math.cos(angle) * minRadius;
+        ny = cy + Math.sin(angle) * minRadius;
+      } else {
+        const targetDist = Math.max(minRadius, dist * spread);
+        nx = cx + (dx / dist) * targetDist;
+        ny = cy + (dy / dist) * targetDist;
+      }
+
+      nextPos[p.id] = { x: nx, y: ny };
+    });
+
+    onPositions({ ...positions, [mapData.id]: nextPos });
+  }
+
   // Build node geometry map for edge routing
   const geom = {};
   mapData.nodes.forEach(n => {
@@ -197,6 +234,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
             <span style={{color: mapData.color, fontWeight: 700}}>{progressPct}%</span>
           </div>
           <button className="icon-btn" onClick={fitToScreen} title="Reset view">⌂</button>
+          <button className="icon-btn" onClick={explodeLayout} title="Spread nodes for readability">✦</button>
           <button
             className="icon-btn"
             onClick={() => {
@@ -318,7 +356,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
         <ZoomControl scale={t.scale} setScale={(fn) => setT(prev => ({...prev, scale: typeof fn === 'function' ? fn(prev.scale) : fn}))} fitToScreen={fitToScreen} />
 
         <div className="mini-help">
-          <strong>How to use:</strong> Click any glowing label to fill in the relationship. Drag nodes to rearrange. Use mouse wheel to pan, <kbd>⌘/Ctrl</kbd>+wheel to zoom.
+          <strong>How to use:</strong> Click any glowing label to fill in the relationship. Drag nodes to rearrange. Use mouse wheel to pan, <kbd>⌘/Ctrl</kbd>+wheel to zoom, and <kbd>✦</kbd> to spread nodes when labels overlap.
         </div>
       </div>
 
