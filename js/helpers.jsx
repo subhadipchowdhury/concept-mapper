@@ -1,5 +1,5 @@
 // Helpers and shared components
-// Exposes: MathNode, launchConfetti, AnswerPopup, useDrag
+// Exposes: MathNode, launchConfetti, AnswerPopup
 
 const { useState, useEffect, useRef, useCallback, useLayoutEffect } = React;
 

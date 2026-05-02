@@ -1,5 +1,5 @@
 // Concept Map Canvas — draggable nodes, pan, zoom, edge interaction
-// Exposes: ConceptMap, AdminCanvas
+// Exposes: ConceptMap
 
 const { useState: useState2, useEffect: useEffect2, useRef: useRef2, useCallback: useCallback2, useLayoutEffect: useLayoutEffect2 } = React;
 
@@ -166,77 +166,54 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
     setT({ x: 60, y: 80, scale: 1 });
   }
 
-  function explodeLayout() {
+  function spreadNodes() {
     if (!mapData.nodes.length) return;
-
     const points = mapData.nodes.map((n) => {
       const xy = nodeXY(n);
       return { id: n.id, x: xy.x, y: xy.y };
     });
-
     const cx = points.reduce((acc, p) => acc + p.x, 0) / points.length;
     const cy = points.reduce((acc, p) => acc + p.y, 0) / points.length;
-    const spread = 1.35;
-    const minRadius = 140;
-
+    const factor = 1.45;
+    const fallbackRadius = 200;
     const nextPos = { ...mapPositions };
-    points.forEach((p, idx) => {
+    points.forEach((p, i) => {
       const dx = p.x - cx;
       const dy = p.y - cy;
-      const dist = Math.hypot(dx, dy);
-
-      let nx;
-      let ny;
-      if (dist < 1) {
-        const angle = (idx / Math.max(points.length, 1)) * Math.PI * 2;
-        nx = cx + Math.cos(angle) * minRadius;
-        ny = cy + Math.sin(angle) * minRadius;
+      if (Math.hypot(dx, dy) < 1) {
+        const angle = (i / points.length) * Math.PI * 2;
+        nextPos[p.id] = { x: cx + Math.cos(angle) * fallbackRadius, y: cy + Math.sin(angle) * fallbackRadius };
       } else {
-        const targetDist = Math.max(minRadius, dist * spread);
-        nx = cx + (dx / dist) * targetDist;
-        ny = cy + (dy / dist) * targetDist;
+        nextPos[p.id] = { x: cx + dx * factor, y: cy + dy * factor };
       }
-
-      nextPos[p.id] = { x: nx, y: ny };
     });
-
     onPositions({ ...positions, [mapData.id]: nextPos });
   }
 
-  function compactLayout() {
+  function compactNodes() {
     if (!mapData.nodes.length) return;
-
     const points = mapData.nodes.map((n) => {
       const xy = nodeXY(n);
       return { id: n.id, x: xy.x, y: xy.y };
     });
-
     const cx = points.reduce((acc, p) => acc + p.x, 0) / points.length;
     const cy = points.reduce((acc, p) => acc + p.y, 0) / points.length;
-    const shrink = 0.78;
-    const minRadius = 90;
-
+    const factor = 0.68;
+    const minDist = 25;
+    const fallbackRadius = 25;
     const nextPos = { ...mapPositions };
-    points.forEach((p, idx) => {
+    points.forEach((p, i) => {
       const dx = p.x - cx;
       const dy = p.y - cy;
       const dist = Math.hypot(dx, dy);
-
-      let nx;
-      let ny;
       if (dist < 1) {
-        const angle = (idx / Math.max(points.length, 1)) * Math.PI * 2;
-        nx = cx + Math.cos(angle) * minRadius;
-        ny = cy + Math.sin(angle) * minRadius;
+        const angle = (i / points.length) * Math.PI * 2;
+        nextPos[p.id] = { x: cx + Math.cos(angle) * fallbackRadius, y: cy + Math.sin(angle) * fallbackRadius };
       } else {
-        const targetDist = Math.max(minRadius, dist * shrink);
-        nx = cx + (dx / dist) * targetDist;
-        ny = cy + (dy / dist) * targetDist;
+        const newDist = Math.max(minDist, dist * factor);
+        nextPos[p.id] = { x: cx + (dx / dist) * newDist, y: cy + (dy / dist) * newDist };
       }
-
-      nextPos[p.id] = { x: nx, y: ny };
     });
-
     onPositions({ ...positions, [mapData.id]: nextPos });
   }
 
@@ -277,8 +254,8 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
             <span style={{color: mapData.color, fontWeight: 700}}>{progressPct}%</span>
           </div>
           <button className="icon-btn" onClick={fitToScreen} title="Reset view">⌂</button>
-          <button className="icon-btn" onClick={explodeLayout} title="Spread nodes for readability">✦</button>
-          <button className="icon-btn" onClick={compactLayout} title="Pull nodes inward">⤢</button>
+          <button className="icon-btn" onClick={spreadNodes} title="Spread nodes apart">✦</button>
+          <button className="icon-btn" onClick={compactNodes} title="Pull nodes inward">⤢</button>
           <button className="icon-btn" onClick={resetLayout} title="Reset node layout to original map">⟲</button>
           <button
             className="icon-btn"
@@ -401,7 +378,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
         <ZoomControl scale={t.scale} setScale={(fn) => setT(prev => ({...prev, scale: typeof fn === 'function' ? fn(prev.scale) : fn}))} fitToScreen={fitToScreen} />
 
         <div className="mini-help">
-          <strong>How to use:</strong> Click any glowing label to fill in the relationship. Drag nodes to rearrange. Use mouse wheel to pan, <kbd>⌘/Ctrl</kbd>+wheel to zoom, <kbd>✦</kbd> to spread nodes, <kbd>⤢</kbd> to compact, and <kbd>⟲</kbd> to reset layout.
+          <strong>How to use:</strong> Click any glowing label to fill in the relationship. Drag nodes to rearrange. Use mouse wheel to pan, <kbd>⌘/Ctrl</kbd>+wheel to zoom, <kbd>✦</kbd> to spread nodes apart, <kbd>⤢</kbd> to pull them in, and <kbd>⟲</kbd> to reset layout.
         </div>
       </div>
 
