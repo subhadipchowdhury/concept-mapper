@@ -574,6 +574,20 @@ function MapsManager({
           {typeof onCreateSubject === 'function' && (
             <button className="btn btn-ghost btn-sm" onClick={createFolderFromPrompt}>New Subject Folder</button>
           )}
+          <button
+            className="btn btn-ghost btn-sm btn-danger-ghost"
+            onClick={() => {
+              const confirmed = window.confirm(
+                'Reset all local storage?\n\nThis will erase all saved progress, custom maps, and settings for every user on this device — just as if they were visiting for the first time.\n\nThis cannot be undone.'
+              );
+              if (confirmed) {
+                localStorage.clear();
+                window.location.reload();
+              }
+            }}
+          >
+            Reset Local Storage
+          </button>
         </div>
       </div>
       <div className="folder-sections">

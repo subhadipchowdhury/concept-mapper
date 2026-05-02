@@ -1017,6 +1017,8 @@ body {
   border: 1px solid var(--border);
 }
 .btn-ghost:hover { color: var(--text); background: var(--bg3); }
+.btn-danger-ghost { color: #f87171; border-color: #f8717155; }
+.btn-danger-ghost:hover { color: #fca5a5; background: #f8717118; }
 .btn-success { background: var(--accent-teal); color: #0a0c12; }
 
 .popup-feedback {
