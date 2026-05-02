@@ -1,0 +1,165 @@
+{
+  "id": "secondOrderLaplace",
+  "title": "Second-Order ODEs and Laplace Transform",
+  "description": "Homogeneous/nonhomogeneous linear ODEs, IVPs, and Laplace-based solving",
+  "color": "#3b82f6",
+  "accentColor": "#1d4ed8",
+  "subjectId": "differential-equations",
+  "subjectTitle": "Differential Equations",
+  "nodes": [
+    {
+      "id": "sode",
+      "label": "Second-Order Linear ODE\\n\\(ay''+by'+cy=g(t)\\)",
+      "x": 520,
+      "y": 70,
+      "color": "#3b82f6",
+      "isStart": true
+    },
+    {
+      "id": "hom",
+      "label": "Homogeneous Case\\n\\(g(t)=0\\)",
+      "x": 260,
+      "y": 220,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "char",
+      "label": "Characteristic Equation",
+      "x": 260,
+      "y": 370,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "roots",
+      "label": "Real / Repeated / Complex Roots",
+      "x": 260,
+      "y": 520,
+      "color": "#34d399"
+    },
+    {
+      "id": "nonhom",
+      "label": "Nonhomogeneous Case\\n\\(g(t)\\neq 0\\)",
+      "x": 780,
+      "y": 220,
+      "color": "#22c55e"
+    },
+    {
+      "id": "particular",
+      "label": "Particular Solution",
+      "x": 780,
+      "y": 370,
+      "color": "#22c55e"
+    },
+    {
+      "id": "general",
+      "label": "General Solution\\n\\(y=y_h+y_p\\)",
+      "x": 520,
+      "y": 520,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "ivp",
+      "label": "Second-Order IVP\\n\\(y(t_0), y'(t_0)\\)",
+      "x": 520,
+      "y": 670,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "laplace",
+      "label": "Laplace Transform",
+      "x": 780,
+      "y": 520,
+      "color": "#a78bfa"
+    },
+    {
+      "id": "inverse",
+      "label": "Inverse Laplace + Partial Fractions",
+      "x": 780,
+      "y": 670,
+      "color": "#a78bfa"
+    }
+  ],
+  "edges": [
+    {
+      "id": "so_e1",
+      "from": "sode",
+      "to": "hom",
+      "label": "setting forcing term g(t) to 0 gives the ___ equation",
+      "answer": "homogeneous",
+      "type": "fillin",
+      "hint": "No forcing term on the right side."
+    },
+    {
+      "id": "so_e2",
+      "from": "hom",
+      "to": "char",
+      "label": "try y=e^{rt} to get an algebraic ___ in r",
+      "answer": "equation",
+      "type": "fillin",
+      "hint": "Called the characteristic equation."
+    },
+    {
+      "id": "so_e3",
+      "from": "char",
+      "to": "roots",
+      "label": "solution form depends on the type of characteristic ___",
+      "answer": "roots",
+      "type": "fillin",
+      "hint": "real, repeated, or complex values of r."
+    },
+    {
+      "id": "so_e4",
+      "from": "sode",
+      "to": "nonhom",
+      "label": "if g(t) is not zero, equation is ___",
+      "answer": "nonhomogeneous",
+      "type": "fillin",
+      "hint": "Opposite of homogeneous."
+    },
+    {
+      "id": "so_e5",
+      "from": "nonhom",
+      "to": "particular",
+      "label": "need one specific solution called a ___ solution",
+      "answer": "particular",
+      "type": "fillin",
+      "hint": "Not the full family, one specific solution."
+    },
+    {
+      "id": "so_e6",
+      "from": "particular",
+      "to": "general",
+      "label": "full answer combines homogeneous and particular parts as y_h + ___",
+      "answer": "y_p",
+      "type": "fillin",
+      "hint": "Standard notation for particular piece."
+    },
+    {
+      "id": "so_e7",
+      "from": "general",
+      "to": "ivp",
+      "label": "two initial conditions determine the constants for a second-order ___",
+      "answer": "ivp",
+      "type": "fillin",
+      "hint": "Initial Value Problem abbreviation."
+    },
+    {
+      "id": "so_e8",
+      "from": "sode",
+      "to": "laplace",
+      "label": "transforming derivatives to algebraic terms in s uses the ___ transform",
+      "answer": "laplace",
+      "type": "fillin",
+      "hint": "Major method from Module 5 in the notes."
+    },
+    {
+      "id": "so_e9",
+      "from": "laplace",
+      "to": "inverse",
+      "label": "after solving in s-domain, apply ___ Laplace to return to time-domain",
+      "answer": "inverse",
+      "type": "fillin",
+      "hint": "The backward transform."
+    }
+  ]
+}

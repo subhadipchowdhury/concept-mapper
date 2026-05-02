@@ -1,0 +1,181 @@
+{
+  "id": "pdeHeatEquation",
+  "title": "PDEs and the Heat Equation",
+  "description": "Separation of variables, IBVPs, series solutions, and Fourier series",
+  "color": "#8b5cf6",
+  "accentColor": "#7c3aed",
+  "subjectId": "differential-equations",
+  "subjectTitle": "Differential Equations",
+  "nodes": [
+    {
+      "id": "pde",
+      "label": "Partial Differential Equation\\n(PDE)",
+      "x": 520,
+      "y": 70,
+      "color": "#8b5cf6",
+      "isStart": true
+    },
+    {
+      "id": "odevspde",
+      "label": "ODE vs PDE",
+      "x": 250,
+      "y": 70,
+      "color": "#8b5cf6"
+    },
+    {
+      "id": "heat",
+      "label": "Heat Equation\\n\\(u_t = k u_{xx}\\)",
+      "x": 780,
+      "y": 70,
+      "color": "#8b5cf6"
+    },
+    {
+      "id": "sov",
+      "label": "Separation of Variables\\n\\(u = X(x)T(t)\\)",
+      "x": 520,
+      "y": 240,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "ibvp",
+      "label": "Initial-Boundary Value Problem\\n(IBVP)",
+      "x": 780,
+      "y": 240,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "dirichlet",
+      "label": "Dirichlet Boundary Conditions",
+      "x": 980,
+      "y": 410,
+      "color": "#22c55e"
+    },
+    {
+      "id": "neumann",
+      "label": "Neumann Boundary Conditions",
+      "x": 780,
+      "y": 410,
+      "color": "#22c55e"
+    },
+    {
+      "id": "series",
+      "label": "Series Solutions",
+      "x": 520,
+      "y": 410,
+      "color": "#22c55e"
+    },
+    {
+      "id": "fourier",
+      "label": "Fourier Series",
+      "x": 320,
+      "y": 410,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "superposition",
+      "label": "Superposition Principle",
+      "x": 520,
+      "y": 580,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "final",
+      "label": "Final Heat-Equation Solution",
+      "x": 780,
+      "y": 580,
+      "color": "#f43f5e"
+    }
+  ],
+  "edges": [
+    {
+      "id": "pde_e1",
+      "from": "odevspde",
+      "to": "pde",
+      "label": "equations with partial derivatives are called ___",
+      "answer": "pdes",
+      "type": "fillin",
+      "hint": "Plural abbreviation used in the lecture notes."
+    },
+    {
+      "id": "pde_e2",
+      "from": "pde",
+      "to": "heat",
+      "label": "a key physical model in the notes is the ___ equation",
+      "answer": "heat",
+      "type": "fillin",
+      "hint": "Describes diffusion of temperature."
+    },
+    {
+      "id": "pde_e3",
+      "from": "heat",
+      "to": "sov",
+      "label": "a standard method is separation of ___",
+      "answer": "variables",
+      "type": "fillin",
+      "hint": "Assume u(x,t)=X(x)T(t)."
+    },
+    {
+      "id": "pde_e4",
+      "from": "sov",
+      "to": "ibvp",
+      "label": "to pin down constants, solve with initial and boundary data as an ___",
+      "answer": "ibvp",
+      "type": "fillin",
+      "hint": "Initial-Boundary Value Problem abbreviation."
+    },
+    {
+      "id": "pde_e5",
+      "from": "ibvp",
+      "to": "dirichlet",
+      "label": "fixed endpoint values correspond to ___ boundary conditions",
+      "answer": "dirichlet",
+      "type": "fillin",
+      "hint": "u(0,t) and u(L,t) specified."
+    },
+    {
+      "id": "pde_e6",
+      "from": "ibvp",
+      "to": "neumann",
+      "label": "specified endpoint flux/derivative gives ___ boundary conditions",
+      "answer": "neumann",
+      "type": "fillin",
+      "hint": "u_x at boundaries is prescribed."
+    },
+    {
+      "id": "pde_e7",
+      "from": "sov",
+      "to": "series",
+      "label": "combining product modes leads to ___ expansions",
+      "answer": "series",
+      "type": "fillin",
+      "hint": "Infinite sum of separated solutions."
+    },
+    {
+      "id": "pde_e8",
+      "from": "series",
+      "to": "fourier",
+      "label": "coefficients are determined using ___ series",
+      "answer": "fourier",
+      "type": "fillin",
+      "hint": "Sine/cosine basis expansion."
+    },
+    {
+      "id": "pde_e9",
+      "from": "fourier",
+      "to": "superposition",
+      "label": "linearity allows adding modes via the ___ principle",
+      "answer": "superposition",
+      "type": "fillin",
+      "hint": "If u1 and u2 solve linear PDE, so does c1u1+c2u2."
+    },
+    {
+      "id": "pde_e10",
+      "from": "superposition",
+      "to": "final",
+      "label": "mode sum with fitted coefficients yields the ___ solution",
+      "answer": "final",
+      "type": "fillin",
+      "hint": "Completed closed-form series expression for the IBVP."
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "id": "systemsFirstOrder",
+  "title": "Systems of First-Order ODEs",
+  "description": "Lotka-Volterra, phase plane, equilibria, and linear systems",
+  "color": "#0ea5e9",
+  "accentColor": "#0284c7",
+  "subjectId": "differential-equations",
+  "subjectTitle": "Differential Equations",
+  "nodes": [
+    {
+      "id": "system",
+      "label": "System of ODEs\\n\\(\\mathbf{x}' = F(t,\\mathbf{x})\\)",
+      "x": 520,
+      "y": 70,
+      "color": "#0ea5e9",
+      "isStart": true
+    },
+    {
+      "id": "lv",
+      "label": "Lotka-Volterra Model",
+      "x": 250,
+      "y": 220,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "phaseplane",
+      "label": "Phase Plane",
+      "x": 520,
+      "y": 220,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "nullclines",
+      "label": "Nullclines",
+      "x": 780,
+      "y": 220,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "equil",
+      "label": "Equilibrium Points",
+      "x": 780,
+      "y": 380,
+      "color": "#22c55e"
+    },
+    {
+      "id": "linear",
+      "label": "Linear System\\n\\(\\mathbf{x}' = A\\mathbf{x}\\)",
+      "x": 250,
+      "y": 380,
+      "color": "#22c55e"
+    },
+    {
+      "id": "eigs",
+      "label": "Eigenvalues and Eigenvectors",
+      "x": 250,
+      "y": 540,
+      "color": "#34d399"
+    },
+    {
+      "id": "stability",
+      "label": "Stability Classification",
+      "x": 520,
+      "y": 540,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "portraits",
+      "label": "Phase Portraits",
+      "x": 780,
+      "y": 540,
+      "color": "#f59e0b"
+    }
+  ],
+  "edges": [
+    {
+      "id": "sys_e1",
+      "from": "system",
+      "to": "phaseplane",
+      "label": "for two variables, trajectories are visualized in the phase ___",
+      "answer": "plane",
+      "type": "fillin",
+      "hint": "2D state-space diagram."
+    },
+    {
+      "id": "sys_e2",
+      "from": "system",
+      "to": "lv",
+      "label": "predator-prey interaction is modeled by the Lotka-___ system",
+      "answer": "volterra",
+      "type": "fillin",
+      "hint": "Named after two scientists."
+    },
+    {
+      "id": "sys_e3",
+      "from": "phaseplane",
+      "to": "nullclines",
+      "label": "curves where one component derivative equals zero are called ___",
+      "answer": "nullclines",
+      "type": "fillin",
+      "hint": "x' = 0 or y' = 0 curves."
+    },
+    {
+      "id": "sys_e4",
+      "from": "nullclines",
+      "to": "equil",
+      "label": "intersections of nullclines give ___ points",
+      "answer": "equilibrium",
+      "type": "fillin",
+      "hint": "steady states where all derivatives vanish."
+    },
+    {
+      "id": "sys_e5",
+      "from": "system",
+      "to": "linear",
+      "label": "constant-coefficient form x' = A x is a ___ system",
+      "answer": "linear",
+      "type": "fillin",
+      "hint": "Matrix A multiplies state vector x."
+    },
+    {
+      "id": "sys_e6",
+      "from": "linear",
+      "to": "eigs",
+      "label": "solution behavior is governed by matrix ___ values",
+      "answer": "eigen",
+      "type": "fillin",
+      "hint": "spectral data of A."
+    },
+    {
+      "id": "sys_e7",
+      "from": "eigs",
+      "to": "stability",
+      "label": "sign of real parts helps classify local ___",
+      "answer": "stability",
+      "type": "fillin",
+      "hint": "sink, source, saddle, center patterns."
+    },
+    {
+      "id": "sys_e8",
+      "from": "stability",
+      "to": "portraits",
+      "label": "qualitative behavior is summarized in phase ___",
+      "answer": "portraits",
+      "type": "fillin",
+      "hint": "global picture of trajectories."
+    }
+  ]
+}

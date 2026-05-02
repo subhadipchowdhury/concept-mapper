@@ -1,0 +1,165 @@
+{
+  "id": "firstOrderDE",
+  "title": "First-Order Differential Equations",
+  "description": "From modeling to separable, autonomous, and linear first-order ODEs",
+  "color": "#22c55e",
+  "accentColor": "#16a34a",
+  "subjectId": "differential-equations",
+  "subjectTitle": "Differential Equations",
+  "nodes": [
+    {
+      "id": "ode",
+      "label": "First-Order ODE\\n\\(y' = f(t,y)\\)",
+      "x": 500,
+      "y": 70,
+      "color": "#22c55e",
+      "isStart": true
+    },
+    {
+      "id": "modeling",
+      "label": "Mathematical Modeling",
+      "x": 240,
+      "y": 70,
+      "color": "#22c55e"
+    },
+    {
+      "id": "ivp",
+      "label": "Initial Value Problem\\n\\(y(t_0)=y_0\\)",
+      "x": 760,
+      "y": 70,
+      "color": "#22c55e"
+    },
+    {
+      "id": "existuniq",
+      "label": "Existence and Uniqueness",
+      "x": 760,
+      "y": 230,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "autonomous",
+      "label": "Autonomous ODE\\n\\(y' = g(y)\\)",
+      "x": 240,
+      "y": 230,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "phase",
+      "label": "Phase Line and Equilibria",
+      "x": 240,
+      "y": 390,
+      "color": "#06b6d4"
+    },
+    {
+      "id": "separable",
+      "label": "Separable Equations",
+      "x": 500,
+      "y": 230,
+      "color": "#34d399"
+    },
+    {
+      "id": "linear",
+      "label": "Linear First-Order ODE\\n\\(y'+p(t)y=q(t)\\)",
+      "x": 760,
+      "y": 390,
+      "color": "#34d399"
+    },
+    {
+      "id": "ifactor",
+      "label": "Integrating Factor\\n\\(\\mu(t)=e^{\\int p(t)dt}\\)",
+      "x": 760,
+      "y": 550,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "logistic",
+      "label": "Logistic Model\\n\\(P' = rP(1-P/K)\\)",
+      "x": 500,
+      "y": 550,
+      "color": "#f59e0b"
+    }
+  ],
+  "edges": [
+    {
+      "id": "fo_e1",
+      "from": "modeling",
+      "to": "ode",
+      "label": "time-dependent systems are often represented by a differential ___",
+      "answer": "equation",
+      "type": "fillin",
+      "hint": "The central object in this course is the differential ___."
+    },
+    {
+      "id": "fo_e2",
+      "from": "ode",
+      "to": "ivp",
+      "label": "adding an initial condition defines an ___ value problem",
+      "answer": "initial",
+      "type": "fillin",
+      "hint": "IVP stands for this."
+    },
+    {
+      "id": "fo_e3",
+      "from": "ivp",
+      "to": "existuniq",
+      "label": "continuity and regularity assumptions help guarantee ___ and uniqueness",
+      "answer": "existence",
+      "type": "fillin",
+      "hint": "The theorem name has two parts: ___ and uniqueness."
+    },
+    {
+      "id": "fo_e4",
+      "from": "ode",
+      "to": "autonomous",
+      "label": "if right-hand side depends only on y, the ODE is called ___",
+      "answer": "autonomous",
+      "type": "fillin",
+      "hint": "No explicit time variable appears on the right side."
+    },
+    {
+      "id": "fo_e5",
+      "from": "autonomous",
+      "to": "phase",
+      "label": "equilibrium points and sign of y' are read on a phase ___",
+      "answer": "line",
+      "type": "fillin",
+      "hint": "1D qualitative diagram for autonomous equations."
+    },
+    {
+      "id": "fo_e6",
+      "from": "ode",
+      "to": "separable",
+      "label": "can be rewritten as A(y)dy = B(t)dt means equation is ___",
+      "answer": "separable",
+      "type": "fillin",
+      "hint": "Variables can be separated to opposite sides."
+    },
+    {
+      "id": "fo_e7",
+      "from": "ode",
+      "to": "linear",
+      "label": "standard first-order linear form is y' + p(t)y = ___",
+      "answer": "q(t)",
+      "type": "fillin",
+      "hint": "Right side is usually denoted by q(t)."
+    },
+    {
+      "id": "fo_e8",
+      "from": "linear",
+      "to": "ifactor",
+      "label": "multiply by mu(t) to solve linear ODE; mu is called integrating ___",
+      "answer": "factor",
+      "type": "fillin",
+      "hint": "integrating ___."
+    },
+    {
+      "id": "fo_e9",
+      "from": "autonomous",
+      "to": "logistic",
+      "label": "population model with carrying capacity K is the ___ model",
+      "answer": "logistic",
+      "type": "fillin",
+      "hint": "Classic nonlinear growth-with-capacity model."
+    }
+  ]
+}

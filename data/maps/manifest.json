@@ -19,5 +19,33 @@
     "file": "data/maps/funcSequences.json",
     "subjectId": "real-analysis",
     "subjectTitle": "Real Analysis"
+  },
+  {
+    "id": "firstOrderDE",
+    "title": "First-Order Differential Equations",
+    "file": "data/maps/firstOrderDE.json",
+    "subjectId": "differential-equations",
+    "subjectTitle": "Differential Equations"
+  },
+  {
+    "id": "secondOrderLaplace",
+    "title": "Second-Order ODEs and Laplace Transform",
+    "file": "data/maps/secondOrderLaplace.json",
+    "subjectId": "differential-equations",
+    "subjectTitle": "Differential Equations"
+  },
+  {
+    "id": "systemsFirstOrder",
+    "title": "Systems of First-Order ODEs",
+    "file": "data/maps/systemsFirstOrder.json",
+    "subjectId": "differential-equations",
+    "subjectTitle": "Differential Equations"
+  },
+  {
+    "id": "pdeHeatEquation",
+    "title": "PDEs and the Heat Equation",
+    "file": "data/maps/pdeHeatEquation.json",
+    "subjectId": "differential-equations",
+    "subjectTitle": "Differential Equations"
   }
 ]
