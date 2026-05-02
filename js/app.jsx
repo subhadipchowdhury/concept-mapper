@@ -1024,7 +1024,7 @@ function App() {
             <div>Reading the map list and opening each topic file.</div>
           </div>
         )}
-        {!mapsLoading && mapsLoadError && (
+        {!mapsLoading && mapsLoadError && view === 'student' && !mapData && (
           <div className="empty-canvas-hint">
             <div className="empty-canvas-hint-title">Some maps could not be loaded</div>
             <div>{mapsLoadError}</div>
