@@ -175,6 +175,18 @@ body {
   background: var(--bg3);
 }
 
+.sidebar-progress-summary {
+  padding: 8px 24px;
+  font-size: 12px;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+  text-align: center;
+  background: var(--bg3);
+  font-weight: 500;
+}
+
 .sidebar-folder-title {
   width: 100%;
   display: flex;
@@ -255,6 +267,25 @@ body {
     radial-gradient(circle at 85% 75%, rgba(52,211,153,0.06) 0%, transparent 40%),
     radial-gradient(circle at 50% 50%, rgba(167,139,250,0.04) 0%, transparent 50%),
     var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.student-view-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.breadcrumb {
+  padding: 12px 24px;
+  font-size: 13px;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg3);
+  flex-shrink: 0;
 }
 
 .map-area::before {

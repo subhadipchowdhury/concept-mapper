@@ -337,6 +337,22 @@ function App() {
     return allProgress[mapId];
   }
 
+  function getCompletedMapCount() {
+    return studentSections.reduce((count, section) => {
+      const completedInSection = section.maps.filter(m => {
+        const prog = getProgress(m.id);
+        const done = (prog.answeredEdges || new Set()).size;
+        const total = m.edges.length;
+        return total > 0 && done === total;
+      }).length;
+      return count + completedInSection;
+    }, 0);
+  }
+
+  function getTotalMapCount() {
+    return studentSections.reduce((count, section) => count + section.maps.length, 0);
+  }
+
   function handleProgress(mapId, prog) {
     const updated = { ...allProgress, [mapId]: prog };
     setAllProgress(updated);
@@ -714,7 +730,6 @@ function App() {
           <div className="topbar-logo-mark">∑</div>
           Concept Mapper
         </div>
-        <div className="topbar-sub">Math 163 · Real Analysis</div>
         <div className="topbar-spacer"></div>
         {view === 'student' && (
           <>
@@ -754,6 +769,11 @@ function App() {
             <button type="button" className="sidebar-folder-control-btn" onClick={expandAllFolders}>Expand all</button>
           </div>
         </div>
+        {studentSections.length > 0 && (
+          <div className="sidebar-progress-summary">
+            {getCompletedMapCount()}/{getTotalMapCount()} maps complete
+          </div>
+        )}
         {studentSections.map((section) => (
           <React.Fragment key={section.id}>
             <button
@@ -762,7 +782,7 @@ function App() {
               onClick={() => toggleFolder(section.id)}
               aria-expanded={!collapsedFolders[section.id]}
             >
-              <span>{section.title}</span>
+              <span>{section.title} ({section.maps.length})</span>
               <span className={`sidebar-folder-caret ${collapsedFolders[section.id] ? 'collapsed' : ''}`}>▾</span>
             </button>
             {!collapsedFolders[section.id] && section.maps.map((m) => {
@@ -839,14 +859,21 @@ function App() {
           </div>
         )}
         {view === 'student' && mapData && (
-          <ConceptMap
-            key={activeMapId}
-            mapData={mapData}
-            progress={getProgress(activeMapId)}
-            onProgress={(p) => handleProgress(activeMapId, p)}
-            positions={positions}
-            onPositions={handlePositions}
-          />
+          <div className="student-view-wrapper">
+            {activeMapId && (
+              <div className="breadcrumb">
+                {studentSections.find(s => s.maps.some(m => m.id === activeMapId))?.title || 'Maps'} › {mapData.title}
+              </div>
+            )}
+            <ConceptMap
+              key={activeMapId}
+              mapData={mapData}
+              progress={getProgress(activeMapId)}
+              onProgress={(p) => handleProgress(activeMapId, p)}
+              positions={positions}
+              onPositions={handlePositions}
+            />
+          </div>
         )}
         {view === 'admin' && (
           <MapsManager
