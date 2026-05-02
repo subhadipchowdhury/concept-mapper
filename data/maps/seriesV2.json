@@ -167,29 +167,29 @@
       "id": "r_e1",
       "from": "seq",
       "to": "series",
-      "label": "a series \\(\\sum a_n\\) is built by formally \\_\\_\\_ all terms of \\(\\{a_n\\}\\)",
-      "answer": "adding",
+      "label": "concept check: \\(\\sum a_n\\) is an \\_\\_\\_ infinite sum of sequence terms",
+      "answer": "ordered",
       "type": "dropdown",
       "options": [
-        "adding",
-        "multiplying",
-        "dividing",
-        "composing"
+        "ordered",
+        "unordered",
+        "finite",
+        "pairwise"
       ],
-      "hint": "The Σ symbol indicates this operation."
+      "hint": "Index order matters because convergence is defined via ordered partial sums."
     },
     {
       "id": "r_e2",
       "from": "series",
       "to": "partial",
-      "label": "for \\(s_n=\\sum_{k=1}^n a_k\\), the object \\(s_n\\) is the \\_\\_\\_ sum",
-      "answer": "partial",
+      "label": "for \\(s_n=\\sum_{k=1}^n a_k\\), truncation happens at a \\_\\_\\_ index",
+      "answer": "finite",
       "type": "dropdown",
       "options": [
-        "partial",
-        "total",
-        "terminal",
-        "signed"
+        "finite",
+        "infinite",
+        "negative",
+        "complex"
       ],
       "hint": "You stop at a finite cutoff index \\(n\\), not at infinity."
     },
@@ -257,14 +257,14 @@
       "id": "r_e7",
       "from": "conv",
       "to": "geom",
-      "label": "\\(\\sum ar^n\\) converges precisely when \\(|r|\\) \\_\\_\\_ \\(1\\)",
-      "answer": "<",
+      "label": "for geometric series, convergence occurs exactly when \\(|r|\\) lies \\_\\_\\_ the unit threshold",
+      "answer": "strictly below",
       "type": "dropdown",
       "options": [
-        "<",
-        "≤",
-        "=",
-        ">"
+        "strictly below",
+        "at or below",
+        "at",
+        "above"
       ],
       "hint": "Strict inequality matters here."
     },
@@ -287,14 +287,14 @@
       "id": "r_e9",
       "from": "harmonic",
       "to": "pseries",
-      "label": "\\(\\sum 1/n^p\\) converges \\(\\iff\\) \\(p\\) \\_\\_\\_ \\(1\\)",
-      "answer": ">",
+      "label": "p-series threshold: convergence starts only once \\(p\\) is \\_\\_\\_ 1",
+      "answer": "strictly above",
       "type": "dropdown",
       "options": [
-        "<",
-        "≤",
-        "=",
-        ">"
+        "strictly above",
+        "at or above",
+        "equal to",
+        "below"
       ],
       "hint": "Harmonic (\\(p=1\\)) is the boundary case — diverges."
     },
@@ -332,14 +332,14 @@
       "id": "r_e12",
       "from": "integral",
       "to": "pseries",
-      "label": "\\(\\int_1^\\infty x^{-p}\\,dx\\) converges precisely when \\(p\\) \\_\\_\\_ \\(1\\)",
-      "answer": ">",
+      "label": "integral criterion for \\(x^{-p}\\): finite area on \\([1,\\infty)\\) appears when \\(p\\) is \\_\\_\\_ 1",
+      "answer": "strictly above",
       "type": "dropdown",
       "options": [
-        "<",
-        "≤",
-        "=",
-        ">"
+        "strictly above",
+        "at or above",
+        "equal to",
+        "below"
       ],
       "hint": "The improper integral is finite iff the exponent makes the antiderivative tend to a constant."
     },
@@ -407,14 +407,14 @@
       "id": "r_e17",
       "from": "series",
       "to": "alt",
-      "label": "a \\((-1)^n\\) factor makes the signs \\_\\_\\_ each term",
-      "answer": "flip",
+      "label": "a \\((-1)^n\\) factor enforces sign \\_\\_\\_ across successive terms",
+      "answer": "alternation",
       "type": "dropdown",
       "options": [
-        "repeat",
-        "flip",
-        "cancel",
-        "vanish"
+        "alternation",
+        "constancy",
+        "positivity",
+        "monotonicity"
       ],
       "hint": "\\(+, -, +, -, \\ldots\\) — the signs ___ at each step."
     },
@@ -422,9 +422,15 @@
       "id": "r_e18",
       "from": "alt",
       "to": "leibniz",
-      "label": "Leibniz precision: it is enough that \\(b_n\\) is eventually decreasing and \\(b_n \\to\\) \\_\\_\\_",
-      "answer": "0",
-      "type": "fillin",
+      "label": "Leibniz precision: eventual decrease plus \\(b_n\\) \\_\\_\\_ is sufficient for convergence",
+      "answer": "vanishing",
+      "type": "dropdown",
+      "options": [
+        "vanishing",
+        "bounded away from 0",
+        "eventually increasing",
+        "periodic"
+      ],
       "hint": "A finite number of early exceptions does not affect convergence."
     },
     {
@@ -446,14 +452,14 @@
       "id": "r_e20",
       "from": "abs",
       "to": "abstest",
-      "label": "test-setup step: absolute convergence means apply tests to \\(\\sum\\) \\_\\_\\_",
-      "answer": "|a_n|",
+      "label": "test-setup step: absolute-convergence checks are run on term \\_\\_\\_",
+      "answer": "magnitudes",
       "type": "dropdown",
       "options": [
-        "|a_n|",
-        "a_n^2",
-        "1/a_n",
-        "(-1)^n a_n"
+        "magnitudes",
+        "signs",
+        "differences",
+        "subsequences"
       ],
       "hint": "Replace each term by its magnitude before applying ratio/root/comparison tools."
     },
@@ -461,14 +467,14 @@
       "id": "r_e21",
       "from": "abstest",
       "to": "cond",
-      "label": "a series that converges but \\(\\sum |a_n|\\) does NOT — is called \\_\\_\\_ convergent",
-      "answer": "conditional",
+      "label": "if \\(\\sum a_n\\) converges but \\(\\sum |a_n|\\) diverges, convergence relies on sign \\_\\_\\_",
+      "answer": "cancellation",
       "type": "dropdown",
       "options": [
-        "conditional",
-        "absolute",
-        "geometric",
-        "uniform"
+        "cancellation",
+        "monotonicity",
+        "factorials",
+        "bounded denominator"
       ],
       "hint": "The convergence depends on cancellation between positive and negative terms."
     },
@@ -530,14 +536,14 @@
       "id": "r_e26",
       "from": "root",
       "to": "limcmp",
-      "label": "strategy with concrete form: for \\(a_n=\\frac{n}{n^2+3}\\), ratio/root are boundary-inconclusive; compare with \\(1/n\\) using \\_\\_\\_",
-      "answer": "limit comparison",
+      "label": "for \\(a_n=\\frac{n}{n^2+3}\\), comparing with \\(b_n=1/n\\) gives a limit in \\_\\_\\_",
+      "answer": "(0,∞)",
       "type": "dropdown",
       "options": [
-        "limit comparison",
-        "term test only",
-        "declare divergence immediately",
-        "declare absolute convergence immediately"
+        "(0,∞)",
+        "{0}",
+        "{\\infty}",
+        "no limit"
       ],
       "hint": "At boundary-inconclusive cases, switch to an asymptotic benchmark test."
     },
@@ -545,14 +551,14 @@
       "id": "r_e27",
       "from": "pseries",
       "to": "ratio",
-      "label": "test-selection: for \\(a_n=\\frac{n!}{3^n}\\), the most direct first test is the \\_\\_\\_ test",
-      "answer": "ratio",
+      "label": "for \\(a_n=\\frac{n!}{3^n}\\), the natural first move is to study consecutive-term \\_\\_\\_",
+      "answer": "quotients",
       "type": "dropdown",
       "options": [
-        "ratio",
-        "integral",
-        "limit comparison",
-        "alternating"
+        "quotients",
+        "integrals",
+        "subsequences",
+        "Fourier coefficients"
       ],
       "hint": "Factorials/exponentials are typically handled quickest by consecutive-term ratios."
     },
@@ -605,14 +611,14 @@
       "id": "r_e31",
       "from": "ratio",
       "to": "integral",
-      "label": "strategy step: if ratio/root gives boundary value \\(1\\) for \\(a_n=1/n^p\\), the strongest next test among these is \\_\\_\\_",
-      "answer": "integral",
+      "label": "for \\(a_n=1/n^p\\), the decisive threshold says convergence exactly when \\(p\\) is \\_\\_\\_ 1",
+      "answer": "strictly above",
       "type": "dropdown",
       "options": [
-        "integral",
-        "term test",
-        "alternating",
-        "root again"
+        "strictly above",
+        "at or above",
+        "equal to",
+        "below"
       ],
       "hint": "For positive monotone reciprocal-power forms, integral test gives the threshold \\(p>1\\)."
     },
@@ -620,14 +626,14 @@
       "id": "r_e32",
       "from": "divtest",
       "to": "directcmp",
-      "label": "method distinction: proving \\(\\sum 1\\) diverges because terms do not go to 0 uses the \\_\\_\\_",
-      "answer": "divergence test",
+      "label": "for \\(\\sum 1\\), the necessary condition \\(a_n\\to 0\\) is \\_\\_\\_",
+      "answer": "violated",
       "type": "dropdown",
       "options": [
-        "divergence test",
-        "direct comparison test",
-        "ratio test",
-        "integral test"
+        "violated",
+        "satisfied",
+        "irrelevant",
+        "equivalent to boundedness"
       ],
       "hint": "This conclusion comes before any comparison: necessary condition fails immediately."
     },
@@ -665,14 +671,14 @@
       "id": "r_e35",
       "from": "alt",
       "to": "abs",
-      "label": "capstone workflow: for \\(\\sum (-1)^n n/2^n\\), the strongest shortest route is to test \\(\\sum |a_n|\\) by ratio/root, conclude \\_\\_\\_",
-      "answer": "absolute convergence",
+      "label": "for \\(\\sum (-1)^n n/2^n\\), applying ratio/root to \\(\\sum |a_n|\\) gives boundary constant \\_\\_\\_",
+      "answer": "1/2",
       "type": "dropdown",
       "options": [
-        "absolute convergence",
-        "conditional convergence",
-        "divergence by term test",
-        "inconclusive"
+        "0",
+        "1/2",
+        "1",
+        "2"
       ],
       "hint": "Exponential denominator dominates polynomial numerator, so magnitude series converges."
     }
