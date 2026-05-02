@@ -55,21 +55,23 @@ function usePanZoom(initial = { x: 60, y: 80, scale: 1 }) {
   useEffect2(() => { tRef.current = t; }, [t]);
 
   const onWheel = useCallback2((e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
     if (!e.ctrlKey && !e.metaKey) {
       // pan with wheel
       setT(prev => ({ ...prev, x: prev.x - e.deltaX, y: prev.y - e.deltaY }));
       e.preventDefault();
     } else {
       e.preventDefault();
-      const delta = -e.deltaY * 0.0015;
+      const zoomFactor = Math.exp(-e.deltaY * 0.0015);
       setT(prev => {
-        const newScale = Math.max(0.4, Math.min(2.5, prev.scale * (1 + delta)));
+        const baseScale = Number.isFinite(prev.scale) && prev.scale > 0 ? prev.scale : 1;
+        const newScale = Math.max(0.4, Math.min(2.5, baseScale * zoomFactor));
         // zoom around mouse
-        const rect = e.currentTarget.getBoundingClientRect();
-        const mx = e.clientX - rect.left;
-        const my = e.clientY - rect.top;
-        const wx = (mx - prev.x) / prev.scale;
-        const wy = (my - prev.y) / prev.scale;
+        const wx = (mx - prev.x) / baseScale;
+        const wy = (my - prev.y) / baseScale;
         return {
           x: mx - wx * newScale,
           y: my - wy * newScale,
