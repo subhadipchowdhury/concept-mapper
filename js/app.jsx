@@ -34,6 +34,28 @@ function arraysEqual(a, b) {
   return true;
 }
 
+function normalizeForCompare(value) {
+  if (Array.isArray(value)) return value.map(normalizeForCompare);
+  if (value && typeof value === 'object') {
+    const ignore = new Set(['updatedAt', 'exportedBy']);
+    const out = {};
+    Object.keys(value).sort().forEach((k) => {
+      if (ignore.has(k)) return;
+      out[k] = normalizeForCompare(value[k]);
+    });
+    return out;
+  }
+  return value;
+}
+
+function mapsEquivalent(a, b) {
+  try {
+    return JSON.stringify(normalizeForCompare(a)) === JSON.stringify(normalizeForCompare(b));
+  } catch {
+    return false;
+  }
+}
+
 function buildOrderedIds(preferredOrder, mapsObj) {
   const ids = [];
   const seen = new Set();
@@ -69,8 +91,11 @@ function App() {
   const [mapOrder, setMapOrder] = useStateApp(() => loadMapOrder());
   const [manifestOrder, setManifestOrder] = useStateApp([]);
   const [positions, setPositions] = useStateApp(() => loadPositions());
+  const [toast, setToast] = useStateApp(null);
   const [isAdminUnlocked, setIsAdminUnlocked] = useStateApp(() => sessionStorage.getItem(ADMIN_UNLOCK_KEY) === '1');
   const importInputRef = useRefApp(null);
+  const importCustomMapInputRef = useRefApp(null);
+  const toastTimerRef = useRefApp(null);
 
   const studentMaps = { ...builtInMaps };
   const adminMaps = { ...builtInMaps, ...customMaps };
@@ -107,6 +132,33 @@ function App() {
       saveMapOrder(nextOrder);
     }
   }, [builtInMaps, customMaps, manifestOrder, mapOrder]);
+
+  useEffectApp(() => () => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+  }, []);
+
+  function showToast(message, type = 'info', durationMs = 2600) {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToast({ message, type });
+    toastTimerRef.current = setTimeout(() => {
+      setToast(null);
+      toastTimerRef.current = null;
+    }, durationMs);
+  }
+
+  useEffectApp(() => {
+    const staleCustomIds = Object.keys(customMaps).filter((id) => (
+      builtInMaps[id] && mapsEquivalent(customMaps[id], builtInMaps[id])
+    ));
+    if (staleCustomIds.length === 0) return;
+
+    const next = { ...customMaps };
+    staleCustomIds.forEach((id) => {
+      delete next[id];
+    });
+    setCustomMaps(next);
+    saveCustomMaps(next);
+  }, [builtInMaps, customMaps]);
 
   function getProgress(mapId) {
     if (!allProgress[mapId]) return { answeredEdges: new Set() };
@@ -174,6 +226,51 @@ function App() {
 
   function handleAdminMapChange(updatedMap) {
     handleSaveCustomMap(updatedMap.id, updatedMap);
+  }
+
+  function triggerImportCustomMap() {
+    if (importCustomMapInputRef.current) importCustomMapInputRef.current.click();
+  }
+
+  function isValidMapPayload(map) {
+    return !!(
+      map &&
+      typeof map === 'object' &&
+      typeof map.id === 'string' &&
+      typeof map.title === 'string' &&
+      typeof map.description === 'string' &&
+      Array.isArray(map.nodes) &&
+      Array.isArray(map.edges)
+    );
+  }
+
+  function handleImportCustomMap(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result);
+        if (!isValidMapPayload(parsed)) {
+          throw new Error('Invalid map JSON');
+        }
+
+        if (builtInMaps[parsed.id]) {
+          const ok = confirm('This ID matches a built-in map. Import as a local override?');
+          if (!ok) return;
+        }
+
+        handleSaveCustomMap(parsed.id, parsed);
+        setEditingMapId(parsed.id);
+        setView('admin-edit');
+        showToast(`Imported map "${parsed.title}".`, 'success');
+      } catch {
+        showToast('Could not import map. Please choose a valid map JSON file.', 'error');
+      }
+    };
+    reader.readAsText(file);
   }
 
   function handleDeleteCustomMap(mapId) {
@@ -269,9 +366,9 @@ function App() {
         setPositions(importedPositions);
         savePositions(importedPositions);
 
-        alert('Progress imported successfully.');
+        showToast('Progress imported successfully.', 'success');
       } catch {
-        alert('Could not import file. Please choose a valid Concept Mapper export JSON file.');
+        showToast('Could not import file. Please choose a valid Concept Mapper export JSON file.', 'error');
       }
     };
     reader.readAsText(file);
@@ -385,6 +482,11 @@ function App() {
       </aside>
 
       <main className="map-area">
+        {toast && (
+          <div className={`app-toast ${toast.type || 'info'}`}>
+            {toast.message}
+          </div>
+        )}
         {mapsLoading && (
           <div className="empty-canvas-hint">
             <div className="empty-canvas-hint-title">Loading maps...</div>
@@ -414,9 +516,9 @@ function App() {
             customMaps={customMaps}
             onEdit={handleEditMap}
             onCreate={handleCreateNewMap}
-            onDeleteCustom={handleDeleteCustomMap}
             onExportMap={handleExportMapJSON}
             onReorderMap={handleReorderMaps}
+            onImportMap={triggerImportCustomMap}
           />
         )}
         {view === 'admin-edit' && editingMap && (
@@ -429,6 +531,13 @@ function App() {
             onExport={handleExportMapJSON}
           />
         )}
+        <input
+          ref={importCustomMapInputRef}
+          type="file"
+          accept="application/json,.json"
+          style={{ display: 'none' }}
+          onChange={handleImportCustomMap}
+        />
       </main>
     </div>
   );

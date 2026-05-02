@@ -435,7 +435,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport }) {
 }
 
 // ─── MapsManager: list + create ───────────────────────────────────────────────
-function MapsManager({ allMaps, orderedMapIds, customMaps, onEdit, onCreate, onDeleteCustom, onExportMap, onReorderMap }) {
+function MapsManager({ allMaps, orderedMapIds, customMaps, onEdit, onCreate, onExportMap, onReorderMap, onImportMap }) {
   const [draggedId, setDraggedId] = useStateA(null);
   const [dragOverId, setDragOverId] = useStateA(null);
   const displayOrder = (Array.isArray(orderedMapIds) ? orderedMapIds : Object.keys(allMaps))
@@ -447,6 +447,9 @@ function MapsManager({ allMaps, orderedMapIds, customMaps, onEdit, onCreate, onD
         <div>
           <div className="maps-manager-title">Admin · Concept Maps</div>
           <div className="maps-manager-sub">Create and edit chapter maps with the visual builder. Drag cards here to reorder the left sidebar. Exported files should replace data/maps/{`{mapId}`}.json in the repo.</div>
+        </div>
+        <div>
+          <button className="btn btn-ghost btn-sm" onClick={onImportMap}>Import JSON</button>
         </div>
       </div>
       <div className="maps-grid">
@@ -506,7 +509,7 @@ function MapsManager({ allMaps, orderedMapIds, customMaps, onEdit, onCreate, onD
               <div className="maps-grid-card-stats">
                 <div className="maps-grid-card-stat"><span>{m.nodes.length}</span> nodes</div>
                 <div className="maps-grid-card-stat"><span>{m.edges.length}</span> edges</div>
-                {isCustom && <div className="maps-grid-card-stat" style={{color: 'var(--accent-amber)'}}>● custom</div>}
+                {isCustom && <div className="maps-grid-card-stat" style={{color: 'var(--accent-amber)'}}>● local map</div>}
               </div>
               {isCustom && (
                 <div className="maps-grid-card-actions">
@@ -521,16 +524,6 @@ function MapsManager({ allMaps, orderedMapIds, customMaps, onEdit, onCreate, onD
                       Export JSON
                     </button>
                   )}
-                  <button
-                    className="btn btn-ghost btn-sm"
-                    style={{ color: 'var(--accent-rose)' }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (typeof onDeleteCustom === 'function') onDeleteCustom(m.id);
-                    }}
-                  >
-                    Delete
-                  </button>
                 </div>
               )}
             </div>
