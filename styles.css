@@ -677,6 +677,32 @@ body {
 .popup-input:focus, .popup-select:focus { border-color: var(--accent-amber); background: var(--bg4); }
 .popup-input.correct { border-color: var(--accent-teal); background: rgba(52,211,153,0.08); }
 .popup-input.wrong { border-color: var(--accent-rose); background: rgba(251,113,133,0.08); animation: shake 0.4s; }
+
+.math-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: -4px 0 12px;
+}
+
+.math-token-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 9px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.math-token-btn:hover {
+  border-color: var(--accent-amber);
+  color: var(--text);
+  background: var(--bg4);
+}
 @keyframes shake {
   0%,100% { transform: translateX(0); }
   25% { transform: translateX(-6px); }

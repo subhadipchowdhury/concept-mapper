@@ -180,6 +180,35 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
 
   const canRevealHint = attempts >= 2 && edge.hint;
   const displayLabel = (edge.label || '').replace(/(?:\\_){2,}/g, (m) => '_'.repeat(m.length / 2));
+  const expectsMathAnswer = edge.type === 'fillin' && /sqrt|\\\\sqrt|√|ε|≤|≥|[<>=+\-*/^()\[\]{}]|\d|^[a-z]$|^[A-Z]$/i.test(edge.answer || '');
+  const answerVars = Array.from(new Set(String(edge.answer || '').match(/[a-zA-Z]/g) || [])).slice(0, 4);
+  const mathPaletteTokens = ['√()', 'ε', '≤', '≥', '<', '>', '=', '+', '-', '/', '^', '(', ')', ...answerVars];
+
+  function insertMathToken(token) {
+    const el = inputRef.current;
+    const current = value || '';
+    const start = el && Number.isFinite(el.selectionStart) ? el.selectionStart : current.length;
+    const end = el && Number.isFinite(el.selectionEnd) ? el.selectionEnd : start;
+
+    let insert = token;
+    let cursorBack = 0;
+    if (token === '√()') {
+      insert = '√()';
+      cursorBack = 1; // place cursor inside parentheses
+    }
+
+    const next = current.slice(0, start) + insert + current.slice(end);
+    setValue(next);
+    if (feedback === 'wrong') setFeedback(null);
+
+    requestAnimationFrame(() => {
+      const inputEl = inputRef.current;
+      if (!inputEl) return;
+      inputEl.focus();
+      const pos = start + insert.length - cursorBack;
+      inputEl.setSelectionRange(pos, pos);
+    });
+  }
 
   return (
     <div className="answer-popup" onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}>
@@ -218,17 +247,33 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
         </div>
 
         {edge.type === 'fillin' ? (
-          <input
-            ref={inputRef}
-            className={`popup-input ${feedback === 'correct' ? 'correct' : feedback === 'wrong' ? 'wrong' : ''}`}
-            type="text"
-            placeholder="Type your answer…"
-            value={value}
-            onChange={e => { setValue(e.target.value); if (feedback === 'wrong') setFeedback(null); }}
-            onKeyDown={handleKey}
-            autoComplete="off"
-            spellCheck="false"
-          />
+          <>
+            <input
+              ref={inputRef}
+              className={`popup-input ${feedback === 'correct' ? 'correct' : feedback === 'wrong' ? 'wrong' : ''}`}
+              type="text"
+              placeholder="Type your answer…"
+              value={value}
+              onChange={e => { setValue(e.target.value); if (feedback === 'wrong') setFeedback(null); }}
+              onKeyDown={handleKey}
+              autoComplete="off"
+              spellCheck="false"
+            />
+            {expectsMathAnswer && (
+              <div className="math-palette" aria-label="Math palette">
+                {mathPaletteTokens.map((token) => (
+                  <button
+                    key={token}
+                    type="button"
+                    className="math-token-btn"
+                    onClick={() => insertMathToken(token)}
+                  >
+                    {token}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
         ) : (
           <select
             className="popup-select"
