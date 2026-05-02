@@ -686,21 +686,29 @@ function App() {
     if (view.startsWith('admin')) setView('student');
   }
 
-  // Export student progress + positions as a portable JSON backup.
+  // Export student progress + positions for the current map as a portable JSON backup.
   function exportStudentData() {
+    if (!activeMapId || !mapData) return;
+    const mapProgress = allProgress[activeMapId]
+      ? { [activeMapId]: { answeredEdges: [...(allProgress[activeMapId].answeredEdges || [])] } }
+      : {};
+    const mapPositions = positions[activeMapId] ? { [activeMapId]: positions[activeMapId] } : {};
     const payload = {
       app: 'Concept Mapper',
       version: 1,
+      mapId: activeMapId,
+      mapTitle: mapData.title || activeMapId,
       exportedAt: new Date().toISOString(),
-      progress: serializeProgress(allProgress),
-      positions,
+      progress: mapProgress,
+      positions: mapPositions,
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     const stamp = new Date().toISOString().slice(0, 10);
+    const safeTitle = (mapData.title || activeMapId).replace(/[^a-z0-9]+/gi, '-').toLowerCase();
     a.href = url;
-    a.download = `concept-mapper-progress-${stamp}.json`;
+    a.download = `cm-progress-${safeTitle}-${stamp}.json`;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -712,7 +720,7 @@ function App() {
     if (importInputRef.current) importInputRef.current.click();
   }
 
-  // Import student progress JSON and replace current local progress state.
+  // Import student progress JSON and merge the current map's progress into local state.
   function handleImportStudentData(e) {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -724,13 +732,30 @@ function App() {
         const parsed = JSON.parse(reader.result);
         if (!parsed || typeof parsed !== 'object') throw new Error('Invalid file');
 
+        // Determine which map this file targets.
+        const fileMapId = parsed.mapId || null;
+        const progressKeys = Object.keys(parsed.progress || {});
+        const targetMapId = fileMapId || (progressKeys.length === 1 ? progressKeys[0] : null);
+
+        if (!targetMapId) throw new Error('Cannot determine target map');
+        if (targetMapId !== activeMapId) {
+          showToast(
+            `This progress file is for "${parsed.mapTitle || targetMapId}", not the currently open map.`,
+            'error'
+          );
+          return;
+        }
+
         const importedProgress = deserializeProgress(parsed.progress || {});
         const importedPositions = parsed.positions && typeof parsed.positions === 'object' ? parsed.positions : {};
 
-        setAllProgress(importedProgress);
-        saveProgress(importedProgress);
-        setPositions(importedPositions);
-        savePositions(importedPositions);
+        const mergedProgress = { ...allProgress, ...importedProgress };
+        const mergedPositions = { ...positions, ...importedPositions };
+
+        setAllProgress(mergedProgress);
+        saveProgress(mergedProgress);
+        setPositions(mergedPositions);
+        savePositions(mergedPositions);
 
         showToast('Progress imported. Your saved answers and node positions have been updated.', 'success');
       } catch {
