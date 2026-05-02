@@ -80,7 +80,13 @@ function buildOrderedIds(preferredOrder, mapsObj) {
 
 function App() {
   const [view, setView] = useStateApp('student'); // 'student' | 'admin' | 'admin-edit'
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useStateApp(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useStateApp(() => {
+    try {
+      return window.matchMedia('(max-width: 760px)').matches;
+    } catch {
+      return false;
+    }
+  });
   const [activeMapId, setActiveMapId] = useStateApp(null);
   const [editingMapId, setEditingMapId] = useStateApp(null);
   const [builtInMaps, setBuiltInMaps] = useStateApp({});
@@ -325,6 +331,11 @@ function App() {
   function openAdmin() {
     if (isAdminUnlocked || requestAdminAccess()) {
       setView('admin');
+      try {
+        if (window.matchMedia('(max-width: 760px)').matches) {
+          setIsSidebarCollapsed(true);
+        }
+      } catch {}
     }
   }
 
@@ -457,7 +468,15 @@ function App() {
               key={m.id}
               className={`sidebar-item ${activeMapId === m.id && view === 'student' ? 'active' : ''}`}
               style={{'--item-color': m.color}}
-              onClick={() => { setActiveMapId(m.id); setView('student'); }}
+              onClick={() => {
+                setActiveMapId(m.id);
+                setView('student');
+                try {
+                  if (window.matchMedia('(max-width: 760px)').matches) {
+                    setIsSidebarCollapsed(true);
+                  }
+                } catch {}
+              }}
             >
               <div className="sidebar-item-title">
                 <div className="sidebar-item-dot" style={{background: m.color}}></div>

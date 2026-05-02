@@ -17,27 +17,53 @@ function useNodeDrag(onMove, onEnd) {
   const stateRef = useRef2(null);
   const start = useCallback2((e, nodeId, startX, startY) => {
     e.stopPropagation();
-    e.preventDefault();
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+    const isTouchEvent = !!e.touches;
+    const point = isTouchEvent ? e.touches[0] : e;
+    if (!point) return;
     stateRef.current = {
       nodeId,
       startX, startY,
-      mouseX: e.clientX, mouseY: e.clientY,
+      mouseX: point.clientX, mouseY: point.clientY,
       moved: false,
     };
-    function move(ev) {
+    function applyMove(clientX, clientY) {
       if (!stateRef.current) return;
-      const dx = ev.clientX - stateRef.current.mouseX;
-      const dy = ev.clientY - stateRef.current.mouseY;
+      const dx = clientX - stateRef.current.mouseX;
+      const dy = clientY - stateRef.current.mouseY;
       if (Math.abs(dx) + Math.abs(dy) > 3) stateRef.current.moved = true;
       onMove(nodeId, startX + dx, startY + dy);
     }
+
+    function move(ev) {
+      applyMove(ev.clientX, ev.clientY);
+    }
+
+    function touchMove(ev) {
+      const t = ev.touches && ev.touches[0];
+      if (!t) return;
+      ev.preventDefault();
+      applyMove(t.clientX, t.clientY);
+    }
+
     function up() {
       window.removeEventListener('mousemove', move);
       window.removeEventListener('mouseup', up);
+      window.removeEventListener('touchmove', touchMove);
+      window.removeEventListener('touchend', up);
+      window.removeEventListener('touchcancel', up);
       const moved = stateRef.current?.moved;
       stateRef.current = null;
       if (onEnd) onEnd(nodeId, moved);
     }
+
+    if (isTouchEvent) {
+      window.addEventListener('touchmove', touchMove, { passive: false });
+      window.addEventListener('touchend', up);
+      window.addEventListener('touchcancel', up);
+      return;
+    }
+
     window.addEventListener('mousemove', move);
     window.addEventListener('mouseup', up);
   }, [onMove, onEnd]);
@@ -52,6 +78,7 @@ function nodeBorder(color) { return color + 'AA'; }
 function usePanZoom(initial = { x: 60, y: 80, scale: 1 }) {
   const [t, setT] = useState2(initial);
   const tRef = useRef2(t);
+  const touchStateRef = useRef2(null);
   useEffect2(() => { tRef.current = t; }, [t]);
 
   const onWheel = useCallback2((e) => {
@@ -97,7 +124,106 @@ function usePanZoom(initial = { x: 60, y: 80, scale: 1 }) {
     document.body.classList.add('panning');
   }, []);
 
-  return { t, setT, onWheel, startPan };
+  function getTouchCenter(t1, t2) {
+    return {
+      x: (t1.clientX + t2.clientX) / 2,
+      y: (t1.clientY + t2.clientY) / 2,
+    };
+  }
+
+  function getTouchDistance(t1, t2) {
+    const dx = t2.clientX - t1.clientX;
+    const dy = t2.clientY - t1.clientY;
+    return Math.hypot(dx, dy);
+  }
+
+  const onTouchStart = useCallback2((e) => {
+    if (e.target.closest('.node-card') || e.target.closest('.edge-label-badge') || e.target.closest('.inspector') || e.target.closest('.admin-toolbar')) return;
+    if (e.touches.length === 2) {
+      const center = getTouchCenter(e.touches[0], e.touches[1]);
+      touchStateRef.current = {
+        mode: 'pinch',
+        startDist: getTouchDistance(e.touches[0], e.touches[1]),
+        startScale: tRef.current.scale,
+        startX: tRef.current.x,
+        startY: tRef.current.y,
+        center,
+      };
+      return;
+    }
+
+    if (e.touches.length === 1) {
+      touchStateRef.current = {
+        mode: 'pan',
+        startTouchX: e.touches[0].clientX,
+        startTouchY: e.touches[0].clientY,
+        startX: tRef.current.x,
+        startY: tRef.current.y,
+      };
+    }
+  }, []);
+
+  const onTouchMove = useCallback2((e) => {
+    const touchState = touchStateRef.current;
+    if (!touchState) return;
+
+    if (touchState.mode === 'pinch' && e.touches.length === 2) {
+      e.preventDefault();
+      const newDist = getTouchDistance(e.touches[0], e.touches[1]);
+      const ratio = touchState.startDist > 0 ? (newDist / touchState.startDist) : 1;
+      const newScale = Math.max(0.4, Math.min(2.5, touchState.startScale * ratio));
+      const scaleRatio = newScale / touchState.startScale;
+      setT({
+        scale: newScale,
+        x: touchState.center.x - (touchState.center.x - touchState.startX) * scaleRatio,
+        y: touchState.center.y - (touchState.center.y - touchState.startY) * scaleRatio,
+      });
+      return;
+    }
+
+    if (touchState.mode === 'pan' && e.touches.length === 1) {
+      e.preventDefault();
+      const dx = e.touches[0].clientX - touchState.startTouchX;
+      const dy = e.touches[0].clientY - touchState.startTouchY;
+      setT({
+        ...tRef.current,
+        x: touchState.startX + dx,
+        y: touchState.startY + dy,
+      });
+    }
+  }, []);
+
+  const onTouchEnd = useCallback2((e) => {
+    if (e.touches.length === 0) {
+      touchStateRef.current = null;
+      return;
+    }
+
+    if (e.touches.length === 1) {
+      touchStateRef.current = {
+        mode: 'pan',
+        startTouchX: e.touches[0].clientX,
+        startTouchY: e.touches[0].clientY,
+        startX: tRef.current.x,
+        startY: tRef.current.y,
+      };
+      return;
+    }
+
+    if (e.touches.length === 2) {
+      const center = getTouchCenter(e.touches[0], e.touches[1]);
+      touchStateRef.current = {
+        mode: 'pinch',
+        startDist: getTouchDistance(e.touches[0], e.touches[1]),
+        startScale: tRef.current.scale,
+        startX: tRef.current.x,
+        startY: tRef.current.y,
+        center,
+      };
+    }
+  }, []);
+
+  return { t, setT, onWheel, startPan, onTouchStart, onTouchMove, onTouchEnd };
 }
 
 // ─── ZoomControl UI ─────────────────────────────────────────────────────────
@@ -116,8 +242,9 @@ function ZoomControl({ scale, setScale, fitToScreen }) {
 function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   const [activeEdge, setActiveEdge] = useState2(null);
   const [showComplete, setShowComplete] = useState2(false);
+  const [isHelpOpen, setIsHelpOpen] = useState2(false);
   const viewportRef = useRef2(null);
-  const { t, setT, onWheel, startPan } = usePanZoom();
+  const { t, setT, onWheel, startPan, onTouchStart, onTouchMove, onTouchEnd } = usePanZoom();
 
   const answeredEdges = progress.answeredEdges || new Set();
   const validNodes = mapData.nodes.filter((n) => (
@@ -280,6 +407,10 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
         ref={viewportRef}
         onWheel={onWheel}
         onMouseDown={startPan}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        onTouchCancel={onTouchEnd}
       >
         <div
           className="map-canvas"
@@ -365,6 +496,10 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
                   if (!unlocked) return;
                   dragStart(e, node.id, xy.x, xy.y);
                 }}
+                onTouchStart={(e) => {
+                  if (!unlocked) return;
+                  dragStart(e, node.id, xy.x, xy.y);
+                }}
               >
                 <div
                   className={`node-card ${unlocked ? 'unlocked' : 'locked'} ${node.isStart ? 'start' : ''}`}
@@ -383,8 +518,26 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
 
         <ZoomControl scale={t.scale} setScale={(fn) => setT(prev => ({...prev, scale: typeof fn === 'function' ? fn(prev.scale) : fn}))} fitToScreen={fitToScreen} />
 
-        <div className="mini-help">
-          <strong>How to use:</strong> Click any glowing label to fill in the relationship. Drag nodes to rearrange. Use mouse wheel to pan, <kbd>⌘/Ctrl</kbd>+wheel to zoom, <kbd>⊕</kbd> to spread nodes apart, <kbd>⊖</kbd> to pull them in, and <kbd>⟲</kbd> to reset layout.
+        <div
+          className={`mini-help ${isHelpOpen ? 'open' : 'collapsed'}`}
+          role="button"
+          tabIndex={0}
+          aria-expanded={isHelpOpen}
+          onClick={() => setIsHelpOpen((v) => !v)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setIsHelpOpen((v) => !v);
+            }
+          }}
+        >
+          <div className="mini-help-title-row">
+            <strong>How to use</strong>
+            <span className="mini-help-caret">{isHelpOpen ? '▾' : '▸'}</span>
+          </div>
+          <div className="mini-help-body">
+            Tap any glowing label to fill in the relationship. Drag nodes to rearrange. On touch devices, drag to pan and pinch to zoom. On desktop, use mouse wheel to pan and <kbd>⌘/Ctrl</kbd>+wheel to zoom. Use <kbd>⊕</kbd> to spread nodes apart, <kbd>⊖</kbd> to pull them in, and <kbd>⟲</kbd> to reset layout.
+          </div>
         </div>
       </div>
 

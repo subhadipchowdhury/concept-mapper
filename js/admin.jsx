@@ -20,9 +20,10 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
   const [selectedEdgeId, setSelectedEdgeId] = useStateA(null);
   const [connectSource, setConnectSource] = useStateA(null);
   const [hoverNode, setHoverNode] = useStateA(null);
+  const [isHelpOpen, setIsHelpOpen] = useStateA(false);
   const [activeColor, setActiveColor] = useStateA(NODE_COLOR_PALETTE[0]);
   const viewportRef = useRefA(null);
-  const { t, setT, onWheel, startPan } = usePanZoom();
+  const { t, setT, onWheel, startPan, onTouchStart, onTouchMove, onTouchEnd } = usePanZoom();
 
   // ── Update helpers ──
   function updateNode(id, patch) {
@@ -194,6 +195,10 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
         onMouseDown={(e) => {
           if (tool === 'select' || tool === 'connect') startPan(e);
         }}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        onTouchCancel={onTouchEnd}
         onClick={onCanvasClick}
       >
         <div
@@ -276,6 +281,11 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
                     dragStart(e, node.id, node.x, node.y);
                   }
                 }}
+                onTouchStart={(e) => {
+                  if (tool === 'select') {
+                    dragStart(e, node.id, node.x, node.y);
+                  }
+                }}
                 onClick={(e) => onNodeClick(e, node)}
                 onMouseEnter={() => setHoverNode(node.id)}
                 onMouseLeave={() => setHoverNode(null)}
@@ -316,8 +326,26 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
           fitToScreen={fitToScreen}
         />
 
-        <div className="mini-help">
-          <strong>Builder tips:</strong> <kbd>+ Node</kbd> then click canvas to add. <kbd>→ Connect</kbd> then click two nodes to draw an arrow. <kbd>↖ Select</kbd> to drag, edit & delete. Click an edge to edit its question.
+        <div
+          className={`mini-help ${isHelpOpen ? 'open' : 'collapsed'}`}
+          role="button"
+          tabIndex={0}
+          aria-expanded={isHelpOpen}
+          onClick={() => setIsHelpOpen((v) => !v)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setIsHelpOpen((v) => !v);
+            }
+          }}
+        >
+          <div className="mini-help-title-row">
+            <strong>Builder tips</strong>
+            <span className="mini-help-caret">{isHelpOpen ? '▾' : '▸'}</span>
+          </div>
+          <div className="mini-help-body">
+            <kbd>+ Node</kbd> then click canvas to add. <kbd>→ Connect</kbd> then click two nodes to draw an arrow. <kbd>↖ Select</kbd> to drag, edit and delete. Click an edge to edit its question.
+          </div>
         </div>
       </div>
 
