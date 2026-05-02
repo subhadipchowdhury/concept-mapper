@@ -379,6 +379,37 @@ body {
   pointer-events: auto;
 }
 
+.edge-label-slider {
+  min-height: 34px;
+  padding: 0 10px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.edge-label-slider-text,
+.edge-label-slider-value {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.edge-label-slider-value {
+  min-width: 28px;
+  text-align: right;
+  color: var(--text);
+}
+
+.edge-label-slider input[type="range"] {
+  width: 92px;
+  accent-color: var(--accent-teal);
+  cursor: pointer;
+}
+
 .icon-btn {
   width: 34px; height: 34px;
   background: var(--bg2);
@@ -1203,6 +1234,11 @@ body {
     flex-wrap: wrap;
   }
 
+  .edge-label-slider {
+    min-height: 36px;
+    padding: 0 12px;
+  }
+
   .mini-help {
     max-width: 230px;
     font-size: 10.5px;
@@ -1341,6 +1377,16 @@ body {
   .icon-btn {
     width: 36px;
     height: 36px;
+  }
+
+  .edge-label-slider {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .edge-label-slider input[type="range"] {
+    flex: 1;
+    min-width: 120px;
   }
 
   .edge-label-badge {

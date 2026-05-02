@@ -39,12 +39,18 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
-const EDGE_LABEL_T_PRESETS = [1 / 3, 0.4, 0.5];
+const EDGE_LABEL_T_STOPS = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
+
+function getClosestEdgeLabelTStop(value) {
+  return EDGE_LABEL_T_STOPS.reduce((closest, candidate) => (
+    Math.abs(candidate - value) < Math.abs(closest - value) ? candidate : closest
+  ), EDGE_LABEL_T_STOPS[0]);
+}
 
 // Resolve label anchor position along edges for the active map.
 function getMapEdgeLabelT(mapData) {
   const raw = Number(mapData && mapData.edgeLabelT);
-  return Number.isFinite(raw) ? clamp(raw, 0.2, 0.8) : (1 / 3);
+  return Number.isFinite(raw) ? getClosestEdgeLabelTStop(clamp(raw, 0.2, 0.8)) : (1 / 3);
 }
 
 // Compute a force-directed fallback layout when no manual positions are saved.
@@ -431,6 +437,10 @@ function ZoomControl({ scale, setScale, fitToScreen }) {
   );
 }
 
+function formatEdgeLabelT(value) {
+  return Number(value).toFixed(2).replace(/0+$/,'').replace(/\.$/, '');
+}
+
 // ─── ConceptMap (Student view) ───────────────────────────────────────────────
 function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   const [activeEdge, setActiveEdge] = useState2(null);
@@ -438,7 +448,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   const [isHelpOpen, setIsHelpOpen] = useState2(false);
   const [edgeLabelT, setEdgeLabelT] = useState2(() => {
     const saved = Number(window.localStorage.getItem(`cm:edgeLabelT:${mapData.id}`));
-    return Number.isFinite(saved) ? clamp(saved, 0.2, 0.8) : getMapEdgeLabelT(mapData);
+    return Number.isFinite(saved) ? getClosestEdgeLabelTStop(clamp(saved, 0.2, 0.8)) : getMapEdgeLabelT(mapData);
   });
   const viewportRef = useRef2(null);
   const { t, setT, onWheel, startPan, onTouchStart, onTouchMove, onTouchEnd } = usePanZoom();
@@ -501,13 +511,6 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   // Reset camera transform to default framing.
   function fitToScreen() {
     setT({ x: 60, y: 80, scale: 1 });
-  }
-
-  // Cycle through predefined edge-label anchor presets.
-  function cycleEdgeLabelT() {
-    const currentIdx = EDGE_LABEL_T_PRESETS.findIndex((v) => Math.abs(v - edgeLabelT) < 0.0001);
-    const next = EDGE_LABEL_T_PRESETS[(currentIdx + 1) % EDGE_LABEL_T_PRESETS.length];
-    setEdgeLabelT(next);
   }
 
   // Push nodes outward from centroid to quickly increase spacing.
@@ -588,7 +591,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
 
   useEffect2(() => {
     const saved = Number(window.localStorage.getItem(`cm:edgeLabelT:${mapData.id}`));
-    const next = Number.isFinite(saved) ? clamp(saved, 0.2, 0.8) : getMapEdgeLabelT(mapData);
+    const next = Number.isFinite(saved) ? getClosestEdgeLabelTStop(clamp(saved, 0.2, 0.8)) : getMapEdgeLabelT(mapData);
     setEdgeLabelT(next);
   }, [mapData.id]);
 
@@ -639,13 +642,21 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
           <button className="icon-btn" onClick={spreadNodes} title="Spread nodes apart">⊕</button>
           <button className="icon-btn" onClick={compactNodes} title="Pull nodes inward">⊖</button>
           <button className="icon-btn" onClick={resetLayout} title="Reset node layout to auto placement">⟲</button>
-          <button
-            className="icon-btn"
-            onClick={cycleEdgeLabelT}
-            title={`Label anchor: ${edgeLabelT.toFixed(2)} (click to cycle)`}
-          >
-            {`L${edgeLabelT.toFixed(2)}`}
-          </button>
+          <label className="edge-label-slider" title={`Label anchor: ${edgeLabelT.toFixed(2)}`}>
+            <span className="edge-label-slider-text">Label</span>
+            <input
+              type="range"
+              min="0"
+              max={String(EDGE_LABEL_T_STOPS.length - 1)}
+              step="1"
+              value={String(EDGE_LABEL_T_STOPS.findIndex((stop) => stop === edgeLabelT))}
+              onChange={(e) => {
+                const index = clamp(Number(e.target.value), 0, EDGE_LABEL_T_STOPS.length - 1);
+                setEdgeLabelT(EDGE_LABEL_T_STOPS[index]);
+              }}
+            />
+            <span className="edge-label-slider-value">{formatEdgeLabelT(edgeLabelT)}</span>
+          </label>
         </div>
       </div>
 
