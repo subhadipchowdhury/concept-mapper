@@ -724,20 +724,20 @@ function App() {
           onClick={() => setIsSidebarCollapsed(v => !v)}
           title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          {isSidebarCollapsed ? '▸ Topics' : '◂ Topics'}
+          {isSidebarCollapsed ? '▸ ' : '◂ '}<span className="topbar-btn-label">{isSidebarCollapsed ? 'Topics' : 'Topics'}</span>
         </button>
         <div className="topbar-logo">
           <div className="topbar-logo-mark">∑</div>
-          Concept Mapper
+          <span className="topbar-logo-text">Concept Mapper</span>
         </div>
         <div className="topbar-spacer"></div>
         {view === 'student' && (
           <>
             <button className="topbar-btn" onClick={exportStudentData} title="Download your progress JSON">
-              ⭳ Export Progress
+              ⭳ <span className="topbar-btn-label">Export Progress</span>
             </button>
             <button className="topbar-btn" onClick={triggerImportStudentData} title="Import progress from a JSON file">
-              ⭱ Import Progress
+              ⭱ <span className="topbar-btn-label">Import Progress</span>
             </button>
             <input
               ref={importInputRef}
@@ -749,17 +749,21 @@ function App() {
           </>
         )}
         <button className={`topbar-btn ${view === 'student' ? 'active' : ''}`} onClick={() => setView('student')}>
-          📚 Student
+          📚 <span className="topbar-btn-label">Student</span>
         </button>
         <button className={`topbar-btn ${view.startsWith('admin') ? 'active' : ''}`} onClick={openAdmin}>
-          ⚙ Admin
+          ⚙ <span className="topbar-btn-label">Admin</span>
         </button>
         {isAdminUnlocked && (
           <button className="topbar-btn" onClick={lockAdmin} title="Lock teacher mode for this tab">
-            🔒 Lock
+            🔒 <span className="topbar-btn-label">Lock</span>
           </button>
         )}
       </header>
+
+      {!isSidebarCollapsed && (
+        <div className="sidebar-backdrop" onClick={() => setIsSidebarCollapsed(true)} aria-hidden="true" />
+      )}
 
       <aside className="sidebar">
         <div className="sidebar-header-row">
@@ -865,14 +869,16 @@ function App() {
                 {studentSections.find(s => s.maps.some(m => m.id === activeMapId))?.title || 'Maps'} › {mapData.title}
               </div>
             )}
-            <ConceptMap
-              key={activeMapId}
-              mapData={mapData}
-              progress={getProgress(activeMapId)}
-              onProgress={(p) => handleProgress(activeMapId, p)}
-              positions={positions}
-              onPositions={handlePositions}
-            />
+            <div className="map-canvas-area">
+              <ConceptMap
+                key={activeMapId}
+                mapData={mapData}
+                progress={getProgress(activeMapId)}
+                onProgress={(p) => handleProgress(activeMapId, p)}
+                positions={positions}
+                onPositions={handlePositions}
+              />
+            </div>
           </div>
         )}
         {view === 'admin' && (

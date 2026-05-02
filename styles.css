@@ -276,7 +276,12 @@ body {
   flex-direction: column;
   flex: 1;
   overflow: hidden;
+}
+
+.map-canvas-area {
+  flex: 1;
   position: relative;
+  overflow: hidden;
 }
 
 .breadcrumb {
@@ -1182,6 +1187,28 @@ body {
   }
 }
 
+/* Sidebar backdrop — hidden on desktop, shown by mobile query */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  top: 60px;
+  background: rgba(0,0,0,0.52);
+  z-index: 75;
+  animation: fadeInBackdrop 0.18s ease;
+}
+
+@keyframes fadeInBackdrop {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Topbar text labels — visible by default, hidden on mobile */
+.topbar-logo-text,
+.topbar-btn-label {
+  display: inline;
+}
+
 @media (max-width: 760px) {
   .app-shell,
   .app-shell.sidebar-collapsed {
@@ -1199,6 +1226,7 @@ body {
     box-shadow: 12px 0 28px rgba(0,0,0,0.45);
     background: rgba(17, 20, 29, 0.97);
     backdrop-filter: blur(10px);
+    transition: transform 0.22s ease, opacity 0.18s ease;
   }
 
   .app-shell.sidebar-collapsed .sidebar {
@@ -1206,6 +1234,21 @@ body {
     opacity: 0;
     pointer-events: none;
     border-right-color: transparent;
+  }
+
+  .sidebar-backdrop {
+    display: block;
+  }
+
+  .topbar-logo-text,
+  .topbar-btn-label {
+    display: none;
+  }
+
+  .topbar-btn {
+    padding: 7px 9px;
+    min-width: 36px;
+    justify-content: center;
   }
 
   .map-header {
@@ -1234,7 +1277,12 @@ body {
 
   .edge-label-badge {
     font-size: 10px;
-    padding: 5px 10px;
+    padding: 8px 12px;
+    min-height: 36px;
+    min-width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .node-card {
