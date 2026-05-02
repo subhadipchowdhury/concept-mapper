@@ -1,7 +1,7 @@
 {
   "id": "series",
   "title": "Infinite Series",
-  "description": "Module 2 — Convergence tests, absolute & conditional convergence",
+  "description": "Module 2 — theorem spine and convergence test strategy",
   "color": "#f59e0b",
   "accentColor": "#fb923c",
   "nodes": [
@@ -167,80 +167,104 @@
       "id": "r_e1",
       "from": "seq",
       "to": "series",
-      "label": "a series \\(\\sum a_n\\) is built by formally \\_\\_\\_ all terms of \\(\\{a_n\\}\\)",
-      "answer": "adding",
+      "label": "concept check: \\(\\sum a_n\\) is an \\_\\_\\_ infinite sum of sequence terms",
+      "answer": "ordered",
       "type": "dropdown",
       "options": [
-        "adding",
-        "multiplying",
-        "dividing",
-        "composing"
+        "ordered",
+        "unordered",
+        "finite",
+        "pairwise"
       ],
-      "hint": "The Σ symbol indicates this operation."
+      "hint": "Index order matters because convergence is defined via ordered partial sums."
     },
     {
       "id": "r_e2",
       "from": "series",
       "to": "partial",
-      "label": "truncating after \\(n\\) terms (only PART of the sum) gives \\(s_n\\), the \\_\\_\\_ sum",
-      "answer": "partial",
-      "type": "fillin",
-      "hint": "Latin: \"of a part\". Adjective form: ___."
+      "label": "for \\(s_n=\\sum_{k=1}^n a_k\\), truncation happens at a \\_\\_\\_ index",
+      "answer": "finite",
+      "type": "dropdown",
+      "options": [
+        "finite",
+        "infinite",
+        "negative",
+        "complex"
+      ],
+      "hint": "You stop at a finite cutoff index \\(n\\), not at infinity."
     },
     {
       "id": "r_e3",
       "from": "partial",
       "to": "conv",
-      "label": "\\(\\sum a_n\\) converges \\(\\iff\\) \\(\\{s_n\\}\\) \\_\\_\\_",
-      "answer": "converges",
-      "type": "fillin",
-      "hint": "The series convergence is DEFINED by behavior of partial sums."
+      "label": "definition-level: \\(\\sum a_n\\) converges iff \\(\\{s_n\\}\\) \\_\\_\\_",
+      "answer": "has a finite limit",
+      "type": "dropdown",
+      "options": [
+        "has a finite limit",
+        "is bounded",
+        "is monotone",
+        "has a subsequence"
+      ],
+      "hint": "Convergence of a series is defined by the convergence target of \\(s_n\\)."
     },
     {
       "id": "r_e4",
       "from": "partial",
       "to": "div",
-      "label": "\\(\\sum a_n\\) diverges \\(\\iff\\) \\(\\{s_n\\}\\) \\_\\_\\_",
-      "answer": "diverges",
-      "type": "fillin",
-      "hint": ""
+      "label": "implication check: \\(\\sum a_n\\) diverges iff \\(\\{s_n\\}\\) \\_\\_\\_",
+      "answer": "fails to converge",
+      "type": "dropdown",
+      "options": [
+        "fails to converge",
+        "is bounded",
+        "is increasing",
+        "has a limit"
+      ],
+      "hint": "Use exact negation of the convergence definition for \\(s_n\\)."
     },
     {
       "id": "r_e5",
       "from": "series",
       "to": "divtest",
-      "label": "if \\(a_n \\not\\to 0\\), then \\(\\sum a_n\\) \\_\\_\\_",
-      "answer": "diverges",
-      "type": "fillin",
-      "hint": "Contrapositive: convergence forces \\(a_n \\to 0\\)."
+      "label": "contrapositive use: if \\(a_n \\not\\to 0\\), then \\(\\sum a_n\\) \\_\\_\\_",
+      "answer": "must diverge",
+      "type": "dropdown",
+      "options": [
+        "must diverge",
+        "must converge",
+        "is absolutely convergent",
+        "is conditionally convergent"
+      ],
+      "hint": "If a necessary condition fails, the theorem conclusion cannot hold."
     },
     {
       "id": "r_e6",
       "from": "series",
       "to": "cauchyser",
-      "label": "\\(\\sum a_n\\) converges \\(\\iff\\) \\(\\forall \\varepsilon > 0\\, \\exists N\\) such that \\(|a_{m+1}+\\cdots+a_n|\\) \\_\\_\\_",
-      "answer": "< ε",
+      "label": "Cauchy criterion (series tails): for every \\(\\varepsilon>0\\), there exists \\(N\\) such that \\(|a_{m+1}+\\cdots+a_n|\\) \\_\\_\\_",
+      "answer": "< ε for all n>m≥N",
       "type": "dropdown",
       "options": [
-        "= 0",
-        "< ε",
-        "> ε",
-        "is bounded"
+        "< ε for all n>m≥N",
+        "= 0 for all n>m≥N",
+        "> ε eventually",
+        "is bounded for one pair (m,n)"
       ],
-      "hint": "Cauchy condition for the partial-sum sequence."
+      "hint": "The key is uniform control of every sufficiently far tail, not one specific tail."
     },
     {
       "id": "r_e7",
       "from": "conv",
       "to": "geom",
-      "label": "\\(\\sum ar^n\\) converges precisely when \\(|r|\\) \\_\\_\\_ \\(1\\)",
-      "answer": "<",
+      "label": "for geometric series, convergence occurs exactly when \\(|r|\\) lies \\_\\_\\_ the unit threshold",
+      "answer": "strictly below",
       "type": "dropdown",
       "options": [
-        "<",
-        "≤",
-        "=",
-        ">"
+        "strictly below",
+        "at or below",
+        "at",
+        "above"
       ],
       "hint": "Strict inequality matters here."
     },
@@ -248,29 +272,29 @@
       "id": "r_e8",
       "from": "div",
       "to": "harmonic",
-      "label": "\\(\\sum 1/n\\) diverges, even though \\(1/n\\) \\_\\_\\_ to \\(0\\)",
-      "answer": "tends",
+      "label": "harmonic proof idea: grouping terms in blocks shows partial sums grow without bound, so they are \\_\\_\\_",
+      "answer": "unbounded",
       "type": "dropdown",
       "options": [
-        "tends",
-        "fails",
-        "jumps",
-        "oscillates"
+        "unbounded",
+        "Cauchy",
+        "eventually constant",
+        "decreasing"
       ],
-      "hint": "\\(a_n \\to 0\\) is necessary but NOT sufficient — harmonic is the textbook example."
+      "hint": "Each dyadic block contributes at least a fixed positive amount."
     },
     {
       "id": "r_e9",
       "from": "harmonic",
       "to": "pseries",
-      "label": "\\(\\sum 1/n^p\\) converges \\(\\iff\\) \\(p\\) \\_\\_\\_ \\(1\\)",
-      "answer": ">",
+      "label": "p-series threshold: convergence starts only once \\(p\\) is \\_\\_\\_ 1",
+      "answer": "strictly above",
       "type": "dropdown",
       "options": [
-        "<",
-        "≤",
-        "=",
-        ">"
+        "strictly above",
+        "at or above",
+        "equal to",
+        "below"
       ],
       "hint": "Harmonic (\\(p=1\\)) is the boundary case — diverges."
     },
@@ -278,38 +302,44 @@
       "id": "r_e10",
       "from": "partial",
       "to": "mctser",
-      "label": "for nonneg terms, \\(\\{s_n\\}\\) is automatically \\_\\_\\_",
-      "answer": "monotone",
-      "type": "fillin",
-      "hint": "Adding nonneg numbers can only make \\(s_n\\) go ↑."
+      "label": "proof step: if \\(a_n\\ge 0\\) and partial sums are bounded above, then \\(\\{s_n\\}\\) \\_\\_\\_",
+      "answer": "has a finite limit",
+      "type": "dropdown",
+      "options": [
+        "has a finite limit",
+        "diverges",
+        "is eventually constant",
+        "is inconclusive"
+      ],
+      "hint": "Use monotone convergence theorem on partial sums of nonnegative terms."
     },
     {
       "id": "r_e11",
       "from": "mctser",
       "to": "integral",
-      "label": "compare \\(\\sum f(n)\\) with \\(\\int_1^\\infty f(x)\\,dx\\) when \\(f\\) is positive and \\_\\_\\_",
+      "label": "integral-test proof step: compare rectangles with area under \\(f\\), so \\(f\\) should be eventually \\_\\_\\_",
       "answer": "decreasing",
       "type": "dropdown",
       "options": [
-        "continuous",
         "increasing",
         "decreasing",
+        "periodic",
         "bounded"
       ],
-      "hint": "Need monotone behavior to box the sum between two integrals."
+      "hint": "Monotone decrease is what makes left/right rectangle bounds work."
     },
     {
       "id": "r_e12",
       "from": "integral",
       "to": "pseries",
-      "label": "\\(\\int_1^\\infty x^{-p}\\,dx\\) converges precisely when \\(p\\) \\_\\_\\_ \\(1\\)",
-      "answer": ">",
+      "label": "integral criterion for \\(x^{-p}\\): finite area on \\([1,\\infty)\\) appears when \\(p\\) is \\_\\_\\_ 1",
+      "answer": "greater than",
       "type": "dropdown",
       "options": [
-        "<",
-        "≤",
-        "=",
-        ">"
+        "greater than",
+        "at or above",
+        "equal to",
+        "below"
       ],
       "hint": "The improper integral is finite iff the exponent makes the antiderivative tend to a constant."
     },
@@ -317,56 +347,74 @@
       "id": "r_e13",
       "from": "mctser",
       "to": "directcmp",
-      "label": "if \\(0 \\le a_n \\le b_n\\) and \\(\\sum b_n\\) converges, then \\(\\sum a_n\\) \\_\\_\\_",
-      "answer": "converges",
-      "type": "fillin",
-      "hint": "Smaller nonneg terms inherit the convergence."
+      "label": "direct comparison (eventual nonnegative order): if \\(0\\le b_n\\le a_n\\) for all large \\(n\\), and \\(\\sum b_n\\) diverges, then \\(\\sum a_n\\) \\_\\_\\_",
+      "answer": "diverges",
+      "type": "dropdown",
+      "options": [
+        "diverges",
+        "converges",
+        "is inconclusive",
+        "is absolutely convergent"
+      ],
+      "hint": "The larger nonnegative tail cannot converge if a smaller benchmark already diverges."
     },
     {
       "id": "r_e14",
       "from": "directcmp",
       "to": "limcmp",
-      "label": "if \\(\\lim a_n/b_n = L \\in (0, \\infty)\\), the two series share the \\_\\_\\_ behavior",
-      "answer": "same",
+      "label": "limit comparison: if \\(\\lim a_n/b_n = L \\in (0, \\infty)\\), then the two series \\_\\_\\_",
+      "answer": "both converge or both diverge",
       "type": "dropdown",
       "options": [
-        "same",
-        "opposite",
-        "unrelated",
-        "reciprocal"
+        "both converge or both diverge",
+        "always both diverge",
+        "always both converge",
+        "have unrelated behavior"
       ],
-      "hint": "Both converge or both diverge."
+      "hint": "A finite positive comparison limit means asymptotically comparable size."
     },
     {
       "id": "r_e15",
       "from": "geom",
       "to": "ratio",
-      "label": "mimics geometric: if \\(\\lim |a_{n+1}/a_n| < 1\\), then \\(\\sum a_n\\) \\_\\_\\_",
-      "answer": "converges",
-      "type": "fillin",
-      "hint": "The behavior is exactly that of \\(\\sum r^n\\) with this ratio playing the role of \\(r\\)."
+      "label": "ratio test: if \\(L=\\lim |a_{n+1}/a_n|<1\\), then \\(\\sum a_n\\) converges \\_\\_\\_",
+      "answer": "absolutely",
+      "type": "dropdown",
+      "options": [
+        "absolutely",
+        "conditionally",
+        "only if alternating",
+        "never"
+      ],
+      "hint": "Compare eventually to a geometric series with ratio strictly below 1."
     },
     {
       "id": "r_e16",
       "from": "geom",
       "to": "root",
-      "label": "also mimics geometric: if \\(\\limsup |a_n|^{1/n} < 1\\), then \\(\\sum a_n\\) \\_\\_\\_",
-      "answer": "converges",
-      "type": "fillin",
-      "hint": "Take \\(n\\)-th root instead of consecutive ratios."
+      "label": "root test: if \\(\\limsup |a_n|^{1/n} < 1\\), then \\(\\sum a_n\\) converges \\_\\_\\_",
+      "answer": "absolutely",
+      "type": "dropdown",
+      "options": [
+        "absolutely",
+        "conditionally",
+        "only for decreasing terms",
+        "only for alternating terms"
+      ],
+      "hint": "The root test compares term magnitudes to a geometric series."
     },
     {
       "id": "r_e17",
       "from": "series",
       "to": "alt",
-      "label": "a \\((-1)^n\\) factor makes the signs \\_\\_\\_ each term",
-      "answer": "flip",
+      "label": "a \\((-1)^n\\) factor enforces sign \\_\\_\\_ across successive terms",
+      "answer": "alternation",
       "type": "dropdown",
       "options": [
-        "repeat",
-        "flip",
-        "cancel",
-        "vanish"
+        "alternation",
+        "constancy",
+        "positivity",
+        "monotonicity"
       ],
       "hint": "\\(+, -, +, -, \\ldots\\) — the signs ___ at each step."
     },
@@ -374,97 +422,310 @@
       "id": "r_e18",
       "from": "alt",
       "to": "leibniz",
-      "label": "Leibniz: if \\(b_n\\) is decreasing AND \\(b_n \\to\\) \\_\\_\\_, the alternating series converges",
-      "answer": "0",
-      "type": "fillin",
-      "hint": "The terms must shrink all the way to ___."
+      "label": "Leibniz precision: eventual decrease plus \\(b_n\\) \\_\\_\\_ is sufficient for convergence",
+      "answer": "vanishing",
+      "type": "dropdown",
+      "options": [
+        "vanishing",
+        "bounded away from 0",
+        "eventually increasing",
+        "periodic"
+      ],
+      "hint": "A finite number of early exceptions does not affect convergence."
     },
     {
       "id": "r_e19",
       "from": "conv",
       "to": "abs",
-      "label": "requiring \\(\\sum |a_n| < \\infty\\) is a STRICTLY \\_\\_\\_ condition than ordinary convergence",
-      "answer": "stronger",
+      "label": "logic check: ordinary convergence always implies absolute convergence",
+      "answer": "false",
       "type": "dropdown",
       "options": [
-        "weaker",
-        "equivalent",
-        "stronger",
-        "unrelated"
+        "true",
+        "false",
+        "true only for geometric series",
+        "true only for p-series"
       ],
-      "hint": "Implies ordinary convergence, but not the other way — so it is ___."
+      "hint": "Use the alternating harmonic series as the canonical counterexample."
     },
     {
       "id": "r_e20",
       "from": "abs",
       "to": "abstest",
-      "label": "if \\(\\sum |a_n|\\) converges, then \\(\\sum a_n\\) automatically \\_\\_\\_",
-      "answer": "converges",
-      "type": "fillin",
-      "hint": "Absolute convergence is the stronger condition — the original series inherits convergence."
+      "label": "test-setup step: absolute-convergence checks are run on term \\_\\_\\_",
+      "answer": "magnitudes",
+      "type": "dropdown",
+      "options": [
+        "magnitudes",
+        "signs",
+        "differences",
+        "subsequences"
+      ],
+      "hint": "Replace each term by its magnitude before applying ratio/root/comparison tools."
     },
     {
       "id": "r_e21",
       "from": "abstest",
       "to": "cond",
-      "label": "a series that converges but \\(\\sum |a_n|\\) does NOT — is called \\_\\_\\_ convergent",
-      "answer": "conditionally",
-      "type": "fillin",
+      "label": "if \\(\\sum a_n\\) converges but \\(\\sum |a_n|\\) diverges, convergence relies on sign \\_\\_\\_",
+      "answer": "cancellation",
+      "type": "dropdown",
+      "options": [
+        "cancellation",
+        "monotonicity",
+        "factorials",
+        "bounded denominator"
+      ],
       "hint": "The convergence depends on cancellation between positive and negative terms."
     },
     {
       "id": "r_e22",
       "from": "leibniz",
       "to": "cond",
-      "label": "classic case: \\(\\sum (-1)^n / n\\) is \\_\\_\\_ convergent",
-      "answer": "conditionally",
+      "label": "Leibniz remainder fact: if \\(S\\) is the sum, then \\(|S-s_n|\\le\\) \\_\\_\\_",
+      "answer": "b_{n+1}",
       "type": "fillin",
-      "hint": "It converges (Leibniz) but \\(\\sum 1/n\\) does not — so the convergence is ___."
+      "hint": "Error magnitude is controlled by the first omitted alternating-term magnitude."
     },
     {
       "id": "r_e23",
       "from": "abstest",
       "to": "ratio",
-      "label": "if \\(\\lim |a_{n+1}/a_n| = L < 1\\), then \\(\\sum a_n\\) converges \\_\\_\\_",
-      "answer": "absolutely",
-      "type": "dropdown",
-      "options": [
-        "conditionally",
-        "absolutely",
-        "pointwise",
-        "never"
-      ],
-      "hint": "L < 1 gives the strongest form of convergence."
-    },
-    {
-      "id": "r_e24",
-      "from": "abstest",
-      "to": "root",
-      "label": "if \\(\\limsup |a_n|^{1/n} = L\\), the test is \\_\\_\\_ when \\(L = 1\\)",
+      "label": "ratio boundary case: when \\(L=\\lim |a_{n+1}/a_n|=1\\), the ratio test is \\_\\_\\_",
       "answer": "inconclusive",
       "type": "dropdown",
       "options": [
         "conclusive",
         "inconclusive",
-        "positive",
-        "divergent"
+        "equivalent to divergence",
+        "equivalent to absolute convergence"
       ],
-      "hint": "The boundary case \\(L=1\\) gives no information either way."
+      "hint": "Classic counterexamples at \\(L=1\\): \\(\\sum 1/n\\) vs \\(\\sum 1/n^2\\)."
+    },
+    {
+      "id": "r_e24",
+      "from": "abstest",
+      "to": "root",
+      "label": "root test checkpoint: with \\(C=\\limsup |a_n|^{1/n}\\), the only always-true statement is that \\(C=1\\) is \\_\\_\\_",
+      "answer": "inconclusive",
+      "type": "dropdown",
+      "options": [
+        "inconclusive",
+        "absolutely convergent",
+        "divergent",
+        "equivalent to ratio test with L<1"
+      ],
+      "hint": "At the boundary value, root and ratio tests do not decide by themselves."
     },
     {
       "id": "r_e25",
       "from": "leibniz",
       "to": "dirichlet",
-      "label": "replacing \\((-1)^n\\) by any sequence with bounded \\_\\_\\_ sums generalizes Leibniz",
-      "answer": "partial",
+      "label": "Dirichlet step: if \\(B_n=\\sum_{k=1}^n b_k\\) is bounded and \\(a_n\\downarrow 0\\), then \\(\\sum a_n b_n\\) \\_\\_\\_",
+      "answer": "converges",
       "type": "dropdown",
       "options": [
-        "partial",
-        "absolute",
-        "geometric",
-        "harmonic"
+        "converges",
+        "diverges",
+        "is absolutely convergent",
+        "is geometric"
       ],
-      "hint": "Dirichlet only needs \\(\\{B_n = \\sum b_k\\}\\) to be bounded."
+      "hint": "Bounded partial sums plus monotone-to-zero coefficient is the core pairing."
+    },
+    {
+      "id": "r_e26",
+      "from": "root",
+      "to": "limcmp",
+      "label": "for \\(a_n=\\frac{n}{n^2+3}\\), comparing with \\(b_n=1/n\\) gives a limit in \\_\\_\\_",
+      "answer": "(0,∞)",
+      "type": "dropdown",
+      "options": [
+        "(0,∞)",
+        "{0}",
+        "{\\infty}",
+        "no limit"
+      ],
+      "hint": "At boundary-inconclusive cases, switch to an asymptotic benchmark test."
+    },
+    {
+      "id": "r_e27",
+      "from": "pseries",
+      "to": "ratio",
+      "label": "for \\(a_n=\\frac{n!}{3^n}\\), the natural first move is to study consecutive-term \\_\\_\\_",
+      "answer": "quotients",
+      "type": "dropdown",
+      "options": [
+        "quotients",
+        "integrals",
+        "subsequences",
+        "Fourier coefficients"
+      ],
+      "hint": "Factorials/exponentials are typically handled quickest by consecutive-term ratios."
+    },
+    {
+      "id": "r_e28",
+      "from": "integral",
+      "to": "directcmp",
+      "label": "integral test gatekeeper: if \\(f(n)=a_n>0\\) but \\(f\\) is not eventually decreasing, the test is \\_\\_\\_ to apply",
+      "answer": "not applicable",
+      "type": "dropdown",
+      "options": [
+        "not applicable",
+        "automatically convergent",
+        "automatically divergent",
+        "equivalent to ratio test"
+      ],
+      "hint": "Missing key hypotheses means the theorem cannot be safely applied."
+    },
+    {
+      "id": "r_e29",
+      "from": "divtest",
+      "to": "harmonic",
+      "label": "logic check: \\(a_n\\to 0\\) is a \\_\\_\\_ condition for \\(\\sum a_n\\) to converge",
+      "answer": "necessary but not sufficient",
+      "type": "dropdown",
+      "options": [
+        "necessary but not sufficient",
+        "sufficient but not necessary",
+        "necessary and sufficient",
+        "neither necessary nor sufficient"
+      ],
+      "hint": "Harmonic gives the standard counterexample to sufficiency."
+    },
+    {
+      "id": "r_e30",
+      "from": "leibniz",
+      "to": "alt",
+      "label": "error target: for an alternating series with \\(b_n=1/n\\), to guarantee \\(|S-s_n|<0.01\\), it is enough to choose \\(n\\) so that \\_\\_\\_",
+      "answer": "1/(n+1) < 0.01",
+      "type": "dropdown",
+      "options": [
+        "1/(n+1) < 0.01",
+        "1/(n+1) > 0.01",
+        "n < 100",
+        "n is even"
+      ],
+      "hint": "Leibniz remainder is bounded by the first omitted magnitude \\(b_{n+1}\\)."
+    },
+    {
+      "id": "r_e31",
+      "from": "ratio",
+      "to": "integral",
+      "label": "boundary check: for \\(a_n=1/n^p\\), when \\(p=1\\) the p-series is \\_\\_\\_",
+      "answer": "divergent",
+      "type": "dropdown",
+      "options": [
+        "divergent",
+        "absolutely convergent",
+        "conditionally convergent",
+        "inconclusive by all tests"
+      ],
+      "hint": "At \\(p=1\\), this is the harmonic series benchmark, which diverges."
+    },
+    {
+      "id": "r_e32",
+      "from": "divtest",
+      "to": "directcmp",
+      "label": "for \\(\\sum 1\\), the necessary condition \\(a_n\\to 0\\) is \\_\\_\\_",
+      "answer": "violated",
+      "type": "dropdown",
+      "options": [
+        "violated",
+        "satisfied",
+        "irrelevant",
+        "equivalent to boundedness"
+      ],
+      "hint": "This conclusion comes before any comparison: necessary condition fails immediately."
+    },
+    {
+      "id": "r_e33",
+      "from": "limcmp",
+      "to": "directcmp",
+      "label": "one-sided limit comparison: if \\(a_n,b_n\\ge 0\\), \\(\\limsup a_n/b_n<\\infty\\), and \\(\\sum b_n\\) converges, then \\(\\sum a_n\\) \\_\\_\\_",
+      "answer": "converges",
+      "type": "dropdown",
+      "options": [
+        "converges",
+        "diverges",
+        "is conditionally convergent",
+        "is always inconclusive"
+      ],
+      "hint": "Finite asymptotic upper ratio makes \\(a_n\\) eventually bounded by a constant multiple of \\(b_n\\)."
+    },
+    {
+      "id": "r_e34",
+      "from": "ratio",
+      "to": "root",
+      "label": "diagnose misuse: if \\(\\lim |a_{n+1}/a_n|\\) does NOT exist, saying \"ratio test proves convergence\" is generally \\_\\_\\_",
+      "answer": "invalid without another argument",
+      "type": "dropdown",
+      "options": [
+        "invalid without another argument",
+        "valid and proves convergence",
+        "valid and proves divergence",
+        "equivalent to root test with C<1"
+      ],
+      "hint": "No limit means the standard ratio criterion does not directly decide."
+    },
+    {
+      "id": "r_e35",
+      "from": "alt",
+      "to": "abs",
+      "label": "for \\(\\sum (-1)^n n/2^n\\), applying ratio/root to \\(\\sum |a_n|\\) gives boundary constant \\_\\_\\_",
+      "answer": "1/2",
+      "type": "dropdown",
+      "options": [
+        "0",
+        "1/2",
+        "1",
+        "2"
+      ],
+      "hint": "Exponential denominator dominates polynomial numerator, so magnitude series converges."
+    },
+    {
+      "id": "r_e36",
+      "from": "directcmp",
+      "to": "conv",
+      "label": "comparison (convergence direction): if \\(0\\le a_n\\le b_n\\) eventually and \\(\\sum b_n\\) converges, then \\(\\sum a_n\\) is \\_\\_\\_ by a convergent majorant",
+      "answer": "dominated",
+      "type": "dropdown",
+      "options": [
+        "dominated",
+        "reversed",
+        "oscillatory",
+        "inconclusive"
+      ],
+      "hint": "A smaller nonnegative tail inherits convergence from a larger convergent benchmark."
+    },
+    {
+      "id": "r_e37",
+      "from": "abs",
+      "to": "conv",
+      "label": "theorem implication: \\(\\sum |a_n|<\\infty\\) guarantees \\(\\sum a_n\\) has \\_\\_\\_ convergence",
+      "answer": "ordinary",
+      "type": "dropdown",
+      "options": [
+        "ordinary",
+        "no",
+        "periodic",
+        "geometric-only"
+      ],
+      "hint": "Absolute convergence is stronger and therefore implies the usual notion."
+    },
+    {
+      "id": "r_e38",
+      "from": "cond",
+      "to": "alt",
+      "label": "canonical benchmark: the alternating harmonic series converges to \\_\\_\\_",
+      "answer": "ln 2",
+      "type": "dropdown",
+      "options": [
+        "ln 2",
+        "\\pi/4",
+        "e",
+        "0"
+      ],
+      "hint": "It converges by Leibniz, while the absolute-value version is harmonic and diverges."
     }
   ],
   "_published": true,
