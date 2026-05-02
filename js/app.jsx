@@ -732,6 +732,9 @@ function App() {
   const answeredCount = mapData ? studentProgress.answeredEdges.size : 0;
   const totalCount = mapData?.edges?.length || 0;
   const completionPct = totalCount > 0 ? Math.round((answeredCount / totalCount) * 100) : 0;
+  const sidebarTotalCount = getTotalMapCount();
+  const sidebarDoneCount = getCompletedMapCount();
+  const sidebarPct = sidebarTotalCount > 0 ? Math.round((sidebarDoneCount / sidebarTotalCount) * 100) : 0;
 
   useEffectApp(() => {
     const valid = new Set(studentSections.map((section) => section.id));
@@ -896,18 +899,25 @@ function App() {
       )}
 
       <aside className="sidebar">
-        <div className="sidebar-header-row">
-          <div className="sidebar-section-title">Topics</div>
-          <div className="sidebar-folder-controls">
-            <button type="button" className="sidebar-folder-control-btn" onClick={collapseAllFolders}>Collapse all</button>
-            <button type="button" className="sidebar-folder-control-btn" onClick={expandAllFolders}>Expand all</button>
+        <div className="sidebar-header">
+          <div className="sidebar-header-top">
+            <div className="sidebar-section-title">Topics</div>
+            <div className="sidebar-folder-controls">
+              <button type="button" className="sidebar-folder-control-btn" onClick={collapseAllFolders}>Collapse</button>
+              <button type="button" className="sidebar-folder-control-btn" onClick={expandAllFolders}>Expand</button>
+            </div>
           </div>
+          {studentSections.length > 0 && (
+            <div className="sidebar-progress-chip" aria-label={`Overall progress: ${sidebarPct}%`}>
+              <span className="sidebar-progress-chip-label">{sidebarDoneCount} / {sidebarTotalCount} maps complete</span>
+              <div className="sidebar-progress-chip-bar" aria-hidden="true">
+                <div className="sidebar-progress-chip-fill" style={{ width: `${sidebarPct}%` }}></div>
+              </div>
+              <span className="sidebar-progress-chip-pct">{sidebarPct}%</span>
+            </div>
+          )}
         </div>
-        {studentSections.length > 0 && (
-          <div className="sidebar-progress-summary">
-            {getCompletedMapCount()}/{getTotalMapCount()} maps complete
-          </div>
-        )}
+        <div className="sidebar-body">
         {studentSections.map((section) => (
           <React.Fragment key={section.id}>
             <button
@@ -972,6 +982,7 @@ function App() {
             </div>
           </>
         )}
+        </div>
       </aside>
 
       <main className="map-area">
