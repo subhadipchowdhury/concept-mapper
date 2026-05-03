@@ -1,89 +1,9 @@
 /* Concept Mapper — visual styles */
 /* University of Chicago Brand Colors */
-@font-face {
-  font-family: "UChicago Sans Serif";
-  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-sans-serif/UChicagoSansSerif-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "UChicago Sans Serif";
-  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-sans-serif/UChicagoSansSerif-RegularItalic.woff2") format("woff2");
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "UChicago Sans Serif";
-  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-sans-serif/UChicagoSansSerif-SemiBold.woff2") format("woff2");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "UChicago Sans Serif";
-  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-sans-serif/UChicagoSansSerif-SemiBoldItalic.woff2") format("woff2");
-  font-weight: 600;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "UChicago Sans Serif";
-  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-sans-serif/UChicagoSansSerif-Bold.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "UChicago Sans Serif";
-  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-sans-serif/UChicagoSansSerif-BoldItalic.woff2") format("woff2");
-  font-weight: 700;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "UChicago Serif";
-  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-serif/UChicagoSerif-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "UChicago Serif";
-  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-serif/UChicagoSerif-RegularItalic.woff2") format("woff2");
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "UChicago Serif";
-  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-serif/UChicagoSerif-SemiBold.woff2") format("woff2");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "UChicago Serif";
-  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-serif/UChicagoSerif-Bold.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
   /* Dark Theme with UChicago Colors */
-  --font-sans: "UChicago Sans Serif", "Segoe UI", Arial, sans-serif;
-  --font-serif: "UChicago Serif", Georgia, "Times New Roman", serif;
+  --font-sans: "UChicagoSansSerif-Regular", "Segoe UI", Arial, sans-serif;
+  --font-sans-strong: "UChicagoSansSerif-SemiBold", "Segoe UI", Arial, sans-serif;
   --bg: #0a0c12;
   --bg2: #11141d;
   --bg3: #181c28;
@@ -97,7 +17,6 @@
   --uc-ivy: #A9C47F;
   --uc-goldenrod: #EAAA00;
   --uc-brick: #B46A55;
-  --uc-forest: #9CAF88;
   --shadow: 0 8px 32px rgba(0,0,0,0.5);
 }
 
@@ -109,7 +28,6 @@ body {
   color: var(--text);
   height: 100vh;
   overflow: hidden;
-  font-feature-settings: 'ss01' on;
 }
 
 a {
@@ -182,8 +100,9 @@ a:hover {
 }
 
 .topbar-logo-text {
+  font-family: var(--font-sans-strong);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: normal;
   letter-spacing: -0.2px;
   color: var(--text);
 }
@@ -374,7 +293,7 @@ a:hover {
 
 .sidebar-section-title {
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--uc-brick);
@@ -512,8 +431,9 @@ a:hover {
 }
 
 .sidebar-subject-title {
+  font-family: var(--font-sans-strong);
   font-size: 12.5px;
-  font-weight: 600;
+  font-weight: normal;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
@@ -605,8 +525,9 @@ a:hover {
 }
 
 .sidebar-item-title {
+  font-family: var(--font-sans-strong);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: normal;
   color: var(--text);
   display: flex;
   align-items: center;
@@ -781,7 +702,11 @@ a:hover {
   pointer-events: none;
 }
 .map-title-block { pointer-events: auto; }
-.map-title { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; }
+.map-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
 .map-desc { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
 
 .map-controls {
@@ -1218,9 +1143,9 @@ a:hover {
 .btn {
   padding: 10px 18px;
   border-radius: 10px;
-  font-family: inherit;
+  font-family: var(--font-sans-strong);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: normal;
   cursor: pointer;
   border: none;
   transition: all 0.15s;
@@ -1290,7 +1215,12 @@ a:hover {
 }
 
 .completion-emoji { font-size: 90px; display: block; margin-bottom: 16px; }
-.completion-title { font-size: 38px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+.completion-title {
+  font-size: 38px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
 .completion-sub { font-size: 16px; color: var(--text-muted); margin-bottom: 32px; line-height: 1.6; }
 .completion-sub strong { color: var(--text); }
 
@@ -1492,7 +1422,7 @@ a:hover {
 
 .maps-manager-subject-title {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.25px;
 }
 
@@ -1670,7 +1600,7 @@ a:hover {
 
 .maps-manager-row-title {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.2px;
 }
 

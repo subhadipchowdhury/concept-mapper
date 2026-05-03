@@ -693,6 +693,10 @@ function App() {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('File is too large. Map JSON files should be under 5 MB.', 'error');
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -819,6 +823,10 @@ function App() {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      showToast('File is too large. Progress backup files should be under 2 MB.', 'error');
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = () => {
