@@ -1236,9 +1236,9 @@ function App() {
               <>
                 <div className="sidebar-divider"></div>
                 <div className="sidebar-section-title">Admin</div>
-                <div className={`sidebar-item ${view.startsWith('admin') ? 'active' : ''}`} style={{'--item-color': 'var(--accent-amber)'}} onClick={openAdmin}>
+                <div className={`sidebar-item ${view.startsWith('admin') ? 'active' : ''}`} style={{'--item-color': 'var(--uc-goldenrod)'}} onClick={openAdmin}>
                   <div className="sidebar-item-title">
-                    <div className="sidebar-item-dot" style={{background: 'var(--accent-amber)'}}></div>
+                    <div className="sidebar-item-dot" style={{background: 'var(--uc-goldenrod)'}}></div>
                     Map Builder
                   </div>
                   <div className="sidebar-item-desc">Create and edit concept maps</div>

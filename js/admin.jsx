@@ -197,7 +197,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
     <>
       <div className="map-header">
         <div className="map-title-block">
-          <div className="map-title">{mapData.title} <span style={{fontSize: 12, fontWeight: 500, color: 'var(--accent-amber)', marginLeft: 8}}>● Editing</span></div>
+          <div className="map-title">{mapData.title} <span style={{fontSize: 12, fontWeight: 500, color: 'var(--uc-goldenrod)', marginLeft: 8}}>● Editing</span></div>
           <div className="map-desc">{mapData.description}</div>
         </div>
         <div className="map-controls">
@@ -268,7 +268,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
             className="admin-tool-btn"
             onClick={() => onDelete(mapData.id)}
             title="Delete this custom map from local admin storage"
-            style={{ color: 'var(--accent-rose)' }}
+            style={{ color: 'var(--uc-brick)' }}
           >
             🗑 Delete Map
           </button>
@@ -325,7 +325,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
               if (!f || !to) return null;
               const path = computeEdgePath(f, to);
               const fromN = mapData.nodes.find(n => n.id === edge.from);
-              const stroke = selectedEdgeId === edge.id ? 'var(--accent-amber)' : (fromN.color || '#818cf8');
+              const stroke = selectedEdgeId === edge.id ? 'var(--uc-goldenrod)' : (fromN.color || '#818cf8');
               return (
                 <g key={edge.id} style={{color: stroke}}>
                   <path
@@ -364,7 +364,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
                   style={{cursor: 'pointer'}}
                 >
                   <MathNode text={edge.label} />
-                  <span style={{color: 'var(--accent-teal)'}}><MathNode text={`✓ ${edge.answer}`} /></span>
+                  <span style={{color: 'var(--uc-ivy)'}}><MathNode text={`✓ ${edge.answer}`} /></span>
                   <span style={{fontSize: 10, opacity: 0.6}}>{edge.type === 'dropdown' ? '▼' : '✏️'}</span>
                 </div>
               </div>
@@ -502,7 +502,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
             Position: ({Math.round(selectedNode.x)}, {Math.round(selectedNode.y)}) - drag the node on the canvas to reposition it
           </div>
           <div className="btn-row">
-            <button className="btn btn-ghost btn-sm" onClick={() => deleteNode(selectedNode.id)} style={{flex: 1, color: 'var(--accent-rose)'}}>Delete node</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => deleteNode(selectedNode.id)} style={{flex: 1, color: 'var(--uc-brick)'}}>Delete node</button>
           </div>
         </div>
       )}
@@ -570,7 +570,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
             />
           </div>
           <div className="btn-row">
-            <button className="btn btn-ghost btn-sm" onClick={() => deleteEdge(selectedEdge.id)} style={{flex: 1, color: 'var(--accent-rose)'}}>Delete edge</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => deleteEdge(selectedEdge.id)} style={{flex: 1, color: 'var(--uc-brick)'}}>Delete edge</button>
           </div>
         </div>
       )}
@@ -778,7 +778,7 @@ function MapsManager({
               className="maps-manager-row"
               style={{
                 '--row-color': m.color,
-                outline: dragOverId === m.id ? '2px dashed var(--accent-amber)' : 'none',
+                outline: dragOverId === m.id ? '2px dashed var(--uc-goldenrod)' : 'none',
                 opacity: draggedId === m.id ? 0.58 : 1,
               }}
               draggable
