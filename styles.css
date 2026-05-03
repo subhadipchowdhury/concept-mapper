@@ -1339,6 +1339,32 @@ body {
   gap: 12px;
 }
 
+.admin-repo-sync-banner {
+  margin: 18px 22px 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-repo-sync-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.admin-repo-sync-copy strong {
+  color: #fcd78a;
+  font-size: 12.5px;
+}
+
 .maps-manager-subject-header {
   display: flex;
   align-items: center;
@@ -1847,6 +1873,12 @@ body {
     padding: 18px 14px 22px;
   }
 
+  .admin-repo-sync-banner {
+    margin: 18px 14px 0;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .maps-manager-subject-header {
     flex-direction: column;
     align-items: flex-start;
@@ -2124,6 +2156,11 @@ body {
 
   .maps-manager {
     padding: 12px 10px 14px;
+  }
+
+  .admin-repo-sync-banner {
+    margin: 12px 10px 0;
+    padding: 10px 11px;
   }
 
   .maps-manager-subject-title {

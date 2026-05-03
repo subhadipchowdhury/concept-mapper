@@ -325,12 +325,17 @@ function App() {
   const importInputRef = useRefApp(null);
   const importCustomMapInputRef = useRefApp(null);
   const toastTimerRef = useRefApp(null);
+  const adminRepoPromptSignatureRef = useRefApp('');
 
   const publishedCustomMaps = Object.fromEntries(
     Object.entries(customMaps).filter(([, m]) => !!m?._published)
   );
   const studentMaps = { ...builtInMaps, ...publishedCustomMaps };
   const adminMaps = { ...builtInMaps, ...customMaps };
+  const repoMismatchMapIds = Object.keys(customMaps).filter((id) => (
+    builtInMaps[id] && !mapsEquivalent(customMaps[id], builtInMaps[id])
+  ));
+  const repoMismatchSignature = [...repoMismatchMapIds].sort().join('|');
   const allSubjects = buildSubjectCatalog(subjectOrder, adminMaps, customSubjects);
   const subjectTitleById = Object.fromEntries(allSubjects.map((s) => [s.id, s.title]));
 
@@ -355,6 +360,35 @@ function App() {
     hydrateBuiltInMaps();
     return () => { cancelled = true; };
   }, []);
+
+  // When opening admin, refresh built-in maps from repo so comparisons use the latest source.
+  useEffectApp(() => {
+    if (!view.startsWith('admin')) return undefined;
+    let cancelled = false;
+
+    async function refreshBuiltInsForAdmin() {
+      try {
+        const { maps, failures, order } = await loadBuiltInMaps();
+        if (cancelled) return;
+        setBuiltInMaps(maps);
+        setManifestOrder(order || []);
+        if (failures.length > 0) {
+          const message = `Some maps failed to load: ${failures.join(' | ')}`;
+          setMapsLoadError(message);
+          showToast('Admin refresh found map loading issues. Check console details.', 'error', 4200);
+        } else {
+          setMapsLoadError('');
+        }
+      } catch (err) {
+        if (cancelled) return;
+        setMapsLoadError(err?.message || 'Failed to load built-in maps.');
+        showToast('Could not refresh built-in maps from the repo source.', 'error', 4200);
+      }
+    }
+
+    refreshBuiltInsForAdmin();
+    return () => { cancelled = true; };
+  }, [view]);
 
   useEffectApp(() => {
     const nextOrder = buildOrderedIds(
@@ -411,6 +445,24 @@ function App() {
     }, durationMs);
   }
 
+  // Replace local overrides with current built-in copies from repo.
+  function handleUpdateOverridesFromRepo(mapIds) {
+    const ids = (Array.isArray(mapIds) ? mapIds : [])
+      .filter((id) => customMaps[id] && builtInMaps[id]);
+    if (ids.length === 0) {
+      showToast('All local overrides already match repo maps.', 'info');
+      return;
+    }
+
+    const next = { ...customMaps };
+    ids.forEach((id) => {
+      delete next[id];
+    });
+    setCustomMaps(next);
+    saveCustomMaps(next);
+    showToast(`Updated ${ids.length} local override${ids.length === 1 ? '' : 's'} from repo.`, 'success', 3200);
+  }
+
   useEffectApp(() => {
     const staleCustomIds = Object.keys(customMaps).filter((id) => (
       builtInMaps[id] && mapsEquivalent(customMaps[id], builtInMaps[id])
@@ -424,6 +476,24 @@ function App() {
     setCustomMaps(next);
     saveCustomMaps(next);
   }, [builtInMaps, customMaps]);
+
+  // Prompt admins to update stale local overrides after repo refresh.
+  useEffectApp(() => {
+    if (!view.startsWith('admin')) {
+      adminRepoPromptSignatureRef.current = '';
+      return;
+    }
+    if (repoMismatchMapIds.length === 0) return;
+    if (adminRepoPromptSignatureRef.current === repoMismatchSignature) return;
+
+    adminRepoPromptSignatureRef.current = repoMismatchSignature;
+    const shouldUpdate = window.confirm(
+      `${repoMismatchMapIds.length} local override(s) differ from the latest repo version.\n\nUpdate local copies from repo now?`
+    );
+    if (shouldUpdate) {
+      handleUpdateOverridesFromRepo(repoMismatchMapIds);
+    }
+  }, [view, repoMismatchMapIds, repoMismatchSignature]);
 
   // Return progress for a map, always providing a Set-based default.
   function getProgress(mapId) {
@@ -829,6 +899,10 @@ function App() {
   const resolvedAdminSubjectId = adminSubjectId === 'all' || allSubjects.some((s) => s.id === adminSubjectId)
     ? adminSubjectId
     : 'all';
+  const repoMismatchPreview = repoMismatchMapIds
+    .slice(0, 3)
+    .map((id) => adminMaps[id]?.title || id)
+    .join(', ');
   const studentSections = buildSubjectSections(
     orderedStudentMapIds,
     studentMaps,
@@ -1204,24 +1278,42 @@ function App() {
           </div>
         )}
         {view === 'admin' && (
-          <MapsManager
-            allMaps={adminMaps}
-            builtInMaps={builtInMaps}
-            subjects={allSubjects}
-            orderedMapIds={orderedAdminMapIds}
-            selectedSubjectId={resolvedAdminSubjectId}
-            customMaps={customMaps}
-            onEdit={handleEditMap}
-            onCreate={handleCreateNewMap}
-            onCreateSubject={handleCreateSubject}
-            onExportMap={handleExportMapJSON}
-            onExportManifest={handleExportManifestJSON}
-            onReorderMap={handleReorderMaps}
-            onMoveToSubject={handleMoveMapToSubject}
-            onImportMap={triggerImportCustomMap}
-            onTogglePublish={handleTogglePublish}
-            onRevertToBuiltIn={handleRevertToBuiltIn}
-          />
+          <>
+            {repoMismatchMapIds.length > 0 && (
+              <div className="admin-repo-sync-banner" role="status" aria-live="polite">
+                <div className="admin-repo-sync-copy">
+                  <strong>{repoMismatchMapIds.length} local override{repoMismatchMapIds.length === 1 ? '' : 's'} out of date.</strong>
+                  <span>
+                    Latest repo versions are available{repoMismatchPreview ? ` (${repoMismatchPreview}${repoMismatchMapIds.length > 3 ? ', ...' : ''})` : ''}.
+                  </span>
+                </div>
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => handleUpdateOverridesFromRepo(repoMismatchMapIds)}
+                >
+                  Update from Repo
+                </button>
+              </div>
+            )}
+            <MapsManager
+              allMaps={adminMaps}
+              builtInMaps={builtInMaps}
+              subjects={allSubjects}
+              orderedMapIds={orderedAdminMapIds}
+              selectedSubjectId={resolvedAdminSubjectId}
+              customMaps={customMaps}
+              onEdit={handleEditMap}
+              onCreate={handleCreateNewMap}
+              onCreateSubject={handleCreateSubject}
+              onExportMap={handleExportMapJSON}
+              onExportManifest={handleExportManifestJSON}
+              onReorderMap={handleReorderMaps}
+              onMoveToSubject={handleMoveMapToSubject}
+              onImportMap={triggerImportCustomMap}
+              onTogglePublish={handleTogglePublish}
+              onRevertToBuiltIn={handleRevertToBuiltIn}
+            />
+          </>
         )}
         {view === 'admin-edit' && editingMap && (
           <AdminCanvas
