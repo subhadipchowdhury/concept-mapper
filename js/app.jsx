@@ -1179,6 +1179,11 @@ function App() {
                   const total = m.edges.length;
                   const done = (prog.answeredEdges || new Set()).size;
                   const pct = total > 0 ? (done / total) * 100 : 0;
+                  const statusDotColor = done === 0
+                    ? '#A6A6A6'
+                    : done >= total && total > 0
+                      ? '#3EB1C8'
+                      : '#ECA154';
                   return (
                     <div
                       key={m.id}
@@ -1191,7 +1196,7 @@ function App() {
                       }}
                     >
                       <div className="sidebar-item-title">
-                        <div className="sidebar-item-dot" style={{background: m.color}}></div>
+                        <div className="sidebar-item-dot" style={{ background: statusDotColor }}></div>
                         {m.title}
                       </div>
                       <div className="sidebar-item-desc">{m.description}</div>
