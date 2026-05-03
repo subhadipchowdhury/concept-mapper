@@ -1,15 +1,97 @@
 /* Concept Mapper — visual styles */
 /* University of Chicago Brand Colors */
+@font-face {
+  font-family: "UChicago Sans Serif";
+  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-sans-serif/UChicagoSansSerif-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UChicago Sans Serif";
+  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-sans-serif/UChicagoSansSerif-RegularItalic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UChicago Sans Serif";
+  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-sans-serif/UChicagoSansSerif-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UChicago Sans Serif";
+  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-sans-serif/UChicagoSansSerif-SemiBoldItalic.woff2") format("woff2");
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UChicago Sans Serif";
+  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-sans-serif/UChicagoSansSerif-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UChicago Sans Serif";
+  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-sans-serif/UChicagoSansSerif-BoldItalic.woff2") format("woff2");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UChicago Serif";
+  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-serif/UChicagoSerif-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UChicago Serif";
+  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-serif/UChicagoSerif-RegularItalic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UChicago Serif";
+  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-serif/UChicagoSerif-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UChicago Serif";
+  src: url("https://uchicago-brand-fonts.s3.us-east-2.amazonaws.com/fonts/uchicago-serif/UChicagoSerif-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* Dark Theme with UChicago Colors */
+  --font-sans: "UChicago Sans Serif", "Segoe UI", Arial, sans-serif;
+  --font-serif: "UChicago Serif", Georgia, "Times New Roman", serif;
   --bg: #0a0c12;
   --bg2: #11141d;
   --bg3: #181c28;
   --bg4: #20253a;
-  --border: rgba(255,255,255,0.08);
-  --border-2: rgba(255,255,255,0.14);
+  --border: rgba(255,255,255,0.1);
+  --border-2: rgba(255,255,255,0.18);
   --text: #e8eaf2;
-  --text-muted: #6b7280;
+  --text-muted: #7a8293;
   --text-dim: #9ca3af;
   --uc-lake: #3EB1C8;
   --uc-ivy: #A9C47F;
@@ -22,12 +104,24 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-sans);
   background: var(--bg);
   color: var(--text);
   height: 100vh;
   overflow: hidden;
   font-feature-settings: 'ss01' on;
+}
+
+a {
+  color: var(--uc-lake);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: #6cc5d7;
+  text-decoration-style: solid;
 }
 
 /* ─── LAYOUT ─── */
@@ -115,7 +209,7 @@ body {
 
 .topbar-context-subject {
   font-size: 12px;
-  color: rgba(180,106,85, 0.88);
+  color: var(--uc-brick);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -283,7 +377,7 @@ body {
   font-weight: 700;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: rgba(180,106,85,0.6);
+  color: var(--uc-brick);
   padding: 0 16px 0;
 }
 
@@ -412,7 +506,7 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 11px;
-  color: rgba(180,106,85,0.9);
+  color: var(--uc-brick);
   background: rgba(128,0,0,0.12);
   flex-shrink: 0;
 }
@@ -445,7 +539,7 @@ body {
   border-radius: 9px;
   border: 1.5px dashed rgba(128,0,0,0.24);
   background: transparent;
-  color: rgba(180,106,85,0.72);
+  color: var(--uc-brick);
   font-family: inherit;
   font-size: 12px;
   font-weight: 600;
@@ -472,13 +566,13 @@ body {
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: rgba(180,106,85,0.55);
+  color: var(--uc-brick);
   padding: 10px 16px 5px;
   font-family: inherit;
 }
 
 .sidebar-folder-title:hover {
-  color: rgba(180,106,85,0.85);
+  color: #ECA154;
 }
 
 .sidebar-folder-caret {
@@ -963,7 +1057,7 @@ body {
   white-space: nowrap;
   cursor: pointer;
   transition: all 0.15s;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   display: flex; align-items: center; gap: 5px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
@@ -1131,7 +1225,7 @@ body {
   border: none;
   transition: all 0.15s;
 }
-.btn-primary { background: var(--uc-lake); color: #fff; flex: 1; }
+.btn-primary { background: var(--uc-lake); color: #0a0c12; flex: 1; }
 .btn-primary:hover { filter: brightness(1.1); }
 .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
 .btn-ghost {
@@ -1459,11 +1553,11 @@ body {
 }
 
 .maps-manager-overflow-item.danger {
-  color: rgba(180,106,85,0.82);
+  color: var(--uc-brick);
 }
 
 .maps-manager-overflow-item.danger:hover {
-  background: rgba(180,106,85,0.09);
+  background: rgba(180,106,85,0.14);
   color: var(--uc-brick);
 }
 
@@ -1725,7 +1819,7 @@ body {
   border: 1px solid var(--border-2);
   padding: 1px 5px;
   border-radius: 4px;
-  font-family: 'DM Mono', monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   font-size: 10px;
 }
 
