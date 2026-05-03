@@ -751,8 +751,8 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
               const path = computeEdgePath(f, to, { labelT: edgeLabelT });
               const fromN = mapData.nodes.find(n => n.id === edge.from);
               const stroke = !fromUnlocked ? 'rgba(255,255,255,0.08)'
-                           : isAnswered ? (fromN.color || '#34d399')
-                           : (fromN.color || '#818cf8');
+                           : isAnswered ? (fromN.color || '#A9C47F')
+                           : (fromN.color || '#3EB1C8');
               return (
                 <g key={edge.id} style={{color: stroke}}>
                   <path

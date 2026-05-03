@@ -108,10 +108,10 @@ data/maps/
   "id": "sequences",
   "title": "Sequences",
   "description": "...",
-  "color": "#34d399",
-  "accentColor": "#10b981",
+  "color": "#A9C47F",
+  "accentColor": "#9CAF88",
   "nodes": [
-    { "id": "start", "label": "Sequence", "x": 100, "y": 100, "isStart": true, "color": "#34d399" }
+    { "id": "start", "label": "Sequence", "x": 100, "y": 100, "isStart": true, "color": "#A9C47F" }
   ],
   "edges": [
     { "id": "edge1", "from": "start", "to": "limit", "label": "approaches a single value", "answer": "converges" }

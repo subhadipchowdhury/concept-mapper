@@ -4,13 +4,13 @@
 const { useState: useStateA, useRef: useRefA, useEffect: useEffectA, useMemo: useMemoA } = React;
 
 const NODE_COLOR_PALETTE = [
-  '#4f8ef7', // blue
-  '#34d399', // teal
-  '#f59e0b', // amber
-  '#fb7185', // rose
-  '#a78bfa', // purple
-  '#06b6d4', // cyan
-  '#f472b6', // pink
+  '#3EB1C8', // Light Lake
+  '#A9C47F', // Light Ivy
+  '#EAAA00', // Goldenrod
+  '#B46A55', // Light Brick
+  '#9CAF88', // Light Forest
+  '#A6A6A6', // Light Greystone
+  '#ECA154', // Light Terracotta
 ];
 
 function adminMapPublishPath(mapData) {
@@ -325,7 +325,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
               if (!f || !to) return null;
               const path = computeEdgePath(f, to);
               const fromN = mapData.nodes.find(n => n.id === edge.from);
-              const stroke = selectedEdgeId === edge.id ? 'var(--uc-goldenrod)' : (fromN.color || '#818cf8');
+              const stroke = selectedEdgeId === edge.id ? 'var(--uc-goldenrod)' : (fromN.color || '#3EB1C8');
               return (
                 <g key={edge.id} style={{color: stroke}}>
                   <path
@@ -401,8 +401,8 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
                 <div
                   className={`node-card unlocked ${node.isStart ? 'start' : ''} ${isSelected ? 'selected' : ''} ${isConnectSource ? 'connect-source' : ''} ${hoverNode === node.id && connectSource && connectSource !== node.id ? 'connect-target-hover' : ''}`}
                   style={{
-                    background: nodeBg(node.color || '#4f8ef7'),
-                    borderColor: nodeBorder(node.color || '#4f8ef7'),
+                    background: nodeBg(node.color || '#3EB1C8'),
+                    borderColor: nodeBorder(node.color || '#3EB1C8'),
                     width: sz.w,
                   }}
                 >

@@ -57,7 +57,7 @@ function launchConfetti() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   const ctx = canvas.getContext('2d');
-  const colors = ['#4f8ef7','#34d399','#f59e0b','#fb7185','#a78bfa','#06b6d4','#f472b6'];
+  const colors = ['#3EB1C8','#A9C47F','#EAAA00','#B46A55','#9CAF88','#A6A6A6','#ECA154'];
   const pieces = Array.from({ length: 160 }, () => ({
     x: Math.random() * canvas.width,
     y: Math.random() * -canvas.height,
@@ -513,8 +513,8 @@ function normalizeMapData(rawMap, fallbackId) {
     id: typeof map.id === 'string' ? map.id : fallbackId,
     title: typeof map.title === 'string' ? map.title : 'Untitled Map',
     description: typeof map.description === 'string' ? map.description : '',
-    color: typeof map.color === 'string' ? map.color : '#4f8ef7',
-    accentColor: typeof map.accentColor === 'string' ? map.accentColor : '#a78bfa',
+    color: typeof map.color === 'string' ? map.color : '#3EB1C8',
+    accentColor: typeof map.accentColor === 'string' ? map.accentColor : '#9CAF88',
     subjectId: typeof map.subjectId === 'string' ? map.subjectId : 'general',
     subjectTitle: typeof map.subjectTitle === 'string' ? map.subjectTitle : 'General',
     nodes: safeNodes,
