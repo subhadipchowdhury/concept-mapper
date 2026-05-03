@@ -165,11 +165,11 @@
       "id": "rk_e7",
       "from": "rateConstant",
       "to": "temperature",
-      "label": "in the Arrhenius relationship, the rate constant k depends strongly on ___",
-      "answer": "temperature",
+      "label": "in the Arrhenius relationship, the temperature term T must be expressed in ___",
+      "answer": "kelvin",
       "type": "dropdown",
-      "options": ["temperature", "pressure", "volume", "reaction order"],
-      "hint": "Arrhenius links k to absolute temperature through an exponential factor."
+      "options": ["kelvin", "celsius", "fahrenheit", "atm"],
+      "hint": "Arrhenius uses absolute temperature, so T must be in kelvin."
     },
     {
       "id": "rk_e8",
