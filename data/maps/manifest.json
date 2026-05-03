@@ -22,7 +22,7 @@
   },
   {
     "id": "reactionKinetics",
-    "title": "Chemical Kinetics and Rate Laws",
+    "title": "Reaction Kinetics and Rate Laws",
     "file": "data/maps/chemical-reactions/reactionKinetics.json",
     "subjectId": "chemical-reactions",
     "subjectTitle": "Chemical Reactions"
