@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Redesign — Option C: Card Gallery</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c12; --bg2: #11141d; --bg3: #181c28; --bg4: #20253a;
+  --border: rgba(255,255,255,0.08); --border-2: rgba(255,255,255,0.14);
+  --text: #e8eaf2; --text-muted: #6b7280; --text-dim: #9ca3af;
+  --uc-lake: #3EB1C8; --uc-ivy: #A9C47F;
+  --uc-goldenrod: #EAAA00; --uc-brick: #B46A55; --uc-forest: #9CAF88;
+  --shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #060810;
+  color: var(--text);
+  padding: 40px 36px;
+  min-height: 100vh;
+}
+
+.page-header { margin-bottom: 40px; }
+.page-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.page-subtitle { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+.page-tag {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: rgba(234,170,0,0.1);
+  color: var(--uc-goldenrod);
+  border: 1px solid rgba(234,170,0,0.22);
+}
+
+/* ── App frame ── */
+.app-frame {
+  width: 1100px;
+  height: 720px;
+  background: var(--bg);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Topbar ── */
+.topbar {
+  height: 56px;
+  background: rgba(17,20,29,0.92);
+  border-bottom: 1px solid rgba(62,177,200,0.12);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 12px;
+  flex-shrink: 0;
+  position: relative;
+}
+.topbar::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, rgba(62,177,200,0.4) 30%, rgba(169,196,127,0.3) 70%, transparent);
+}
+.logo-mark {
+  width: 26px; height: 26px;
+  background: linear-gradient(135deg, var(--uc-lake), var(--uc-forest));
+  border-radius: 8px;
+}
+.logo-text { font-size: 13px; font-weight: 600; }
+.topbar-div { width: 1px; height: 18px; background: rgba(255,255,255,0.1); }
+.role-switcher {
+  display: flex;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+.role-btn {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-size: 12px; font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+}
+.role-btn.active {
+  background: rgba(62,177,200,0.22);
+  border-color: rgba(62,177,200,0.32);
+  color: #3EB1C8;
+}
+.topbar-spacer { flex: 1; }
+
+/* ── Admin body ── */
+.admin-body {
+  flex: 1;
+  overflow-y: auto;
+  background:
+    radial-gradient(circle at 10% 15%, rgba(62,177,200,0.06) 0%, transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(169,196,127,0.05) 0%, transparent 35%),
+    var(--bg);
+}
+
+/* ── Admin header bar (sticky) ── */
+.admin-header-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 28px;
+  background: rgba(10,12,18,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.admin-header-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  flex-shrink: 0;
+}
+.admin-header-div { width: 1px; height: 18px; background: rgba(255,255,255,0.08); }
+
+/* Tag/subject filter row */
+.subject-chips {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.subject-chips::-webkit-scrollbar { display: none; }
+.subject-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.13s;
+  flex-shrink: 0;
+}
+.subject-chip:hover { color: var(--text); border-color: var(--border-2); background: rgba(255,255,255,0.04); }
+.subject-chip.active {
+  color: var(--text);
+  border-color: var(--chip-color, var(--uc-lake));
+  background: var(--chip-bg, rgba(62,177,200,0.1));
+}
+.subject-chip-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--chip-color, var(--uc-lake));
+}
+
+/* Header right actions */
+.header-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.btn {
+  padding: 7px 14px;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.15s;
+}
+.btn-primary { background: var(--uc-lake); color: #fff; }
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-ghost {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+
+/* ── Scroll content ── */
+.admin-scroll-content {
+  padding: 24px 28px 48px;
+}
+
+/* ── Map cards gallery ── */
+.maps-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+/* Rich map card */
+.map-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.map-card:hover {
+  border-color: rgba(255,255,255,0.12);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+}
+
+/* Card gradient header band */
+.map-card-band {
+  height: 72px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 16px 10px;
+}
+.map-card-band-bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+}
+/* Abstract node visualization */
+.map-card-nodes-preview {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.preview-node {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.35;
+}
+.preview-line {
+  position: absolute;
+  height: 1px;
+  background: rgba(255,255,255,0.2);
+  transform-origin: 0 50%;
+}
+.map-card-subject-tag {
+  position: relative;
+  z-index: 2;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-dim);
+}
+
+.map-card-body { padding: 14px 16px 16px; }
+
+.map-card-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.map-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--text);
+  line-height: 1.3;
+}
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  flex-shrink: 0;
+}
+.status-badge.published {
+  background: rgba(169,196,127,0.12);
+  color: #A9C47F;
+  border: 1px solid rgba(169,196,127,0.25);
+}
+.status-badge.draft {
+  background: rgba(234,170,0,0.1);
+  color: var(--uc-goldenrod);
+  border: 1px solid rgba(234,170,0,0.2);
+}
+.status-badge.builtin {
+  background: rgba(154,175,136,0.1);
+  color: #9CAF88;
+  border: 1px solid rgba(154,175,136,0.2);
+}
+.status-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+.map-card-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin-bottom: 12px;
+  min-height: 36px;
+}
+
+.map-card-stats-row {
+  display: flex;
+  gap: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  align-items: center;
+}
+.map-card-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+.map-card-stat strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+/* Actions row (shown on hover in real app) */
+.map-card-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+.card-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.12s;
+  flex: 1;
+  text-align: center;
+}
+.card-btn:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.card-btn.primary {
+  color: #3EB1C8;
+  border-color: rgba(62,177,200,0.25);
+  background: rgba(62,177,200,0.08);
+}
+.card-btn.primary:hover { background: rgba(62,177,200,0.15); }
+
+/* New map card */
+.map-card-new {
+  background: transparent;
+  border: 1.5px dashed rgba(62,177,200,0.2);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px 20px;
+  cursor: pointer;
+  color: rgba(62,177,200,0.5);
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.15s;
+  min-height: 196px;
+}
+.map-card-new:hover {
+  border-color: var(--uc-lake);
+  color: var(--uc-lake);
+  background: rgba(62,177,200,0.04);
+}
+.map-card-new-plus {
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 300;
+}
+
+/* ── Changes note ── */
+.changes-note {
+  margin-top: 36px;
+  padding: 20px 24px;
+  background: rgba(17,20,29,0.85);
+  border: 1px solid rgba(234,170,0,0.2);
+  border-radius: 14px;
+  max-width: 1100px;
+}
+.changes-note h3 {
+  font-size: 13px; font-weight: 700;
+  color: var(--uc-goldenrod);
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 7px;
+}
+.changes-list {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px 24px; list-style: none;
+}
+.changes-list li {
+  font-size: 12.5px; color: var(--text-dim); line-height: 1.5;
+  display: flex; align-items: flex-start; gap: 7px;
+}
+.changes-list li::before {
+  content: '→'; color: var(--uc-goldenrod); font-weight: 700;
+  flex-shrink: 0; margin-top: 1px;
+}
+.tag-added { color: var(--uc-ivy); }
+.tag-changed { color: var(--uc-goldenrod); }
+.tag-removed { color: var(--uc-brick); }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-title">Admin Page Redesign — Option C</div>
+  <div class="page-subtitle">Card Gallery — subject filters as horizontal chips, large visual cards with abstract node previews. Feels more like a CMS or app dashboard.</div>
+  <div class="page-tag">Option C</div>
+</div>
+
+<div class="app-frame">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="logo-mark"></div>
+    <span class="logo-text">Concept Mapper</span>
+    <div class="topbar-div"></div>
+    <div class="role-switcher">
+      <button class="role-btn">Student</button>
+      <button class="role-btn active">Admin</button>
+    </div>
+    <div class="topbar-spacer"></div>
+  </div>
+
+  <div class="admin-body">
+
+    <!-- Sticky header bar with subject chips -->
+    <div class="admin-header-bar">
+      <div class="admin-header-title">Map Library</div>
+      <div class="admin-header-div"></div>
+
+      <!-- Subject filter chips -->
+      <div class="subject-chips">
+        <button class="subject-chip" style="--chip-color: rgba(255,255,255,0.35); --chip-bg: rgba(255,255,255,0.06);">
+          All · 9
+        </button>
+        <button class="subject-chip active" style="--chip-color: #3EB1C8; --chip-bg: rgba(62,177,200,0.1);">
+          <span class="subject-chip-dot" style="background: #3EB1C8;"></span>
+          Real Analysis
+        </button>
+        <button class="subject-chip" style="--chip-color: #A9C47F; --chip-bg: rgba(169,196,127,0.08);">
+          <span class="subject-chip-dot" style="background: #A9C47F;"></span>
+          Diff. Equations
+        </button>
+        <button class="subject-chip" style="--chip-color: #EAAA00; --chip-bg: rgba(234,170,0,0.08);">
+          <span class="subject-chip-dot" style="background: #EAAA00;"></span>
+          Chemical Reactions
+        </button>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn btn-ghost">⋯</button>
+        <button class="btn btn-primary">+ New Map</button>
+      </div>
+    </div>
+
+    <!-- Gallery content -->
+    <div class="admin-scroll-content">
+      <div class="maps-gallery">
+
+        <!-- Card 1 — built-in blue -->
+        <div class="map-card">
+          <div class="map-card-band" style="background: linear-gradient(135deg, rgba(62,177,200,0.3) 0%, rgba(62,177,200,0.1) 100%);">
+            <div class="map-card-nodes-preview">
+              <!-- Abstract node preview (decorative) -->
+              <div class="preview-node" style="width:28px;height:28px;background:#3EB1C8;top:12px;left:18px;"></div>
+              <div class="preview-node" style="width:20px;height:20px;background:#9CAF88;top:22px;left:80px;"></div>
+              <div class="preview-node" style="width:22px;height:22px;background:#A6A6A6;top:8px;left:140px;"></div>
+              <div class="preview-node" style="width:16px;height:16px;background:#3EB1C8;top:30px;left:200px;"></div>
+              <div class="preview-line" style="width:64px;top:25px;left:32px;transform:rotate(8deg);"></div>
+              <div class="preview-line" style="width:62px;top:22px;left:90px;transform:rotate(-5deg);"></div>
+              <div class="preview-line" style="width:60px;top:25px;left:151px;transform:rotate(15deg);"></div>
+            </div>
+            <div class="map-card-subject-tag">Real Analysis</div>
+          </div>
+          <div class="map-card-body">
+            <div class="map-card-header-row">
+              <div class="map-card-title">Sequences &amp; Convergence</div>
+              <span class="status-badge builtin"><span class="status-badge-dot"></span>Built-in</span>
+            </div>
+            <div class="map-card-desc">Monotone convergence theorem, Cauchy sequences, subsequences and cluster points.</div>
+            <div class="map-card-stats-row">
+              <div class="map-card-stat"><strong>12</strong>&nbsp;nodes</div>
+              <div class="map-card-stat"><strong>11</strong>&nbsp;edges</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 — built-in purple -->
+        <div class="map-card">
+          <div class="map-card-band" style="background: linear-gradient(135deg, rgba(154,175,136,0.3) 0%, rgba(154,175,136,0.1) 100%);">
+            <div class="map-card-nodes-preview">
+              <div class="preview-node" style="width:24px;height:24px;background:#9CAF88;top:10px;left:20px;"></div>
+              <div class="preview-node" style="width:30px;height:30px;background:#3EB1C8;top:18px;left:90px;"></div>
+              <div class="preview-node" style="width:18px;height:18px;background:#9CAF88;top:8px;left:160px;"></div>
+              <div class="preview-node" style="width:20px;height:20px;background:#ECA154;top:26px;left:220px;"></div>
+              <div class="preview-line" style="width:72px;top:22px;left:34px;transform:rotate(10deg);"></div>
+              <div class="preview-line" style="width:72px;top:22px;left:110px;transform:rotate(-8deg);"></div>
+              <div class="preview-line" style="width:60px;top:20px;left:170px;transform:rotate(14deg);"></div>
+            </div>
+            <div class="map-card-subject-tag">Real Analysis</div>
+          </div>
+          <div class="map-card-body">
+            <div class="map-card-header-row">
+              <div class="map-card-title">Series &amp; Convergence Tests</div>
+              <span class="status-badge builtin"><span class="status-badge-dot"></span>Built-in</span>
+            </div>
+            <div class="map-card-desc">Comparison, ratio, and root tests. Power series and radius of convergence.</div>
+            <div class="map-card-stats-row">
+              <div class="map-card-stat"><strong>14</strong>&nbsp;nodes</div>
+              <div class="map-card-stat"><strong>13</strong>&nbsp;edges</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 — custom published teal -->
+        <div class="map-card">
+          <div class="map-card-band" style="background: linear-gradient(135deg, rgba(169,196,127,0.25) 0%, rgba(169,196,127,0.08) 100%);">
+            <div class="map-card-nodes-preview">
+              <div class="preview-node" style="width:26px;height:26px;background:#A9C47F;top:14px;left:16px;"></div>
+              <div class="preview-node" style="width:20px;height:20px;background:#A6A6A6;top:22px;left:80px;"></div>
+              <div class="preview-node" style="width:24px;height:24px;background:#A9C47F;top:10px;left:140px;"></div>
+              <div class="preview-line" style="width:66px;top:26px;left:30px;transform:rotate(6deg);"></div>
+              <div class="preview-line" style="width:62px;top:22px;left:90px;transform:rotate(-10deg);"></div>
+            </div>
+            <div class="map-card-subject-tag">Real Analysis</div>
+          </div>
+          <div class="map-card-body">
+            <div class="map-card-header-row">
+              <div class="map-card-title">Function Sequences</div>
+              <span class="status-badge published"><span class="status-badge-dot"></span>Published</span>
+            </div>
+            <div class="map-card-desc">Pointwise vs. uniform convergence, Dini's theorem, Weierstrass M-test.</div>
+            <div class="map-card-stats-row">
+              <div class="map-card-stat"><strong>8</strong>&nbsp;nodes</div>
+              <div class="map-card-stat"><strong>7</strong>&nbsp;edges</div>
+            </div>
+            <div class="map-card-actions">
+              <button class="card-btn">Unpublish</button>
+              <button class="card-btn primary">Export JSON</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 — draft amber -->
+        <div class="map-card">
+          <div class="map-card-band" style="background: linear-gradient(135deg, rgba(234,170,0,0.25) 0%, rgba(234,170,0,0.08) 100%);">
+            <div class="map-card-nodes-preview">
+              <div class="preview-node" style="width:22px;height:22px;background:#EAAA00;top:16px;left:22px;"></div>
+              <div class="preview-node" style="width:28px;height:28px;background:#B46A55;top:12px;left:90px;"></div>
+              <div class="preview-node" style="width:18px;height:18px;background:#EAAA00;top:24px;left:160px;"></div>
+              <div class="preview-line" style="width:70px;top:24px;left:34px;transform:rotate(-5deg);"></div>
+              <div class="preview-line" style="width:68px;top:24px;left:108px;transform:rotate(10deg);"></div>
+            </div>
+            <div class="map-card-subject-tag">Diff. Equations</div>
+          </div>
+          <div class="map-card-body">
+            <div class="map-card-header-row">
+              <div class="map-card-title">PDE Heat Equation</div>
+              <span class="status-badge draft"><span class="status-badge-dot"></span>Draft</span>
+            </div>
+            <div class="map-card-desc">Separation of variables, Fourier series solutions to the heat equation.</div>
+            <div class="map-card-stats-row">
+              <div class="map-card-stat"><strong>9</strong>&nbsp;nodes</div>
+              <div class="map-card-stat"><strong>8</strong>&nbsp;edges</div>
+            </div>
+            <div class="map-card-actions">
+              <button class="card-btn primary">Publish</button>
+              <button class="card-btn">Export JSON</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- New card placeholder -->
+        <div class="map-card-new">
+          <div class="map-card-new-plus">+</div>
+          Create a new map
+        </div>
+
+      </div><!-- /gallery -->
+    </div>
+  </div><!-- /admin-body -->
+</div><!-- /app-frame -->
+
+<!-- Changes note -->
+<div class="changes-note">
+  <h3>🟡 Option C — Key Changes vs. Current Design</h3>
+  <ul class="changes-list">
+    <li><span class="tag-added">[new]</span> Horizontal subject chip filter bar — sticky at top, select a subject or "All" to instantly filter gallery</li>
+    <li><span class="tag-added">[new]</span> Card header band with abstract node preview visualization — gives each card a unique visual identity</li>
+    <li><span class="tag-changed">[changed]</span> Larger, taller cards with gradient color bands instead of a thin top stripe — much more distinct and visually rich</li>
+    <li><span class="tag-added">[new]</span> Subject tag shown inside the card band (breadcrumb-style) so subject context is always visible in "All" view</li>
+    <li><span class="tag-removed">[removed]</span> Folder section accordion structure replaced by filter state — less nested, flatter browsing experience</li>
+    <li><span class="tag-changed">[changed]</span> Status badge moved to top-right corner of card title area for immediate visibility</li>
+    <li><span class="tag-changed">[changed]</span> Actions (Publish, Export) only visible for custom maps; built-in cards are intentionally minimal</li>
+    <li><span class="tag-changed">[changed]</span> Overflow menu (⋯) for secondary/danger actions — same approach as Option A</li>
+  </ul>
+</div>
+
+</body>
+</html>
