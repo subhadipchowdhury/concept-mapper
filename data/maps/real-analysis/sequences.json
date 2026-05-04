@@ -10,200 +10,200 @@
     {
       "id": "seq",
       "label": "Sequence\\n\\(\\{a_n\\}: \\mathbb{N} \\to \\mathbb{R}\\)",
-      "x": 470,
-      "y": 60,
+      "x": 1138.4721647231906,
+      "y": 327.5646497941945,
       "color": "#0f766e",
       "isStart": true
     },
     {
       "id": "gp",
       "label": "Geometric Progression\\n\\(a_n=ar^{n-1}\\)",
-      "x": 180,
-      "y": 60,
+      "x": 1663.1058503891704,
+      "y": 120,
       "color": "#0f766e"
     },
     {
       "id": "enconv",
       "label": "ε–N Convergence\\n\\(a_n \\to L\\)",
-      "x": 470,
-      "y": 190,
+      "x": 1367.255221110264,
+      "y": 770.7612798119433,
       "color": "#06b6d4"
     },
     {
       "id": "shift",
       "label": "Shift Theorem\\n\\(a_n\\to L \\Rightarrow a_{n+k}\\to L\\)",
-      "x": 1030,
-      "y": 190,
+      "x": 1894.743761934861,
+      "y": 422.0505873289254,
       "color": "#34d399"
     },
     {
       "id": "div",
       "label": "Divergence",
-      "x": 760,
-      "y": 190,
+      "x": 1960.8390981407176,
+      "y": 125.10557675903374,
       "color": "#fb7185"
     },
     {
       "id": "unique",
       "label": "Uniqueness of Limit",
-      "x": 180,
-      "y": 190,
+      "x": 1203.956475111241,
+      "y": 1466,
       "color": "#06b6d4"
     },
     {
       "id": "algebra",
       "label": "Algebra of Limits",
-      "x": 470,
-      "y": 330,
+      "x": 744.5998271146095,
+      "y": 1380,
       "color": "#34d399"
     },
     {
       "id": "order",
       "label": "Order Limit Theorem",
-      "x": 760,
-      "y": 330,
+      "x": 1010.261371816569,
+      "y": 977.7135774618598,
       "color": "#34d399"
     },
     {
       "id": "squeeze",
       "label": "Squeeze Theorem",
-      "x": 1030,
-      "y": 330,
+      "x": 861.6157035490172,
+      "y": 415.806419679064,
       "color": "#34d399"
     },
     {
       "id": "bdd",
       "label": "Bounded Sequence\\n\\(|a_n| \\le M\\)",
-      "x": 180,
-      "y": 330,
+      "x": 820.3130993814555,
+      "y": 811.0008002014142,
       "color": "#a78bfa"
     },
     {
       "id": "mono",
       "label": "Monotone Sequence",
-      "x": 180,
-      "y": 470,
+      "x": 1556.1880804347481,
+      "y": 378.57745564410357,
       "color": "#a78bfa"
     },
     {
       "id": "subseq",
       "label": "Subsequence\\n\\(\\{a_{n_k}\\}\\)",
-      "x": 470,
-      "y": 470,
+      "x": 1018.5431584449168,
+      "y": 64,
       "color": "#f472b6"
     },
     {
       "id": "substable",
       "label": "Subsequences Share\\nThe Same Limit",
-      "x": 760,
-      "y": 470,
+      "x": 663.0747317736386,
+      "y": 580.2661953814221,
       "color": "#06b6d4"
     },
     {
       "id": "eo",
       "label": "Even–Odd\\nCriterion",
-      "x": 1030,
-      "y": 470,
+      "x": 4.887324879442701,
+      "y": 820.5757722964966,
       "color": "#f472b6"
     },
     {
       "id": "cesaro",
       "label": "Cesàro Mean\\n\\(\\sigma_n=\\frac{a_1+\\cdots+a_n}{n}\\)",
-      "x": 1230,
-      "y": 470,
+      "x": 1442.7441598657858,
+      "y": 122.11050406376305,
       "color": "#fcd34d"
     },
     {
       "id": "sublim",
       "label": "Subsequential Limit",
-      "x": 470,
-      "y": 610,
+      "x": 554.2052870558048,
+      "y": 120,
       "color": "#f472b6"
     },
     {
       "id": "limpt",
       "label": "Limit Point of a Set",
-      "x": 760,
-      "y": 610,
+      "x": 203.8979265000028,
+      "y": 120,
       "color": "#f472b6"
     },
     {
       "id": "peak",
       "label": "Peak Point",
-      "x": 180,
-      "y": 610,
+      "x": 384.3907981554573,
+      "y": 492.8442560718471,
       "color": "#f472b6"
     },
     {
       "id": "monlemma",
       "label": "Monotone Subsequence\\nLemma",
-      "x": 180,
-      "y": 760,
+      "x": 229.9160965302772,
+      "y": 1060.7457803149418,
       "color": "#f59e0b"
     },
     {
       "id": "completeness",
       "label": "Completeness of \\(\\mathbb{R}\\)\\n(LUB property)",
-      "x": 760,
-      "y": 760,
+      "x": 1752.4683120842221,
+      "y": 1567,
       "color": "#f59e0b",
       "isStart": true
     },
     {
       "id": "amgm",
       "label": "AM–GM Inequality\\n\\(\\sqrt{ab} \\le (a+b)/2\\)",
-      "x": 1030,
-      "y": 760,
+      "x": 2447.7102715494193,
+      "y": 1021.2615647435039,
       "color": "#fcd34d",
       "isStart": true
     },
     {
       "id": "mct",
       "label": "Monotone Convergence\\nTheorem",
-      "x": 470,
-      "y": 760,
+      "x": 1648.2366853958608,
+      "y": 1111.5312301273655,
       "color": "#f59e0b"
     },
     {
       "id": "bw",
       "label": "Bolzano–Weierstrass\\nTheorem",
-      "x": 180,
-      "y": 920,
+      "x": 580.2928383737305,
+      "y": 1135.8757465566887,
       "color": "#f59e0b"
     },
     {
       "id": "cauchy",
       "label": "Cauchy Sequence",
-      "x": 760,
-      "y": 920,
+      "x": 1540.187139456923,
+      "y": 1358.4595084629668,
       "color": "#fb7185"
     },
     {
       "id": "cauchy_bdd",
       "label": "Cauchy ⟹ Bounded",
-      "x": 1030,
-      "y": 920,
+      "x": 2207.765987459411,
+      "y": 1380,
       "color": "#fb7185"
     },
     {
       "id": "babylonian",
       "label": "Babylonian Iteration\\n\\(x_{n+1}=\\frac{1}{2}(x_n+c/x_n)\\)",
-      "x": 1230,
-      "y": 920,
+      "x": 1817.2432980581937,
+      "y": 801.1227623539146,
       "color": "#fcd34d"
     },
     {
       "id": "agm",
       "label": "Arithmetic–Geometric\\nMean (AGM)",
-      "x": 1030,
-      "y": 1080,
+      "x": 1985.7352131265798,
+      "y": 1273.6981522972017,
       "color": "#fcd34d"
     },
     {
       "id": "cc",
       "label": "Cauchy Convergence\\nCriterion",
-      "x": 470,
-      "y": 1080,
+      "x": 974.1228950261913,
+      "y": 1380,
       "color": "#f59e0b"
     }
   ],
@@ -226,26 +226,25 @@
       "type": "dropdown",
       "options": [
         "<",
-        "≤",
         ">",
         "="
       ],
-      "hint": "Convergence requires strict control by every positive epsilon."
+      "hint": "Convergence requires \\(a_n\\) to get closer to \\(L\\)"
     },
     {
       "id": "sc_e2",
       "from": "seq",
       "to": "div",
-      "label": "if no real number satisfies the epsilon-N condition, the sequence is:",
-      "answer": "divergent",
+      "label": "A sequence is called divergent if ",
+      "answer": "for all \\(L\\), there exists \\(\\epsilon>0\\) such that \\(\\forall N\\), there exists \\(n>N\\) such that \\(|a_n - L| >\\epsilon\\)",
       "type": "dropdown",
       "options": [
-        "divergent",
-        "bounded",
-        "monotone",
-        "Cauchy"
+        "for all \\(L\\), for all \\(\\epsilon>0\\), \\(\\exists N\\) such that if \\(n>N\\) then \\(|a_n - L| >\\epsilon\\)",
+        "for all \\(L\\), there exists \\(\\epsilon>0\\) such that \\(\\forall N\\), if \\(n>N\\) then \\(|a_n - L| >\\epsilon\\)",
+        "for all \\(L\\), there exists \\(\\epsilon>0\\) such that \\(\\forall N\\), there exists \\(n>N\\) such that \\(|a_n - L| >\\epsilon\\)",
+        "for all \\(L\\), there exists \\(\\epsilon>0\\) such that \\(\\exists N\\) such that for all \\(n>N\\), we have \\(|a_n - L| >\\epsilon\\)"
       ],
-      "hint": "This is the standard opposite of convergent."
+      "hint": "Negate the standard definition"
     },
     {
       "id": "sc_e3",
@@ -504,22 +503,22 @@
       "id": "sc_e18",
       "from": "bdd",
       "to": "bw",
-      "label": "the theorem saying every bounded real sequence has a convergent subsequence is:",
-      "answer": "Bolzano-Weierstrass",
+      "label": "Bolzano-Weierstrass says every bounded real sequence has a",
+      "answer": "convergent subsequence",
       "type": "dropdown",
       "options": [
-        "Bolzano-Weierstrass",
-        "Monotone Convergence",
-        "Squeeze Theorem",
-        "Cesaro Theorem"
+        "convergent subsequence",
+        "divergent subsequence",
+        "limit",
+        "bounded subseqeunce"
       ],
-      "hint": "This is the central compactness theorem for sequences in \\(\\mathbb{R}\\)."
+      "hint": "This comes from Completeness of \\(\\mathbb{R}\\)."
     },
     {
       "id": "sc_e19",
       "from": "monlemma",
       "to": "bw",
-      "label": "for a bounded sequence, monlemma gives a monotone subsequence; MCT then makes that subsequence:",
+      "label": "for a bounded sequence, monotone subsequence lemma gives a monotone subsequence; MCT then makes that subsequence:",
       "answer": "convergent",
       "type": "dropdown",
       "options": [
@@ -617,5 +616,8 @@
       ],
       "hint": "This is exactly the Cauchy convergence criterion."
     }
-  ]
+  ],
+  "_published": true,
+  "updatedAt": "2026-05-04T03:07:47.223Z",
+  "exportedBy": "admin"
 }
