@@ -83,7 +83,6 @@ function getUnlockBlockingIssues(audit) {
 function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePublish }) {
   const [tool, setTool] = useStateA('select'); // 'select' | 'addNode' | 'connect'
   const [selectedNodeId, setSelectedNodeId] = useStateA(null);
-  const [selectedNodeIds, setSelectedNodeIds] = useStateA([]);
   const [selectedEdgeId, setSelectedEdgeId] = useStateA(null);
   const [connectSource, setConnectSource] = useStateA(null);
   const [hoverNode, setHoverNode] = useStateA(null);
@@ -92,7 +91,6 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
   const [isSnapToGrid, setIsSnapToGrid] = useStateA(false);
   const [undoStack, setUndoStack] = useStateA([]);
   const [redoStack, setRedoStack] = useStateA([]);
-  const [marqueeBox, setMarqueeBox] = useStateA(null);
   const viewportRef = useRefA(null);
   const latestMapRef = useRefA(mapData);
   const dragStateRef = useRefA(null);
@@ -108,7 +106,6 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
     ))
   ), [mapData]);
   const isPublishExportBlocked = unlockBlockingIssues.length > 0;
-  const selectedNodeIdSet = useMemoA(() => new Set(selectedNodeIds), [selectedNodeIds]);
 
   useEffectA(() => {
     latestMapRef.current = mapData;
@@ -116,7 +113,6 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
 
   useEffectA(() => {
     const currentNodeIds = new Set((Array.isArray(mapData?.nodes) ? mapData.nodes : []).map((node) => node.id));
-    setSelectedNodeIds((prev) => prev.filter((id) => currentNodeIds.has(id)));
     if (selectedNodeId && !currentNodeIds.has(selectedNodeId)) {
       setSelectedNodeId(null);
     }
@@ -171,16 +167,13 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
     applyNodeUpdates({ [id]: patch });
   }
   // Delete node and any edges connected to it.
-  function deleteNode(idList) {
-    const ids = Array.isArray(idList) ? idList : [idList];
-    const deleteSet = new Set(ids.filter(Boolean));
-    if (deleteSet.size === 0) return;
+  function deleteNode(id) {
+    if (!id) return;
     const source = latestMapRef.current;
-    const newNodes = source.nodes.filter((n) => !deleteSet.has(n.id));
-    const newEdges = source.edges.filter((e) => !deleteSet.has(e.from) && !deleteSet.has(e.to));
+    const newNodes = source.nodes.filter((n) => n.id !== id);
+    const newEdges = source.edges.filter((e) => e.from !== id && e.to !== id);
     applyMapChange({ ...source, nodes: newNodes, edges: newEdges });
     setSelectedNodeId(null);
-    setSelectedNodeIds((prev) => prev.filter((id) => !deleteSet.has(id)));
   }
   // Add a brand-new node at canvas coordinates.
   function addNode(x, y) {
@@ -193,7 +186,6 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
     const source = latestMapRef.current;
     applyMapChange({ ...source, nodes: [...source.nodes, newNode] });
     setSelectedNodeId(id);
-    setSelectedNodeIds([id]);
     setTool('select');
   }
   // Patch one edge and push updated map to parent state.
@@ -229,19 +221,14 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
 
   // ── Node drag ──
   function beginNodeDrag(nodeId, startX, startY) {
-    const activeIds = selectedNodeIdSet.has(nodeId) && selectedNodeIds.length > 1
-      ? selectedNodeIds
-      : [nodeId];
     dragStateRef.current = {
       leadId: nodeId,
-      nodeIds: activeIds,
       lastLeadX: startX,
       lastLeadY: startY,
       baseline: null,
       historyCaptured: false,
     };
-    if (!selectedNodeIdSet.has(nodeId)) {
-      setSelectedNodeIds([nodeId]);
+    if (selectedNodeId !== nodeId) {
       setSelectedNodeId(nodeId);
       setSelectedEdgeId(null);
     }
@@ -261,31 +248,9 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
       state.baseline = cloneMapData(latestMapRef.current);
     }
 
-    if (state.nodeIds.length === 1) {
-      state.lastLeadX = snappedX;
-      state.lastLeadY = snappedY;
-      applyNodeUpdates({ [id]: { x: snappedX, y: snappedY } }, { record: false });
-      return;
-    }
-
-    const dx = snappedX - state.lastLeadX;
-    const dy = snappedY - state.lastLeadY;
-    if (Math.abs(dx) < 0.001 && Math.abs(dy) < 0.001) return;
-
-    const source = latestMapRef.current;
-    const movedSet = new Set(state.nodeIds);
-    const patchById = {};
-    source.nodes.forEach((node) => {
-      if (!movedSet.has(node.id)) return;
-      patchById[node.id] = {
-        x: snapValue(node.x + dx),
-        y: snapValue(node.y + dy),
-      };
-    });
-
     state.lastLeadX = snappedX;
     state.lastLeadY = snappedY;
-    applyNodeUpdates(patchById, { record: false });
+    applyNodeUpdates({ [id]: { x: snappedX, y: snappedY } }, { record: false });
   }, (id, moved) => {
     const state = dragStateRef.current;
     if (state && state.historyCaptured && moved && state.baseline) {
@@ -305,63 +270,6 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
     };
   }
 
-  function startMarqueeSelection(e) {
-    if (tool !== 'select' || e.button !== 0) return false;
-    e.preventDefault();
-    const additive = !!(e.ctrlKey || e.metaKey);
-    const start = clientToCanvas(e.clientX, e.clientY);
-    const nextBox = { x1: start.x, y1: start.y, x2: start.x, y2: start.y };
-    setMarqueeBox(nextBox);
-
-    function onMove(ev) {
-      const point = clientToCanvas(ev.clientX, ev.clientY);
-      setMarqueeBox((prev) => ({ ...(prev || nextBox), x2: point.x, y2: point.y }));
-    }
-
-    function onUp(ev) {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
-      const end = clientToCanvas(ev.clientX, ev.clientY);
-      const box = {
-        x1: nextBox.x1,
-        y1: nextBox.y1,
-        x2: end.x,
-        y2: end.y,
-      };
-      const left = Math.min(box.x1, box.x2);
-      const right = Math.max(box.x1, box.x2);
-      const top = Math.min(box.y1, box.y2);
-      const bottom = Math.max(box.y1, box.y2);
-      const hits = validNodes
-        .filter((node) => {
-          const sz = estimateNodeSize(node.label);
-          const nodeLeft = node.x - sz.w / 2;
-          const nodeRight = node.x + sz.w / 2;
-          const nodeTop = node.y - sz.h / 2;
-          const nodeBottom = node.y + sz.h / 2;
-          return !(nodeRight < left || nodeLeft > right || nodeBottom < top || nodeTop > bottom);
-        })
-        .map((node) => node.id);
-
-      if (additive) {
-        setSelectedNodeIds((prev) => Array.from(new Set([...prev, ...hits])));
-      } else {
-        setSelectedNodeIds(hits);
-      }
-      setSelectedNodeId((prev) => {
-        if (hits.length > 0) return hits[0];
-        if (additive && prev) return prev;
-        return null;
-      });
-      setSelectedEdgeId(null);
-      setMarqueeBox(null);
-    }
-
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-    return true;
-  }
-
   // Handle empty-canvas clicks based on active admin tool.
   function onCanvasClick(e) {
     if (tool === 'addNode') {
@@ -369,7 +277,6 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
       addNode(x, y);
     } else if (tool === 'select') {
       setSelectedNodeId(null);
-      setSelectedNodeIds([]);
       setSelectedEdgeId(null);
     } else if (tool === 'connect') {
       setConnectSource(null);
@@ -387,86 +294,21 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
         setConnectSource(null);
       }
     } else {
-      const toggleSelect = !!(e.shiftKey || e.ctrlKey || e.metaKey);
-      if (toggleSelect) {
-        setSelectedNodeIds((prev) => {
-          const hasNode = prev.includes(node.id);
-          const next = hasNode ? prev.filter((id) => id !== node.id) : [...prev, node.id];
-          setSelectedNodeId(next.length > 0 ? node.id : null);
-          return next;
-        });
-      } else {
-        setSelectedNodeId(node.id);
-        setSelectedNodeIds([node.id]);
-      }
+      setSelectedNodeId(node.id);
       setSelectedEdgeId(null);
     }
   }
 
-  function getSelectedNodes() {
-    const source = latestMapRef.current;
-    const set = new Set(selectedNodeIds);
-    return source.nodes.filter((node) => set.has(node.id));
-  }
-
-  function alignSelectedNodes(axis, mode) {
-    const selected = getSelectedNodes();
-    if (selected.length < 2) return;
-    const xs = selected.map((n) => n.x);
-    const ys = selected.map((n) => n.y);
-    const patchById = {};
-
-    if (axis === 'x') {
-      const value = mode === 'left'
-        ? Math.min(...xs)
-        : mode === 'right'
-          ? Math.max(...xs)
-          : xs.reduce((acc, x) => acc + x, 0) / xs.length;
-      selected.forEach((node) => {
-        patchById[node.id] = { x: snapValue(value) };
-      });
-    } else {
-      const value = mode === 'top'
-        ? Math.min(...ys)
-        : mode === 'bottom'
-          ? Math.max(...ys)
-          : ys.reduce((acc, y) => acc + y, 0) / ys.length;
-      selected.forEach((node) => {
-        patchById[node.id] = { y: snapValue(value) };
-      });
-    }
-
-    applyNodeUpdates(patchById);
-  }
-
-  function distributeSelectedNodes(axis) {
-    const selected = getSelectedNodes();
-    if (selected.length < 3) return;
-    const sorted = [...selected].sort((a, b) => (axis === 'x' ? a.x - b.x : a.y - b.y));
-    const first = axis === 'x' ? sorted[0].x : sorted[0].y;
-    const last = axis === 'x' ? sorted[sorted.length - 1].x : sorted[sorted.length - 1].y;
-    const step = (last - first) / (sorted.length - 1);
-    const patchById = {};
-
-    sorted.forEach((node, idx) => {
-      const target = snapValue(first + step * idx);
-      patchById[node.id] = axis === 'x' ? { x: target } : { y: target };
-    });
-
-    applyNodeUpdates(patchById);
-  }
-
-  function snapSelectedNodesToGrid() {
-    const selected = getSelectedNodes();
-    if (!selected.length) return;
-    const patchById = {};
-    selected.forEach((node) => {
-      patchById[node.id] = {
+  function snapSelectedNodeToGrid() {
+    if (!selectedNodeId) return;
+    const node = latestMapRef.current.nodes.find((n) => n.id === selectedNodeId);
+    if (!node) return;
+    applyNodeUpdates({
+      [selectedNodeId]: {
         x: Math.round(node.x / 20) * 20,
         y: Math.round(node.y / 20) * 20,
-      };
+      }
     });
-    applyNodeUpdates(patchById);
   }
 
   function undoChange() {
@@ -634,9 +476,9 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
           deleteEdge(selectedEdgeId);
           return;
         }
-        if (selectedNodeIds.length > 0) {
+        if (selectedNodeId) {
           e.preventDefault();
-          deleteNode(selectedNodeIds);
+          deleteNode(selectedNodeId);
           return;
         }
       }
@@ -664,32 +506,12 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
       if (key === 'g') {
         e.preventDefault();
         setIsSnapToGrid((v) => !v);
-        return;
-      }
-      if (key === 'h') {
-        e.preventDefault();
-        distributeSelectedNodes('x');
-        return;
-      }
-      if (key === 'j') {
-        e.preventDefault();
-        distributeSelectedNodes('y');
-        return;
-      }
-      if (key === 'k') {
-        e.preventDefault();
-        alignSelectedNodes('x', 'center');
-        return;
-      }
-      if (key === 'l') {
-        e.preventDefault();
-        alignSelectedNodes('y', 'middle');
       }
     }
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [onBack, selectedEdgeId, selectedNodeIds, mapData, validNodes, t, undoStack, redoStack]);
+  }, [onBack, selectedEdgeId, selectedNodeId, undoStack, redoStack]);
 
   // ── Geometry ──
   const geom = {};
@@ -737,14 +559,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
         >
           ⌗ Snap
         </button>
-        <button className="admin-tool-btn" onClick={snapSelectedNodesToGrid} title="Snap selected nodes to grid">Snap Sel</button>
-        <div className="admin-tool-divider"></div>
-        <button className="admin-tool-btn" onClick={() => alignSelectedNodes('x', 'left')} title="Align selected nodes to the left edge">Align L</button>
-        <button className="admin-tool-btn" onClick={() => alignSelectedNodes('x', 'center')} title="Align selected nodes to center">Align X</button>
-        <button className="admin-tool-btn" onClick={() => alignSelectedNodes('y', 'top')} title="Align selected nodes to the top edge">Align T</button>
-        <button className="admin-tool-btn" onClick={() => alignSelectedNodes('y', 'middle')} title="Align selected nodes to middle">Align Y</button>
-        <button className="admin-tool-btn" onClick={() => distributeSelectedNodes('x')} title="Distribute selected nodes horizontally (H)">Dist H</button>
-        <button className="admin-tool-btn" onClick={() => distributeSelectedNodes('y')} title="Distribute selected nodes vertically (J)">Dist V</button>
+        <button className="admin-tool-btn" onClick={snapSelectedNodeToGrid} title="Snap selected node to grid">Snap Sel</button>
         <div className="admin-tool-divider"></div>
         <button className="admin-tool-btn" onClick={undoChange} disabled={undoStack.length === 0} title="Undo (Ctrl/⌘+Z)">↶ Undo</button>
         <button className="admin-tool-btn" onClick={redoChange} disabled={redoStack.length === 0} title="Redo (Ctrl/⌘+Y)">↷ Redo</button>
@@ -839,7 +654,6 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
         ref={viewportRef}
         onWheel={onWheel}
         onMouseDown={(e) => {
-          if (tool === 'select' && e.shiftKey && startMarqueeSelection(e)) return;
           if (tool === 'select' || tool === 'connect') startPan(e);
         }}
         onTouchStart={onTouchStart}
@@ -914,7 +728,6 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
           {mapData.nodes.map(node => {
             const sz = estimateNodeSize(node.label);
             const isSelected = selectedNodeId === node.id;
-            const isMultiSelected = selectedNodeIdSet.has(node.id) && !isSelected;
             const isConnectSource = connectSource === node.id;
             return (
               <div
@@ -941,7 +754,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
                 onMouseLeave={() => setHoverNode(null)}
               >
                 <div
-                  className={`node-card unlocked ${node.isStart ? 'start' : ''} ${isSelected ? 'selected' : ''} ${isMultiSelected ? 'multi-selected' : ''} ${isConnectSource ? 'connect-source' : ''} ${hoverNode === node.id && connectSource && connectSource !== node.id ? 'connect-target-hover' : ''}`}
+                  className={`node-card unlocked ${node.isStart ? 'start' : ''} ${isSelected ? 'selected' : ''} ${isConnectSource ? 'connect-source' : ''} ${hoverNode === node.id && connectSource && connectSource !== node.id ? 'connect-target-hover' : ''}`}
                   style={{
                     background: nodeBg(node.color || '#3EB1C8'),
                     borderColor: nodeBorder(node.color || '#3EB1C8'),
@@ -961,18 +774,6 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
               </div>
             );
           })}
-
-          {marqueeBox && (
-            <div
-              className="admin-marquee"
-              style={{
-                left: Math.min(marqueeBox.x1, marqueeBox.x2),
-                top: Math.min(marqueeBox.y1, marqueeBox.y2),
-                width: Math.abs(marqueeBox.x2 - marqueeBox.x1),
-                height: Math.abs(marqueeBox.y2 - marqueeBox.y1),
-              }}
-            ></div>
-          )}
         </div>
 
         {mapData.nodes.length === 0 && (
@@ -1005,7 +806,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
             <span className="mini-help-caret">{isHelpOpen ? '▾' : '▸'}</span>
           </div>
           <div className="mini-help-body">
-            Start with <kbd>+ Node</kbd>, then click the canvas to add concepts. Use <kbd>→ Connect</kbd>, then click two nodes to draw a relationship. Switch back to <kbd>↖ Select</kbd> to drag items, open node details, or delete something. Hold <kbd>Shift</kbd> and drag to marquee-select multiple nodes, then align/distribute from the toolbar. Use <kbd>⌗ Snap</kbd> to keep movement on a grid. Layout controls: <span className="mini-help-inline-icon icon-btn-spread-nodes-icon" aria-hidden="true"></span> spread, <span className="mini-help-inline-icon icon-btn-compact-nodes-icon" aria-hidden="true"></span> pull, <span className="mini-help-inline-icon icon-btn-auto-arrange-icon" aria-hidden="true"></span> auto. Keyboard: <kbd>V</kbd> select, <kbd>N</kbd> node, <kbd>C</kbd> connect, <kbd>Del</kbd> delete, <kbd>R</kbd> auto arrange, <kbd>Ctrl/⌘+Z</kbd> undo, <kbd>Ctrl/⌘+Y</kbd> redo, <kbd>Ctrl/⌘+S</kbd> save.
+            Start with <kbd>+ Node</kbd>, then click the canvas to add concepts. Use <kbd>→ Connect</kbd>, then click two nodes to draw a relationship. Switch back to <kbd>↖ Select</kbd> to drag items, open node details, or delete something. Use <kbd>⌗ Snap</kbd> to keep movement on a grid. Layout controls: <span className="mini-help-inline-icon icon-btn-spread-nodes-icon" aria-hidden="true"></span> spread, <span className="mini-help-inline-icon icon-btn-compact-nodes-icon" aria-hidden="true"></span> pull, <span className="mini-help-inline-icon icon-btn-auto-arrange-icon" aria-hidden="true"></span> auto. Keyboard: <kbd>V</kbd> select, <kbd>N</kbd> node, <kbd>C</kbd> connect, <kbd>Del</kbd> delete, <kbd>R</kbd> auto arrange, <kbd>G</kbd> snap toggle, <kbd>Ctrl/⌘+Z</kbd> undo, <kbd>Ctrl/⌘+Y</kbd> redo, <kbd>Ctrl/⌘+S</kbd> save.
           </div>
         </div>
       </div>
