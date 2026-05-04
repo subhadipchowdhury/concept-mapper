@@ -83,60 +83,140 @@ function getUnlockBlockingIssues(audit) {
 function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePublish }) {
   const [tool, setTool] = useStateA('select'); // 'select' | 'addNode' | 'connect'
   const [selectedNodeId, setSelectedNodeId] = useStateA(null);
+  const [selectedNodeIds, setSelectedNodeIds] = useStateA([]);
   const [selectedEdgeId, setSelectedEdgeId] = useStateA(null);
   const [connectSource, setConnectSource] = useStateA(null);
   const [hoverNode, setHoverNode] = useStateA(null);
   const [isHelpOpen, setIsHelpOpen] = useStateA(false);
   const [activeColor, setActiveColor] = useStateA(NODE_COLOR_PALETTE[0]);
+  const [isSnapToGrid, setIsSnapToGrid] = useStateA(false);
+  const [undoStack, setUndoStack] = useStateA([]);
+  const [redoStack, setRedoStack] = useStateA([]);
+  const [marqueeBox, setMarqueeBox] = useStateA(null);
   const viewportRef = useRefA(null);
+  const latestMapRef = useRefA(mapData);
+  const dragStateRef = useRefA(null);
   const { t, setT, onWheel, startPan, onTouchStart, onTouchMove, onTouchEnd } = usePanZoom();
   const unlockAudit = useMemoA(() => auditUnlockGraph(mapData), [mapData]);
   const unlockBlockingIssues = useMemoA(() => getUnlockBlockingIssues(unlockAudit), [unlockAudit]);
+  const validNodes = useMemoA(() => (
+    (Array.isArray(mapData?.nodes) ? mapData.nodes : []).filter((n) => (
+      n &&
+      typeof n.id === 'string' &&
+      Number.isFinite(n.x) &&
+      Number.isFinite(n.y)
+    ))
+  ), [mapData]);
   const isPublishExportBlocked = unlockBlockingIssues.length > 0;
+  const selectedNodeIdSet = useMemoA(() => new Set(selectedNodeIds), [selectedNodeIds]);
+
+  useEffectA(() => {
+    latestMapRef.current = mapData;
+  }, [mapData]);
+
+  useEffectA(() => {
+    const currentNodeIds = new Set((Array.isArray(mapData?.nodes) ? mapData.nodes : []).map((node) => node.id));
+    setSelectedNodeIds((prev) => prev.filter((id) => currentNodeIds.has(id)));
+    if (selectedNodeId && !currentNodeIds.has(selectedNodeId)) {
+      setSelectedNodeId(null);
+    }
+  }, [mapData, selectedNodeId]);
+
+  function cloneMapData(data) {
+    return JSON.parse(JSON.stringify(data));
+  }
+
+  function mapDataEqual(a, b) {
+    return JSON.stringify(a) === JSON.stringify(b);
+  }
+
+  function pushUndoSnapshot(snapshot) {
+    const cloned = cloneMapData(snapshot);
+    setUndoStack((prev) => [...prev.slice(-79), cloned]);
+  }
+
+  function applyMapChange(nextMapData, options = {}) {
+    const { record = true, baseline = null } = options;
+    const prevMapData = latestMapRef.current;
+    if (!nextMapData || mapDataEqual(prevMapData, nextMapData)) return false;
+    if (record) {
+      pushUndoSnapshot(baseline || prevMapData);
+      setRedoStack([]);
+    }
+    latestMapRef.current = nextMapData;
+    onChange(nextMapData);
+    return true;
+  }
+
+  function snapValue(value) {
+    if (!isSnapToGrid) return value;
+    const grid = 20;
+    return Math.round(value / grid) * grid;
+  }
+
+  function applyNodeUpdates(nodePatchById, options = {}) {
+    const source = latestMapRef.current;
+    const nextMapData = {
+      ...source,
+      nodes: source.nodes.map((node) => (
+        nodePatchById[node.id] ? { ...node, ...nodePatchById[node.id] } : node
+      )),
+    };
+    return applyMapChange(nextMapData, options);
+  }
 
   // ── Update helpers ──
   // Patch one node and push updated map to parent state.
   function updateNode(id, patch) {
-    const newNodes = mapData.nodes.map(n => n.id === id ? { ...n, ...patch } : n);
-    onChange({ ...mapData, nodes: newNodes });
+    applyNodeUpdates({ [id]: patch });
   }
   // Delete node and any edges connected to it.
-  function deleteNode(id) {
-    const newNodes = mapData.nodes.filter(n => n.id !== id);
-    const newEdges = mapData.edges.filter(e => e.from !== id && e.to !== id);
-    onChange({ ...mapData, nodes: newNodes, edges: newEdges });
+  function deleteNode(idList) {
+    const ids = Array.isArray(idList) ? idList : [idList];
+    const deleteSet = new Set(ids.filter(Boolean));
+    if (deleteSet.size === 0) return;
+    const source = latestMapRef.current;
+    const newNodes = source.nodes.filter((n) => !deleteSet.has(n.id));
+    const newEdges = source.edges.filter((e) => !deleteSet.has(e.from) && !deleteSet.has(e.to));
+    applyMapChange({ ...source, nodes: newNodes, edges: newEdges });
     setSelectedNodeId(null);
+    setSelectedNodeIds((prev) => prev.filter((id) => !deleteSet.has(id)));
   }
   // Add a brand-new node at canvas coordinates.
   function addNode(x, y) {
     const id = 'n' + Date.now().toString(36);
     const newNode = {
-      id, label: 'New Concept', x, y,
+      id, label: 'New Concept', x: snapValue(x), y: snapValue(y),
       color: activeColor,
-      isStart: mapData.nodes.length === 0,
+      isStart: latestMapRef.current.nodes.length === 0,
     };
-    onChange({ ...mapData, nodes: [...mapData.nodes, newNode] });
+    const source = latestMapRef.current;
+    applyMapChange({ ...source, nodes: [...source.nodes, newNode] });
     setSelectedNodeId(id);
+    setSelectedNodeIds([id]);
     setTool('select');
   }
   // Patch one edge and push updated map to parent state.
   function updateEdge(id, patch) {
-    const newEdges = mapData.edges.map(e => e.id === id ? { ...e, ...patch } : e);
-    onChange({ ...mapData, edges: newEdges });
+    const source = latestMapRef.current;
+    const newEdges = source.edges.map((e) => e.id === id ? { ...e, ...patch } : e);
+    applyMapChange({ ...source, edges: newEdges });
   }
   // Delete one edge from map.
   function deleteEdge(id) {
-    onChange({ ...mapData, edges: mapData.edges.filter(e => e.id !== id) });
+    const source = latestMapRef.current;
+    applyMapChange({ ...source, edges: source.edges.filter((e) => e.id !== id) });
     setSelectedEdgeId(null);
   }
   // Create a directed edge between two nodes if valid and non-duplicate.
   function addEdge(fromId, toId) {
     if (fromId === toId) return;
-    if (mapData.edges.some(e => e.from === fromId && e.to === toId)) return;
+    const source = latestMapRef.current;
+    if (source.edges.some((e) => e.from === fromId && e.to === toId)) return;
     const id = 'e' + Date.now().toString(36);
-    onChange({
-      ...mapData,
-      edges: [...mapData.edges, {
+    applyMapChange({
+      ...source,
+      edges: [...source.edges, {
         id, from: fromId, to: toId,
         label: 'leads to',
         answer: 'something',
@@ -148,20 +228,148 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
   }
 
   // ── Node drag ──
+  function beginNodeDrag(nodeId, startX, startY) {
+    const activeIds = selectedNodeIdSet.has(nodeId) && selectedNodeIds.length > 1
+      ? selectedNodeIds
+      : [nodeId];
+    dragStateRef.current = {
+      leadId: nodeId,
+      nodeIds: activeIds,
+      lastLeadX: startX,
+      lastLeadY: startY,
+      baseline: null,
+      historyCaptured: false,
+    };
+    if (!selectedNodeIdSet.has(nodeId)) {
+      setSelectedNodeIds([nodeId]);
+      setSelectedNodeId(nodeId);
+      setSelectedEdgeId(null);
+    }
+  }
+
   const dragStart = useNodeDrag((id, x, y) => {
-    updateNode(id, { x, y });
+    const state = dragStateRef.current;
+    const snappedX = snapValue(x);
+    const snappedY = snapValue(y);
+    if (!state || state.leadId !== id) {
+      applyNodeUpdates({ [id]: { x: snappedX, y: snappedY } }, { record: false });
+      return;
+    }
+
+    if (!state.historyCaptured) {
+      state.historyCaptured = true;
+      state.baseline = cloneMapData(latestMapRef.current);
+    }
+
+    if (state.nodeIds.length === 1) {
+      state.lastLeadX = snappedX;
+      state.lastLeadY = snappedY;
+      applyNodeUpdates({ [id]: { x: snappedX, y: snappedY } }, { record: false });
+      return;
+    }
+
+    const dx = snappedX - state.lastLeadX;
+    const dy = snappedY - state.lastLeadY;
+    if (Math.abs(dx) < 0.001 && Math.abs(dy) < 0.001) return;
+
+    const source = latestMapRef.current;
+    const movedSet = new Set(state.nodeIds);
+    const patchById = {};
+    source.nodes.forEach((node) => {
+      if (!movedSet.has(node.id)) return;
+      patchById[node.id] = {
+        x: snapValue(node.x + dx),
+        y: snapValue(node.y + dy),
+      };
+    });
+
+    state.lastLeadX = snappedX;
+    state.lastLeadY = snappedY;
+    applyNodeUpdates(patchById, { record: false });
+  }, (id, moved) => {
+    const state = dragStateRef.current;
+    if (state && state.historyCaptured && moved && state.baseline) {
+      pushUndoSnapshot(state.baseline);
+      setRedoStack([]);
+    }
+    dragStateRef.current = null;
   });
 
   // ── Click handlers ──
+  function clientToCanvas(clientX, clientY) {
+    const rect = viewportRef.current?.getBoundingClientRect();
+    if (!rect) return { x: 0, y: 0 };
+    return {
+      x: (clientX - rect.left - t.x) / t.scale,
+      y: (clientY - rect.top - t.y) / t.scale,
+    };
+  }
+
+  function startMarqueeSelection(e) {
+    if (tool !== 'select' || e.button !== 0) return false;
+    e.preventDefault();
+    const additive = !!(e.ctrlKey || e.metaKey);
+    const start = clientToCanvas(e.clientX, e.clientY);
+    const nextBox = { x1: start.x, y1: start.y, x2: start.x, y2: start.y };
+    setMarqueeBox(nextBox);
+
+    function onMove(ev) {
+      const point = clientToCanvas(ev.clientX, ev.clientY);
+      setMarqueeBox((prev) => ({ ...(prev || nextBox), x2: point.x, y2: point.y }));
+    }
+
+    function onUp(ev) {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      const end = clientToCanvas(ev.clientX, ev.clientY);
+      const box = {
+        x1: nextBox.x1,
+        y1: nextBox.y1,
+        x2: end.x,
+        y2: end.y,
+      };
+      const left = Math.min(box.x1, box.x2);
+      const right = Math.max(box.x1, box.x2);
+      const top = Math.min(box.y1, box.y2);
+      const bottom = Math.max(box.y1, box.y2);
+      const hits = validNodes
+        .filter((node) => {
+          const sz = estimateNodeSize(node.label);
+          const nodeLeft = node.x - sz.w / 2;
+          const nodeRight = node.x + sz.w / 2;
+          const nodeTop = node.y - sz.h / 2;
+          const nodeBottom = node.y + sz.h / 2;
+          return !(nodeRight < left || nodeLeft > right || nodeBottom < top || nodeTop > bottom);
+        })
+        .map((node) => node.id);
+
+      if (additive) {
+        setSelectedNodeIds((prev) => Array.from(new Set([...prev, ...hits])));
+      } else {
+        setSelectedNodeIds(hits);
+      }
+      setSelectedNodeId((prev) => {
+        if (hits.length > 0) return hits[0];
+        if (additive && prev) return prev;
+        return null;
+      });
+      setSelectedEdgeId(null);
+      setMarqueeBox(null);
+    }
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    return true;
+  }
+
   // Handle empty-canvas clicks based on active admin tool.
   function onCanvasClick(e) {
     if (tool === 'addNode') {
-      const rect = viewportRef.current.getBoundingClientRect();
-      const x = (e.clientX - rect.left - t.x) / t.scale;
-      const y = (e.clientY - rect.top - t.y) / t.scale;
+      const { x, y } = clientToCanvas(e.clientX, e.clientY);
       addNode(x, y);
     } else if (tool === 'select') {
       setSelectedNodeId(null);
+      setSelectedNodeIds([]);
       setSelectedEdgeId(null);
     } else if (tool === 'connect') {
       setConnectSource(null);
@@ -179,10 +387,309 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
         setConnectSource(null);
       }
     } else {
-      setSelectedNodeId(node.id);
+      const toggleSelect = !!(e.shiftKey || e.ctrlKey || e.metaKey);
+      if (toggleSelect) {
+        setSelectedNodeIds((prev) => {
+          const hasNode = prev.includes(node.id);
+          const next = hasNode ? prev.filter((id) => id !== node.id) : [...prev, node.id];
+          setSelectedNodeId(next.length > 0 ? node.id : null);
+          return next;
+        });
+      } else {
+        setSelectedNodeId(node.id);
+        setSelectedNodeIds([node.id]);
+      }
       setSelectedEdgeId(null);
     }
   }
+
+  function getSelectedNodes() {
+    const source = latestMapRef.current;
+    const set = new Set(selectedNodeIds);
+    return source.nodes.filter((node) => set.has(node.id));
+  }
+
+  function alignSelectedNodes(axis, mode) {
+    const selected = getSelectedNodes();
+    if (selected.length < 2) return;
+    const xs = selected.map((n) => n.x);
+    const ys = selected.map((n) => n.y);
+    const patchById = {};
+
+    if (axis === 'x') {
+      const value = mode === 'left'
+        ? Math.min(...xs)
+        : mode === 'right'
+          ? Math.max(...xs)
+          : xs.reduce((acc, x) => acc + x, 0) / xs.length;
+      selected.forEach((node) => {
+        patchById[node.id] = { x: snapValue(value) };
+      });
+    } else {
+      const value = mode === 'top'
+        ? Math.min(...ys)
+        : mode === 'bottom'
+          ? Math.max(...ys)
+          : ys.reduce((acc, y) => acc + y, 0) / ys.length;
+      selected.forEach((node) => {
+        patchById[node.id] = { y: snapValue(value) };
+      });
+    }
+
+    applyNodeUpdates(patchById);
+  }
+
+  function distributeSelectedNodes(axis) {
+    const selected = getSelectedNodes();
+    if (selected.length < 3) return;
+    const sorted = [...selected].sort((a, b) => (axis === 'x' ? a.x - b.x : a.y - b.y));
+    const first = axis === 'x' ? sorted[0].x : sorted[0].y;
+    const last = axis === 'x' ? sorted[sorted.length - 1].x : sorted[sorted.length - 1].y;
+    const step = (last - first) / (sorted.length - 1);
+    const patchById = {};
+
+    sorted.forEach((node, idx) => {
+      const target = snapValue(first + step * idx);
+      patchById[node.id] = axis === 'x' ? { x: target } : { y: target };
+    });
+
+    applyNodeUpdates(patchById);
+  }
+
+  function snapSelectedNodesToGrid() {
+    const selected = getSelectedNodes();
+    if (!selected.length) return;
+    const patchById = {};
+    selected.forEach((node) => {
+      patchById[node.id] = {
+        x: Math.round(node.x / 20) * 20,
+        y: Math.round(node.y / 20) * 20,
+      };
+    });
+    applyNodeUpdates(patchById);
+  }
+
+  function undoChange() {
+    if (!undoStack.length) return;
+    const source = latestMapRef.current;
+    const prev = undoStack[undoStack.length - 1];
+    setUndoStack((stack) => stack.slice(0, -1));
+    setRedoStack((stack) => [...stack.slice(-79), cloneMapData(source)]);
+    const restored = cloneMapData(prev);
+    latestMapRef.current = restored;
+    onChange(restored);
+    setSelectedEdgeId(null);
+  }
+
+  function redoChange() {
+    if (!redoStack.length) return;
+    const source = latestMapRef.current;
+    const next = redoStack[redoStack.length - 1];
+    setRedoStack((stack) => stack.slice(0, -1));
+    setUndoStack((stack) => [...stack.slice(-79), cloneMapData(source)]);
+    const restored = cloneMapData(next);
+    latestMapRef.current = restored;
+    onChange(restored);
+    setSelectedEdgeId(null);
+  }
+
+  // Reset the viewport to center the selected/start node.
+  function resetView() {
+    const targetNode = (selectedNodeId && validNodes.find((n) => n.id === selectedNodeId))
+      || validNodes.find((n) => n.isStart)
+      || validNodes[0];
+    if (!targetNode) {
+      setT({ x: 60, y: 80, scale: 1 });
+      return;
+    }
+
+    const rect = viewportRef.current?.getBoundingClientRect();
+    if (!rect) {
+      setT({ x: 60, y: 80, scale: 1 });
+      return;
+    }
+
+    const scale = 1;
+    setT({
+      x: rect.width / 2 - targetNode.x * scale,
+      y: rect.height / 2 - targetNode.y * scale,
+      scale,
+    });
+  }
+
+  // Push nodes outward from centroid to quickly increase spacing.
+  function spreadNodes() {
+    if (!validNodes.length) return;
+    const cx = validNodes.reduce((acc, node) => acc + node.x, 0) / validNodes.length;
+    const cy = validNodes.reduce((acc, node) => acc + node.y, 0) / validNodes.length;
+    const factor = 1.45;
+    const fallbackRadius = 200;
+    const byId = {};
+
+    validNodes.forEach((node, i) => {
+      const dx = node.x - cx;
+      const dy = node.y - cy;
+      if (Math.hypot(dx, dy) < 1) {
+        const angle = (i / validNodes.length) * Math.PI * 2;
+        byId[node.id] = { x: cx + Math.cos(angle) * fallbackRadius, y: cy + Math.sin(angle) * fallbackRadius };
+      } else {
+        byId[node.id] = { x: cx + dx * factor, y: cy + dy * factor };
+      }
+    });
+
+    applyNodeUpdates(byId);
+  }
+
+  // Pull nodes inward toward centroid while preserving minimum spacing.
+  function compactNodes() {
+    if (!validNodes.length) return;
+    const cx = validNodes.reduce((acc, node) => acc + node.x, 0) / validNodes.length;
+    const cy = validNodes.reduce((acc, node) => acc + node.y, 0) / validNodes.length;
+    const factor = 0.68;
+    const minDist = 25;
+    const fallbackRadius = 25;
+    const byId = {};
+
+    validNodes.forEach((node, i) => {
+      const dx = node.x - cx;
+      const dy = node.y - cy;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 1) {
+        const angle = (i / validNodes.length) * Math.PI * 2;
+        byId[node.id] = { x: cx + Math.cos(angle) * fallbackRadius, y: cy + Math.sin(angle) * fallbackRadius };
+      } else {
+        const newDist = Math.max(minDist, dist * factor);
+        byId[node.id] = { x: cx + (dx / dist) * newDist, y: cy + (dy / dist) * newDist };
+      }
+    });
+
+    applyNodeUpdates(byId);
+  }
+
+  // Rebuild positions with the same deterministic auto-layout used in student view.
+  function autoArrangeNodes() {
+    if (typeof window.computeAutoNodeLayout !== 'function') return;
+    const layout = window.computeAutoNodeLayout(mapData);
+    if (!layout || Object.keys(layout).length === 0) return;
+    applyNodeUpdates(layout);
+  }
+
+  useEffectA(() => {
+    function onKeyDown(e) {
+      const target = e.target;
+      const tag = target?.tagName ? String(target.tagName).toUpperCase() : '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target?.isContentEditable) return;
+
+      const key = (e.key || '').toLowerCase();
+
+      if ((e.ctrlKey || e.metaKey) && key === 's') {
+        e.preventDefault();
+        onBack();
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && key === 'z') {
+        e.preventDefault();
+        undoChange();
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && (key === 'y' || (e.shiftKey && key === 'z'))) {
+        e.preventDefault();
+        redoChange();
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        setTool('select');
+        setSelectedNodeId(null);
+        setSelectedEdgeId(null);
+        setConnectSource(null);
+        return;
+      }
+
+      if (key === 'v') {
+        setTool('select');
+        setConnectSource(null);
+        return;
+      }
+
+      if (key === 'n') {
+        setTool('addNode');
+        setSelectedNodeId(null);
+        setConnectSource(null);
+        return;
+      }
+
+      if (key === 'c') {
+        setTool('connect');
+        setSelectedNodeId(null);
+        setConnectSource(null);
+        return;
+      }
+
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (selectedEdgeId) {
+          e.preventDefault();
+          deleteEdge(selectedEdgeId);
+          return;
+        }
+        if (selectedNodeIds.length > 0) {
+          e.preventDefault();
+          deleteNode(selectedNodeIds);
+          return;
+        }
+      }
+
+      if (key === '0') {
+        e.preventDefault();
+        resetView();
+        return;
+      }
+      if (key === ']') {
+        e.preventDefault();
+        spreadNodes();
+        return;
+      }
+      if (key === '[') {
+        e.preventDefault();
+        compactNodes();
+        return;
+      }
+      if (key === 'r') {
+        e.preventDefault();
+        autoArrangeNodes();
+        return;
+      }
+      if (key === 'g') {
+        e.preventDefault();
+        setIsSnapToGrid((v) => !v);
+        return;
+      }
+      if (key === 'h') {
+        e.preventDefault();
+        distributeSelectedNodes('x');
+        return;
+      }
+      if (key === 'j') {
+        e.preventDefault();
+        distributeSelectedNodes('y');
+        return;
+      }
+      if (key === 'k') {
+        e.preventDefault();
+        alignSelectedNodes('x', 'center');
+        return;
+      }
+      if (key === 'l') {
+        e.preventDefault();
+        alignSelectedNodes('y', 'middle');
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onBack, selectedEdgeId, selectedNodeIds, mapData, validNodes, t, undoStack, redoStack]);
 
   // ── Geometry ──
   const geom = {};
@@ -210,6 +717,37 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
         <button className={`admin-tool-btn ${tool === 'select' ? 'active' : ''}`} onClick={() => { setTool('select'); setConnectSource(null); }}>↖ Select</button>
         <button className={`admin-tool-btn ${tool === 'addNode' ? 'active' : ''}`} onClick={() => { setTool('addNode'); setSelectedNodeId(null); setConnectSource(null); }}>+ Node</button>
         <button className={`admin-tool-btn ${tool === 'connect' ? 'active' : ''}`} onClick={() => { setTool('connect'); setSelectedNodeId(null); }}>→ Connect</button>
+        <div className="admin-tool-divider"></div>
+        <button className="icon-btn" onClick={resetView} title="Center view (0)" aria-label="Center view">
+          ⌂
+        </button>
+        <button className="icon-btn" onClick={spreadNodes} title="Spread nodes apart (])" aria-label="Spread nodes apart">
+          <span className="icon-btn-spread-nodes-icon" aria-hidden="true"></span>
+        </button>
+        <button className="icon-btn" onClick={compactNodes} title="Pull nodes inward ([)" aria-label="Pull nodes inward">
+          <span className="icon-btn-compact-nodes-icon" aria-hidden="true"></span>
+        </button>
+        <button className="icon-btn icon-btn-auto-arrange" onClick={autoArrangeNodes} title="Auto arrange nodes (R)" aria-label="Auto arrange nodes">
+          <span className="icon-btn-auto-arrange-icon" aria-hidden="true"></span>
+        </button>
+        <button
+          className={`admin-tool-btn ${isSnapToGrid ? 'active' : ''}`}
+          onClick={() => setIsSnapToGrid((v) => !v)}
+          title="Snap to 20px grid while moving nodes (G)"
+        >
+          ⌗ Snap
+        </button>
+        <button className="admin-tool-btn" onClick={snapSelectedNodesToGrid} title="Snap selected nodes to grid">Snap Sel</button>
+        <div className="admin-tool-divider"></div>
+        <button className="admin-tool-btn" onClick={() => alignSelectedNodes('x', 'left')} title="Align selected nodes to the left edge">Align L</button>
+        <button className="admin-tool-btn" onClick={() => alignSelectedNodes('x', 'center')} title="Align selected nodes to center">Align X</button>
+        <button className="admin-tool-btn" onClick={() => alignSelectedNodes('y', 'top')} title="Align selected nodes to the top edge">Align T</button>
+        <button className="admin-tool-btn" onClick={() => alignSelectedNodes('y', 'middle')} title="Align selected nodes to middle">Align Y</button>
+        <button className="admin-tool-btn" onClick={() => distributeSelectedNodes('x')} title="Distribute selected nodes horizontally (H)">Dist H</button>
+        <button className="admin-tool-btn" onClick={() => distributeSelectedNodes('y')} title="Distribute selected nodes vertically (J)">Dist V</button>
+        <div className="admin-tool-divider"></div>
+        <button className="admin-tool-btn" onClick={undoChange} disabled={undoStack.length === 0} title="Undo (Ctrl/⌘+Z)">↶ Undo</button>
+        <button className="admin-tool-btn" onClick={redoChange} disabled={redoStack.length === 0} title="Redo (Ctrl/⌘+Y)">↷ Redo</button>
         <div className="admin-tool-divider"></div>
         <div className="color-swatches">
           {NODE_COLOR_PALETTE.map(c => (
@@ -301,6 +839,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
         ref={viewportRef}
         onWheel={onWheel}
         onMouseDown={(e) => {
+          if (tool === 'select' && e.shiftKey && startMarqueeSelection(e)) return;
           if (tool === 'select' || tool === 'connect') startPan(e);
         }}
         onTouchStart={onTouchStart}
@@ -375,6 +914,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
           {mapData.nodes.map(node => {
             const sz = estimateNodeSize(node.label);
             const isSelected = selectedNodeId === node.id;
+            const isMultiSelected = selectedNodeIdSet.has(node.id) && !isSelected;
             const isConnectSource = connectSource === node.id;
             return (
               <div
@@ -386,11 +926,13 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
                 }}
                 onMouseDown={(e) => {
                   if (tool === 'select') {
+                    beginNodeDrag(node.id, node.x, node.y);
                     dragStart(e, node.id, node.x, node.y);
                   }
                 }}
                 onTouchStart={(e) => {
                   if (tool === 'select') {
+                    beginNodeDrag(node.id, node.x, node.y);
                     dragStart(e, node.id, node.x, node.y);
                   }
                 }}
@@ -399,7 +941,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
                 onMouseLeave={() => setHoverNode(null)}
               >
                 <div
-                  className={`node-card unlocked ${node.isStart ? 'start' : ''} ${isSelected ? 'selected' : ''} ${isConnectSource ? 'connect-source' : ''} ${hoverNode === node.id && connectSource && connectSource !== node.id ? 'connect-target-hover' : ''}`}
+                  className={`node-card unlocked ${node.isStart ? 'start' : ''} ${isSelected ? 'selected' : ''} ${isMultiSelected ? 'multi-selected' : ''} ${isConnectSource ? 'connect-source' : ''} ${hoverNode === node.id && connectSource && connectSource !== node.id ? 'connect-target-hover' : ''}`}
                   style={{
                     background: nodeBg(node.color || '#3EB1C8'),
                     borderColor: nodeBorder(node.color || '#3EB1C8'),
@@ -419,6 +961,18 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
               </div>
             );
           })}
+
+          {marqueeBox && (
+            <div
+              className="admin-marquee"
+              style={{
+                left: Math.min(marqueeBox.x1, marqueeBox.x2),
+                top: Math.min(marqueeBox.y1, marqueeBox.y2),
+                width: Math.abs(marqueeBox.x2 - marqueeBox.x1),
+                height: Math.abs(marqueeBox.y2 - marqueeBox.y1),
+              }}
+            ></div>
+          )}
         </div>
 
         {mapData.nodes.length === 0 && (
@@ -451,7 +1005,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
             <span className="mini-help-caret">{isHelpOpen ? '▾' : '▸'}</span>
           </div>
           <div className="mini-help-body">
-            Start with <kbd>+ Node</kbd>, then click the canvas to add concepts. Use <kbd>→ Connect</kbd>, then click two nodes to draw a relationship. Switch back to <kbd>↖ Select</kbd> to drag items, open node details, or delete something. Click any edge label to edit the prompt, answer, and hint students will see.
+            Start with <kbd>+ Node</kbd>, then click the canvas to add concepts. Use <kbd>→ Connect</kbd>, then click two nodes to draw a relationship. Switch back to <kbd>↖ Select</kbd> to drag items, open node details, or delete something. Hold <kbd>Shift</kbd> and drag to marquee-select multiple nodes, then align/distribute from the toolbar. Use <kbd>⌗ Snap</kbd> to keep movement on a grid. Layout controls: <span className="mini-help-inline-icon icon-btn-spread-nodes-icon" aria-hidden="true"></span> spread, <span className="mini-help-inline-icon icon-btn-compact-nodes-icon" aria-hidden="true"></span> pull, <span className="mini-help-inline-icon icon-btn-auto-arrange-icon" aria-hidden="true"></span> auto. Keyboard: <kbd>V</kbd> select, <kbd>N</kbd> node, <kbd>C</kbd> connect, <kbd>Del</kbd> delete, <kbd>R</kbd> auto arrange, <kbd>Ctrl/⌘+Z</kbd> undo, <kbd>Ctrl/⌘+Y</kbd> redo, <kbd>Ctrl/⌘+S</kbd> save.
           </div>
         </div>
       </div>

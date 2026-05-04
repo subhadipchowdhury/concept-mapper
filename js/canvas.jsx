@@ -889,4 +889,4 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   );
 }
 
-Object.assign(window, { ConceptMap, estimateNodeSize, useNodeDrag, usePanZoom, ZoomControl, nodeBg, nodeBorder });
+Object.assign(window, { ConceptMap, estimateNodeSize, useNodeDrag, usePanZoom, ZoomControl, nodeBg, nodeBorder, computeAutoNodeLayout });
