@@ -19,12 +19,5 @@
     "file": "data/maps/real-analysis/funcSequences.json",
     "subjectId": "real-analysis",
     "subjectTitle": "Real Analysis"
-  },
-  {
-    "id": "reactionKinetics",
-    "title": "Reaction Kinetics and Rate Laws",
-    "file": "data/maps/chemical-reactions/reactionKinetics.json",
-    "subjectId": "chemical-reactions",
-    "subjectTitle": "Chemical Reactions"
   }
 ]
