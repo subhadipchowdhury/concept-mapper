@@ -1188,10 +1188,10 @@ function App() {
                   const done = (prog.answeredEdges || new Set()).size;
                   const pct = total > 0 ? (done / total) * 100 : 0;
                   const statusDotColor = done === 0
-                    ? '#A6A6A6'
+                    ? '#B9AE99'
                     : done >= total && total > 0
-                      ? '#3EB1C8'
-                      : '#ECA154';
+                      ? '#357A4D'
+                      : '#B07D00';
                   return (
                     <div
                       key={m.id}

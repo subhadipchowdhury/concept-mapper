@@ -635,8 +635,8 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
             margin: '8px 14px 0',
             padding: '10px 12px',
             borderRadius: 10,
-            border: '1px solid rgba(245, 158, 11, 0.55)',
-            background: 'rgba(245, 158, 11, 0.12)',
+            border: '1px solid rgba(176, 125, 0, 0.45)',
+            background: '#FBF3DC',
             color: 'var(--text-primary)'
           }}
         >
@@ -678,7 +678,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
               if (!f || !to) return null;
               const path = computeEdgePath(f, to);
               const fromN = mapData.nodes.find(n => n.id === edge.from);
-              const stroke = selectedEdgeId === edge.id ? 'var(--uc-goldenrod)' : (fromN.color || '#3EB1C8');
+              const stroke = selectedEdgeId === edge.id ? 'var(--uc-goldenrod)' : nodeBorder(fromN.color || '#3EB1C8');
               return (
                 <g key={edge.id} style={{color: stroke}}>
                   <path

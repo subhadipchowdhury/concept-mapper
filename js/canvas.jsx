@@ -281,8 +281,19 @@ function useNodeDrag(onMove, onEnd) {
 }
 
 // ─── Color helpers ───────────────────────────────────────────────────────────
+// Darken an arbitrary node color so borders/strokes read on light paper.
+function shadeForPaper(color) {
+  const m = /^#?([0-9a-fA-F]{6})$/.exec(color || '');
+  if (!m) return color;
+  const n = parseInt(m[1], 16);
+  const t = 0.35; // blend toward dark ink (41, 36, 29)
+  const r = Math.round(((n >> 16) & 255) * (1 - t) + 41 * t);
+  const g = Math.round(((n >> 8) & 255) * (1 - t) + 36 * t);
+  const b = Math.round((n & 255) * (1 - t) + 29 * t);
+  return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+}
 function nodeBg(color)     { return color + '22'; }
-function nodeBorder(color) { return color + 'AA'; }
+function nodeBorder(color) { return shadeForPaper(color); }
 
 const PAN_GESTURE_BLOCKER_SELECTOR = '.node-card, .edge-label-badge, .inspector, .admin-toolbar';
 
@@ -739,7 +750,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
                 <path d="M0,0 L0,6 L8,3 z" fill="currentColor" />
               </marker>
               <marker id="arrow-locked" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
-                <path d="M0,0 L0,6 L8,3 z" fill="rgba(255,255,255,0.15)" />
+                <path d="M0,0 L0,6 L8,3 z" fill="rgba(60,48,30,0.25)" />
               </marker>
             </defs>
 
@@ -750,9 +761,9 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
               const fromUnlocked = unlockedNodes.has(edge.from);
               const path = computeEdgePath(f, to, { labelT: edgeLabelT });
               const fromN = mapData.nodes.find(n => n.id === edge.from);
-              const stroke = !fromUnlocked ? 'rgba(255,255,255,0.08)'
-                           : isAnswered ? (fromN.color || '#A9C47F')
-                           : (fromN.color || '#3EB1C8');
+              const stroke = !fromUnlocked ? 'rgba(60,48,30,0.16)'
+                           : isAnswered ? nodeBorder(fromN.color || '#A9C47F')
+                           : nodeBorder(fromN.color || '#3EB1C8');
               return (
                 <g key={edge.id} style={{color: stroke}}>
                   <path
@@ -889,4 +900,4 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   );
 }
 
-Object.assign(window, { ConceptMap, estimateNodeSize, useNodeDrag, usePanZoom, ZoomControl, nodeBg, nodeBorder, computeAutoNodeLayout });
+Object.assign(window, { ConceptMap, estimateNodeSize, useNodeDrag, usePanZoom, ZoomControl, nodeBg, nodeBorder, shadeForPaper, computeAutoNodeLayout });
