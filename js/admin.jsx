@@ -94,6 +94,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
   const latestMapRef = useRefA(mapData);
   const dragStateRef = useRefA(null);
   const { t, setT, onWheel, startPan, onTouchStart, onTouchMove, onTouchEnd } = usePanZoom();
+  const { measureRef, sizeOf } = useMeasuredNodeSizes();
   const unlockAudit = useMemoA(() => auditUnlockGraph(mapData), [mapData]);
   const unlockBlockingIssues = useMemoA(() => getUnlockBlockingIssues(unlockAudit), [unlockAudit]);
   const validNodes = useMemoA(() => (
@@ -515,7 +516,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
   // ── Geometry ──
   const geom = {};
   mapData.nodes.forEach(n => {
-    const sz = estimateNodeSize(n.label);
+    const sz = sizeOf(n);
     geom[n.id] = { x: n.x, y: n.y, w: sz.w, h: sz.h };
   });
   const selectedNode = selectedNodeId ? mapData.nodes.find(n => n.id === selectedNodeId) : null;
@@ -725,7 +726,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
 
           {/* Nodes */}
           {mapData.nodes.map(node => {
-            const sz = estimateNodeSize(node.label);
+            const sz = sizeOf(node);
             const isSelected = selectedNodeId === node.id;
             const isConnectSource = connectSource === node.id;
             return (
@@ -754,10 +755,11 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
               >
                 <div
                   className={`node-card unlocked ${node.isStart ? 'start' : ''} ${isSelected ? 'selected' : ''} ${isConnectSource ? 'connect-source' : ''} ${hoverNode === node.id && connectSource && connectSource !== node.id ? 'connect-target-hover' : ''}`}
+                  ref={measureRef(node.id)}
+                  data-node-id={node.id}
                   style={{
                     background: nodeBg(node.color || DEFAULT_NODE_COLOR),
                     borderColor: nodeBorder(node.color || DEFAULT_NODE_COLOR),
-                    width: sz.w,
                   }}
                 >
                   <MathNode text={node.label} />

@@ -225,6 +225,90 @@ function computeAutoNodeLayout(mapData, edgeLabelT = getMapEdgeLabelT(mapData)) 
   return pos;
 }
 
+// ─── Measured node sizes ────────────────────────────────────────────────────
+// estimateNodeSize() can only guess from label text, and MathJax then typesets
+// asynchronously into the box — so the guess was always wrong for math nodes and
+// edges anchored away from the visible border. This observes the real rendered
+// boxes and feeds their dimensions back into edge routing.
+//
+// ResizeObserver and offsetWidth/offsetHeight both report untransformed layout
+// size, which is what we want: node coordinates live in canvas space, before the
+// pan/zoom transform is applied.
+function useMeasuredNodeSizes() {
+  const [sizes, setSizes] = useState2({});
+  const ref = useRef2(null);
+  if (ref.current === null) {
+    ref.current = { observer: null, elements: new Map(), pending: {}, raf: 0, sizes: {}, callbacks: new Map() };
+  }
+
+  useEffect2(() => () => {
+    const s = ref.current;
+    if (s.observer) s.observer.disconnect();
+    if (s.raf) cancelAnimationFrame(s.raf);
+  }, []);
+
+  // Coalesce a burst of measurements (one per node, plus one per MathJax pass)
+  // into a single state update per frame.
+  function record(id, el) {
+    const s = ref.current;
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    if (!w || !h) return;
+    const prev = s.sizes[id];
+    if (prev && Math.abs(prev.w - w) < 0.5 && Math.abs(prev.h - h) < 0.5) return;
+    s.pending[id] = { w, h };
+    if (s.raf) return;
+    s.raf = requestAnimationFrame(() => {
+      s.raf = 0;
+      const pending = s.pending;
+      s.pending = {};
+      if (!Object.keys(pending).length) return;
+      s.sizes = { ...s.sizes, ...pending };
+      setSizes(s.sizes);
+    });
+  }
+
+  function ensureObserver() {
+    const s = ref.current;
+    if (s.observer || typeof ResizeObserver === 'undefined') return s.observer;
+    s.observer = new ResizeObserver((entries) => {
+      entries.forEach((entry) => {
+        const id = entry.target.getAttribute('data-node-id');
+        if (id) record(id, entry.target);
+      });
+    });
+    return s.observer;
+  }
+
+  // One stable callback ref per node id, so React does not detach and reattach
+  // every ref on each render.
+  function measureRef(id) {
+    const s = ref.current;
+    if (!s.callbacks.has(id)) {
+      s.callbacks.set(id, (el) => {
+        const observer = ensureObserver();
+        const previous = s.elements.get(id);
+        if (previous && previous !== el && observer) observer.unobserve(previous);
+        if (el) {
+          s.elements.set(id, el);
+          if (observer) observer.observe(el);
+          record(id, el);
+        } else {
+          s.elements.delete(id);
+        }
+      });
+    }
+    return s.callbacks.get(id);
+  }
+
+  // Measured when available, estimated until then.
+  function sizeOf(node) {
+    return sizes[node.id] || estimateNodeSize(node.label);
+  }
+
+  return { measureRef, sizeOf };
+}
+
 // ─── Custom hook for drag-on-canvas ─────────────────────────────────────────
 function useNodeDrag(onMove, onEnd) {
   const stateRef = useRef2(null);
@@ -482,6 +566,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   });
   const viewportRef = useRef2(null);
   const { t, setT, onWheel, startPan, onTouchStart, onTouchMove, onTouchEnd } = usePanZoom();
+  const { measureRef, sizeOf } = useMeasuredNodeSizes();
 
   const answeredEdges = progress.answeredEdges || new Set();
   const validNodes = mapData.nodes.filter((n) => (
@@ -644,11 +729,12 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
 
   const nodeLabelById = Object.fromEntries(validNodes.map((n) => [n.id, n.label]));
 
-  // Build node geometry map for edge routing
+  // Build node geometry map for edge routing, from measured boxes where we have
+  // them so arrows land on the visible border rather than a guessed one.
   const geom = {};
   validNodes.forEach(n => {
     const xy = nodeXY(n);
-    const sz = estimateNodeSize(n.label);
+    const sz = sizeOf(n);
     geom[n.id] = { x: xy.x, y: xy.y, w: sz.w, h: sz.h };
   });
   const edgeDirectionSet = new Set(mapData.edges.map(e => `${e.from}->${e.to}`));
@@ -830,7 +916,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
           {/* Nodes */}
           {validNodes.map(node => {
             const xy = nodeXY(node);
-            const sz = estimateNodeSize(node.label);
+            const sz = sizeOf(node);
             const unlocked = unlockedNodes.has(node.id);
             return (
               <div
@@ -851,10 +937,14 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
               >
                 <div
                   className={`node-card ${unlocked ? 'unlocked' : 'locked'} ${node.isStart ? 'start' : ''}`}
+                  /* No inline width: the card sizes to its content between the
+                     min-width/max-width in CSS, and useMeasuredNodeSizes reads
+                     back whatever it settles at (including after MathJax runs). */
+                  ref={measureRef(node.id)}
+                  data-node-id={node.id}
                   style={{
                     background: unlocked ? nodeBg(node.color) : undefined,
                     borderColor: unlocked ? nodeBorder(node.color) : undefined,
-                    width: sz.w,
                   }}
                   /* Revealed nodes are focusable and nudgeable with the arrow
                      keys, so rearranging the map does not require a mouse. */
@@ -947,4 +1037,4 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
   );
 }
 
-Object.assign(window, { ConceptMap, estimateNodeSize, useNodeDrag, usePanZoom, ZoomControl, nodeBg, nodeBorder, shadeForPaper, computeAutoNodeLayout });
+Object.assign(window, { ConceptMap, estimateNodeSize, useMeasuredNodeSizes, useNodeDrag, usePanZoom, ZoomControl, nodeBg, nodeBorder, shadeForPaper, computeAutoNodeLayout });
