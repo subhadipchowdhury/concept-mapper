@@ -1,0 +1,20 @@
+# Python virtual environments (a stray .venv was sitting in this repo)
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Node / build output (for when a build step is added)
+node_modules/
+dist/
+
+# Scratch and working files — these must not ship to GitHub Pages,
+# which deploys the whole repo root as the site.
+temp/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
