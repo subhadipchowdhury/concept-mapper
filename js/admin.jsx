@@ -13,11 +13,15 @@ const NODE_COLOR_PALETTE = [
   '#ECA154', // Light Terracotta
 ];
 
-function adminMapPublishPath(mapData) {
-  const subjectId = typeof mapData?.subjectId === 'string' && mapData.subjectId.trim()
+// Resolve the subject folder a map belongs to, defaulting to 'general'.
+function mapSubjectIdOf(mapData) {
+  return typeof mapData?.subjectId === 'string' && mapData.subjectId.trim()
     ? mapData.subjectId.trim()
     : 'general';
-  return `data/maps/${subjectId}/${mapData.id}.json`;
+}
+
+function adminMapPublishPath(mapData) {
+  return `data/maps/${mapSubjectIdOf(mapData)}/${mapData.id}.json`;
 }
 
 // Validate graph reachability so authoring mistakes are visible in admin.
@@ -902,7 +906,26 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
               onChange={e => updateEdge(selectedEdge.id, { answer: e.target.value })}
               placeholder="Enter the correct word or phrase"
             />
+            <div className="field-help">This is the wording revealed on the map once the student solves the edge.</div>
           </div>
+          {selectedEdge.type === 'fillin' && (
+            <div className="field">
+              <div className="field-label">Also accept (one per line)</div>
+              <textarea
+                className="field-textarea"
+                rows={3}
+                value={(selectedEdge.acceptedAnswers || []).join('\n')}
+                onChange={e => updateEdge(selectedEdge.id, {
+                  acceptedAnswers: e.target.value.split('\n').map(o => o.trim()).filter(Boolean),
+                })}
+                placeholder={'is bounded\nbounded above and below'}
+              />
+              <div className="field-help">
+                Alternate phrasings that should also count as correct. Case, spacing, plurals,
+                <code> -ly</code> endings, and common math spellings are already matched automatically.
+              </div>
+            </div>
+          )}
           {selectedEdge.type === 'dropdown' && (
             <div className="field">
               <div className="field-label">Dropdown options (one per line, including the correct answer)</div>
@@ -964,14 +987,7 @@ function MapsManager({
 
   const displayOrder = (Array.isArray(orderedMapIds) ? orderedMapIds : Object.keys(allMaps || {}))
     .filter(id => !!allMaps[id])
-    .filter((id) => {
-      if (activeSubjectId === 'all') return true;
-      const mapData = allMaps[id];
-      const mapSubjectId = typeof mapData?.subjectId === 'string' && mapData.subjectId.trim()
-        ? mapData.subjectId.trim()
-        : 'general';
-      return mapSubjectId === activeSubjectId;
-    });
+    .filter((id) => activeSubjectId === 'all' || mapSubjectIdOf(allMaps[id]) === activeSubjectId);
 
   const visibleMapIds = displayOrder.filter((mapId) => {
     const mapData = allMaps[mapId];
@@ -1189,6 +1205,19 @@ function MapsManager({
               </div>
 
               <div className="maps-manager-row-actions" onClick={(e) => e.stopPropagation()}>
+                {typeof onMoveToSubject === 'function' && allSubjects.length > 0 && (
+                  <select
+                    className="maps-manager-row-subject-select"
+                    value={mapSubjectIdOf(m)}
+                    onChange={(e) => onMoveToSubject(m.id, e.target.value)}
+                    title="Move this map to another subject folder"
+                    aria-label={`Subject folder for ${m.title}`}
+                  >
+                    {allSubjects.map((subject) => (
+                      <option key={subject.id} value={subject.id}>{subject.title}</option>
+                    ))}
+                  </select>
+                )}
                 {isCustom && typeof onTogglePublish === 'function' && (
                   <button
                     className="btn btn-ghost btn-sm"
