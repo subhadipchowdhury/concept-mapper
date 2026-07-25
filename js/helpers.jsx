@@ -40,6 +40,20 @@ function normalizeDisplayText(rawText) {
     .replace(/(?:\\_){2,}/g, (m) => '_'.repeat(m.length / 2));
 }
 
+// Flatten authored text to a bare phrase for accessible names and tooltips,
+// where raw LaTeX would be read out character by character. Best effort: drops
+// the \( \) delimiters and control words, keeping the variables between them.
+function plainLabel(text) {
+  return String(text || '')
+    .replace(/\\r\\n|\\n/g, ' ')
+    .replace(/\\[()[\]]/g, ' ')
+    .replace(/\\(?:mathbb|mathcal|mathrm|text|left|right|displaystyle)\b/g, ' ')
+    .replace(/\\([a-zA-Z]+)/g, ' $1 ')
+    .replace(/[{}$]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 // MathJax-rendered text (handles \n as <br>)
 function MathNode({ text, className = '' }) {
   const ref = useRef(null);
@@ -219,15 +233,52 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
     return opts;
   }, [edge.id]);
   const cardRef = useRef(null);
+  const selectRef = useRef(null);
+  // Remember what opened the dialog so focus can go back there on close;
+  // otherwise a keyboard user is dumped at the top of the document.
+  const returnFocusRef = useRef(null);
 
   useEffect(() => {
-    if (edge.type === 'fillin' && inputRef.current) inputRef.current.focus();
+    returnFocusRef.current = document.activeElement;
+    const target = edge.type === 'fillin' ? inputRef.current : selectRef.current;
+    if (target) target.focus();
     setTimeout(() => {
       if (window.MathJax && window.MathJax.typesetPromise && cardRef.current) {
         window.MathJax.typesetPromise([cardRef.current]).catch(()=>{});
       }
     }, 80);
+    return () => {
+      const back = returnFocusRef.current;
+      if (back && typeof back.focus === 'function' && document.contains(back)) back.focus();
+    };
   }, [edge.id]);
+
+  // Escape closes from anywhere in the dialog, and Tab is trapped inside it.
+  useEffect(() => {
+    function onKeyDown(e) {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        onClose();
+        return;
+      }
+      if (e.key !== 'Tab' || !cardRef.current) return;
+      const focusable = cardRef.current.querySelectorAll(
+        'button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      } else if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      }
+    }
+    document.addEventListener('keydown', onKeyDown, true);
+    return () => document.removeEventListener('keydown', onKeyDown, true);
+  }, [onClose]);
 
   function checkAnswer() {
     const userAns = normalizeAnswer(value);
@@ -300,8 +351,14 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
 
   return (
     <div className="answer-popup" onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="answer-popup-card" ref={cardRef}>
-        <div className="popup-relationship">
+      <div
+        className="answer-popup-card"
+        ref={cardRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="answer-popup-heading"
+      >
+        <div className="popup-relationship" id="answer-popup-heading">
           {edge.type === 'fillin' ? 'Fill in the relationship' : 'Choose the relationship'}
         </div>
 
@@ -366,9 +423,12 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
           </>
         ) : (
           <select
+            ref={selectRef}
             className="popup-select"
             value={value}
             onChange={e => { setValue(e.target.value); setFeedback(null); }}
+            onKeyDown={e => { if (e.key === 'Enter' && value.trim()) checkAnswer(); }}
+            aria-label="Choose the relationship"
           >
             <option value="">— choose one —</option>
             {shuffledOptions.map(opt => (
@@ -377,14 +437,18 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
           </select>
         )}
 
-        {feedback === 'correct' && (
-          <div className="popup-feedback correct">✓ Correct! Unlocking next concepts…</div>
-        )}
-        {feedback === 'wrong' && (
-          <div className="popup-feedback wrong">
-            ✗ Not quite — {attempts >= 2 ? 'check the hint above' : 'try again'}
-          </div>
-        )}
+        {/* Announced to screen readers, since the only other signal that an
+            answer was wrong is a colour change on the input. */}
+        <div role="status" aria-live="polite">
+          {feedback === 'correct' && (
+            <div className="popup-feedback correct">✓ Correct! Unlocking next concepts…</div>
+          )}
+          {feedback === 'wrong' && (
+            <div className="popup-feedback wrong">
+              ✗ Not quite — {attempts >= 2 ? 'check the hint above' : 'try again'}
+            </div>
+          )}
+        </div>
         <div className="popup-actions">
           <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
           {feedback !== 'correct' && (
@@ -694,6 +758,7 @@ Object.assign(window, {
   launchConfetti,
   NODE_PALETTE,
   DEFAULT_NODE_COLOR,
+  plainLabel,
   computeEdgePath,
   AnswerPopup,
   normalizeAnswer,

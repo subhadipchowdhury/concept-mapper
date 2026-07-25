@@ -1040,6 +1040,62 @@ a:hover {
   display: none;
 }
 
+/* Answerable badges are real <button>s so the map is keyboard-completable.
+   Reset the UA button styling the rules above assume is absent. */
+button.edge-label-badge {
+  margin: 0;
+  text-align: left;
+  line-height: 1.35;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* The global :focus-visible ring is too quiet against a busy canvas, so
+   answerable badges and revealed nodes get a stronger, offset ring. */
+button.edge-label-badge:focus-visible {
+  outline: 3px solid var(--maroon);
+  outline-offset: 3px;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+  animation: none; /* hold still while focused */
+}
+
+.node-card:focus-visible {
+  outline: 3px solid var(--maroon);
+  outline-offset: 3px;
+  box-shadow: var(--shadow-lg);
+}
+
+/* Keyboard hint strip listing the canvas shortcuts */
+.canvas-keyboard-hint {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text-muted);
+  font-size: 10.5px;
+  box-shadow: var(--shadow-sm);
+  pointer-events: none;
+}
+
+.canvas-keyboard-hint kbd {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  padding: 1px 4px;
+  border: 1px solid var(--line-2);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--paper-3);
+  color: var(--text-dim);
+}
+
 /* ─── ANSWER POPUP ─── */
 .answer-popup {
   position: fixed;

@@ -642,6 +642,8 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
     onPositions(next);
   }
 
+  const nodeLabelById = Object.fromEntries(validNodes.map((n) => [n.id, n.label]));
+
   // Build node geometry map for edge routing
   const geom = {};
   validNodes.forEach(n => {
@@ -798,17 +800,29 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
                 className="edge-label-wrap"
                 style={{ left: path.midX, top: path.midY }}
               >
-                <div
-                  className={`edge-label-badge ${isAnswered ? 'correct' : 'answering'}`}
-                  onMouseDown={e => { e.stopPropagation(); }}
-                  onClick={(e) => { e.stopPropagation(); if (!isAnswered) handleEdgeClick(edge); }}
-                  title={isAnswered ? '' : 'Click to answer'}
-                >
-                  {isAnswered
-                    ? <>✓ <MathNode text={`${edge.label} ${edge.answer}`} /></>
-                    : <><MathNode text={edge.label} /> <span style={{fontSize: 11, marginLeft: 6}}>✏️</span></>
-                  }
-                </div>
+                {/* A real <button> when it can be answered, so the map is
+                    completable by keyboard. Answered edges become static text —
+                    there is nothing left to activate. */}
+                {isAnswered ? (
+                  <div className="edge-label-badge correct">
+                    ✓ <MathNode text={`${edge.label} ${edge.answer}`} />
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="edge-label-badge answering"
+                    onMouseDown={e => { e.stopPropagation(); }}
+                    onClick={(e) => { e.stopPropagation(); handleEdgeClick(edge); }}
+                    title="Answer this relationship"
+                    aria-label={
+                      `Answer the relationship from ${plainLabel(nodeLabelById[edge.from])}`
+                      + ` to ${plainLabel(nodeLabelById[edge.to])}: ${plainLabel(edge.label)}`
+                    }
+                  >
+                    <MathNode text={edge.label} />
+                    <span aria-hidden="true" style={{fontSize: 11, marginLeft: 6}}>✏️</span>
+                  </button>
+                )}
               </div>
             );
           })}
@@ -842,6 +856,28 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
                     borderColor: unlocked ? nodeBorder(node.color) : undefined,
                     width: sz.w,
                   }}
+                  /* Revealed nodes are focusable and nudgeable with the arrow
+                     keys, so rearranging the map does not require a mouse. */
+                  tabIndex={unlocked ? 0 : -1}
+                  /* 'group' rather than 'button': it is focusable and movable,
+                     but pressing Enter does not activate anything. A locked card
+                     is role=img so its ████ blocks are read as the alt text
+                     instead of aloud, character by character. */
+                  role={unlocked ? 'group' : 'img'}
+                  aria-label={unlocked
+                    ? `Concept: ${plainLabel(node.label)}. Use the arrow keys to move it.`
+                    : 'Hidden concept — answer an incoming relationship to reveal it'}
+                  onKeyDown={(e) => {
+                    if (!unlocked) return;
+                    const step = e.shiftKey ? 40 : 10;
+                    const delta = {
+                      ArrowLeft: [-step, 0], ArrowRight: [step, 0],
+                      ArrowUp: [0, -step], ArrowDown: [0, step],
+                    }[e.key];
+                    if (!delta) return;
+                    e.preventDefault();
+                    setNodeXY(node.id, xy.x + delta[0], xy.y + delta[1]);
+                  }}
                 >
                   <MathNode text={unlocked ? node.label : '████ ████\\n████████'} />
                 </div>
@@ -851,6 +887,10 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
         </div>
 
         <ZoomControl scale={t.scale} setScale={(fn) => setT(prev => ({...prev, scale: typeof fn === 'function' ? fn(prev.scale) : fn}))} />
+
+        <div className="canvas-keyboard-hint">
+          <kbd>Tab</kbd> to a relationship · <kbd>Enter</kbd> to answer · arrows move a concept
+        </div>
 
         <div
           className={`mini-help ${isHelpOpen ? 'open' : 'collapsed'}`}
@@ -870,7 +910,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
             <span className="mini-help-caret">{isHelpOpen ? '▾' : '▸'}</span>
           </div>
           <div className="mini-help-body">
-            Select a topic from the sidebar, then tap any glowing relationship label to answer it. Drag nodes to arrange the map in a way that helps you study. On touch devices, drag the background to pan and pinch to zoom. On desktop, use the mouse wheel to pan and <kbd>Ctrl</kbd>+wheel to zoom. Use the Label slider to move arrow labels along edges in discrete 0.1 steps. Use <span className="mini-help-inline-icon icon-btn-spread-nodes-icon" aria-hidden="true"></span> to spread nodes out, <span className="mini-help-inline-icon icon-btn-compact-nodes-icon" aria-hidden="true"></span> to bring them closer together, and <span className="mini-help-inline-icon icon-btn-auto-arrange-icon" aria-hidden="true"></span> to rebuild the automatic layout.
+            Select a topic from the sidebar, then tap any glowing relationship label to answer it. Drag nodes to arrange the map in a way that helps you study. On touch devices, drag the background to pan and pinch to zoom. On desktop, use the mouse wheel to pan and <kbd>Ctrl</kbd>+wheel to zoom. Use the Label slider to move arrow labels along edges in discrete 0.1 steps. Keyboard only: <kbd>Tab</kbd> moves between answerable relationships and revealed concepts, <kbd>Enter</kbd> opens the question, <kbd>Esc</kbd> closes it, and the arrow keys nudge a focused concept (hold <kbd>Shift</kbd> for larger steps). Use <span className="mini-help-inline-icon icon-btn-spread-nodes-icon" aria-hidden="true"></span> to spread nodes out, <span className="mini-help-inline-icon icon-btn-compact-nodes-icon" aria-hidden="true"></span> to bring them closer together, and <span className="mini-help-inline-icon icon-btn-auto-arrange-icon" aria-hidden="true"></span> to rebuild the automatic layout.
           </div>
         </div>
       </div>
