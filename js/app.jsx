@@ -8,6 +8,7 @@ const SUBJECT_ORDER_KEY = 'conceptmapper_subject_order_v1';
 const SIDEBAR_FOLDER_COLLAPSE_KEY = 'conceptmapper_sidebar_folder_collapse_v1';
 const ACTIVE_MAP_KEY = 'conceptmapper_active_map_v1';
 const EXPORTED_SIGNATURES_KEY = 'conceptmapper_exported_v1';
+const OVERRIDE_BASE_KEY = 'conceptmapper_override_base_v1';
 const DEFAULT_SUBJECT_ID = 'general';
 const DEFAULT_SUBJECT_TITLE = 'General';
 const MOBILE_VIEWPORT_QUERY = '(max-width: 760px)';
@@ -234,6 +235,22 @@ function saveExportedSignatures(value) {
   localStorage.setItem(EXPORTED_SIGNATURES_KEY, JSON.stringify(value || {}));
 }
 
+// The built-in signature captured when a local override was first created. Used
+// to tell "the repo changed under me" apart from "I edited this myself".
+function loadOverrideBases() {
+  try {
+    const raw = localStorage.getItem(OVERRIDE_BASE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveOverrideBases(value) {
+  localStorage.setItem(OVERRIDE_BASE_KEY, JSON.stringify(value || {}));
+}
+
 // Build a stable ordered id list: preferred order first, then unseen ids.
 function buildOrderedIds(preferredOrder, mapsObj) {
   const ids = [];
@@ -354,12 +371,12 @@ function App() {
   const [manifestOrder, setManifestOrder] = useStateApp([]);
   const [positions, setPositions] = useStateApp(() => loadPositions());
   const [exportedSignatures, setExportedSignatures] = useStateApp(() => loadExportedSignatures());
+  const [overrideBases, setOverrideBases] = useStateApp(() => loadOverrideBases());
   const [toast, setToast] = useStateApp(null);
   const [isAdminUnlocked, setIsAdminUnlocked] = useStateApp(() => sessionStorage.getItem(ADMIN_UNLOCK_KEY) === '1');
   const importInputRef = useRefApp(null);
   const importCustomMapInputRef = useRefApp(null);
   const toastTimerRef = useRefApp(null);
-  const adminRepoPromptSignatureRef = useRefApp('');
 
   // Admin sees everything; students see only maps marked ready. A local override
   // shadows its built-in version, so setting an override to draft hides the
@@ -368,10 +385,16 @@ function App() {
   const studentMaps = Object.fromEntries(
     Object.entries(adminMaps).filter(([, m]) => isMapReady(m))
   );
+  // "Out of date" means the repo copy has changed since this override was made —
+  // not merely that the override differs from it, which is true of every edit.
+  // overrideBases holds the built-in signature captured when each override was
+  // created; if the built-in no longer matches that, the repo has moved ahead.
+  // A missing baseline (an override predating this tracking) is not flagged.
   const repoMismatchMapIds = Object.keys(customMaps).filter((id) => (
-    builtInMaps[id] && !mapsEquivalent(customMaps[id], builtInMaps[id])
+    builtInMaps[id]
+    && overrideBases[id]
+    && overrideBases[id] !== mapSignature(builtInMaps[id])
   ));
-  const repoMismatchSignature = [...repoMismatchMapIds].sort().join('|');
   const allSubjects = buildSubjectCatalog(subjectOrder, adminMaps, customSubjects);
   const subjectTitleById = Object.fromEntries(allSubjects.map((s) => [s.id, s.title]));
 
@@ -496,6 +519,7 @@ function App() {
     });
     setCustomMaps(next);
     saveCustomMaps(next);
+    clearOverrideBases(ids);
     showToast(`Updated ${ids.length} local override${ids.length === 1 ? '' : 's'} from repo.`, 'success', 3200);
   }
 
@@ -511,25 +535,15 @@ function App() {
     });
     setCustomMaps(next);
     saveCustomMaps(next);
+    clearOverrideBases(staleCustomIds);
   }, [builtInMaps, customMaps]);
 
-  // Prompt admins to update stale local overrides after repo refresh.
-  useEffectApp(() => {
-    if (!view.startsWith('admin')) {
-      adminRepoPromptSignatureRef.current = '';
-      return;
-    }
-    if (repoMismatchMapIds.length === 0) return;
-    if (adminRepoPromptSignatureRef.current === repoMismatchSignature) return;
-
-    adminRepoPromptSignatureRef.current = repoMismatchSignature;
-    const shouldUpdate = window.confirm(
-      `${repoMismatchMapIds.length} local override(s) differ from the latest repo version.\n\nUpdate local copies from repo now?`
-    );
-    if (shouldUpdate) {
-      handleUpdateOverridesFromRepo(repoMismatchMapIds);
-    }
-  }, [view, repoMismatchMapIds, repoMismatchSignature]);
+  // No modal here on purpose. This used to open a confirm() offering to replace
+  // local overrides with the repo copies, which fired on any override that
+  // differed from its built-in version — including one the author had just
+  // created by editing. Clicking OK then discarded that edit. The
+  // .admin-repo-sync-banner below says the same thing without a blocking dialog
+  // and without a destructive default.
 
   // Return progress for a map, always providing a Set-based default.
   function getProgress(mapId) {
@@ -580,6 +594,25 @@ function App() {
     const updated = { ...customMaps, [mapId]: normalized };
     setCustomMaps(updated);
     saveCustomMaps(updated);
+
+    // First time this map gets a local override, remember what the repo version
+    // looked like. Later edits must not move the baseline, or a genuine upstream
+    // change would go unnoticed.
+    if (builtInMaps[mapId] && !overrideBases[mapId]) {
+      const nextBases = { ...overrideBases, [mapId]: mapSignature(builtInMaps[mapId]) };
+      setOverrideBases(nextBases);
+      saveOverrideBases(nextBases);
+    }
+  }
+
+  // Forget baselines for maps that no longer carry an override.
+  function clearOverrideBases(mapIds) {
+    const ids = (Array.isArray(mapIds) ? mapIds : []).filter((id) => overrideBases[id]);
+    if (ids.length === 0) return;
+    const next = { ...overrideBases };
+    ids.forEach((id) => { delete next[id]; });
+    setOverrideBases(next);
+    saveOverrideBases(next);
   }
 
   // Create a new subject folder and append it to subject ordering.
@@ -740,12 +773,20 @@ function App() {
     const next = status === MAP_STATUS_DRAFT ? MAP_STATUS_DRAFT : MAP_STATUS_READY;
     if (getMapStatus(existing) === next) return;
     handleSaveCustomMap(mapId, { ...existing, status: next });
+    // Say outright that this has not reached students yet. The dropdown moving is
+    // easy to read as "done", but students load the committed file, not this
+    // browser's storage.
+    const isRepoMap = !!builtInMaps[mapId];
     showToast(
-      next === MAP_STATUS_READY
-        ? 'Marked ready. Export and commit the map file to show it to students.'
-        : 'Marked draft. Export and commit the map file to hide it from students.',
+      isRepoMap
+        ? (next === MAP_STATUS_READY
+          ? 'Ready in this browser only — export the map and commit the file before students see it.'
+          : 'Hidden in this browser only — students keep seeing it until you export the map and commit the file.')
+        : (next === MAP_STATUS_READY
+          ? 'Marked ready. Export the map and commit it so students can load it.'
+          : 'Marked draft.'),
       'info',
-      4200
+      5200
     );
   }
 
@@ -758,6 +799,7 @@ function App() {
     delete next[mapId];
     setCustomMaps(next);
     saveCustomMaps(next);
+    clearOverrideBases([mapId]);
     showToast('Local override removed. Using built-in map version.', 'success');
   }
 
@@ -815,6 +857,7 @@ function App() {
     delete updatedCustomMaps[mapId];
     setCustomMaps(updatedCustomMaps);
     saveCustomMaps(updatedCustomMaps);
+    clearOverrideBases([mapId]);
 
     const updatedProgress = { ...allProgress };
     delete updatedProgress[mapId];

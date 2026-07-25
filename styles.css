@@ -1786,6 +1786,14 @@ button.edge-label-badge:focus-visible {
   align-items: center;
 }
 
+/* Local status differs from the committed file, so what the author sees and what
+   students see disagree. Loudest badge in the row on purpose. */
+.maps-manager-status-badge.visibility-drift {
+  color: #FFFFFF;
+  background: var(--uc-brick);
+  border: 1px solid var(--uc-brick);
+}
+
 /* Readiness picker on each map row. Colour-coded because this is the control
    that decides whether students can see a map at all. */
 .maps-manager-row-status-select {

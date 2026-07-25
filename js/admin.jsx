@@ -1174,6 +1174,8 @@ function MapsManager({
           const hasBuiltInVersion = !!builtInMaps?.[m.id];
           const publishState = typeof getPublishState === 'function' ? getPublishState(m.id) : 'repo';
           const rowStatus = getMapStatus(m);
+          // What the committed file says, which is what students actually load.
+          const repoStatus = builtInMaps?.[m.id] ? getMapStatus(builtInMaps[m.id]) : null;
           return (
             <div
               key={m.id}
@@ -1231,6 +1233,22 @@ function MapsManager({
                 <span className={`maps-manager-status-badge ${rowStatus === MAP_STATUS_READY ? 'published' : 'draft'}`}>
                   {rowStatus === MAP_STATUS_READY ? 'Ready' : 'Drafting'}
                 </span>
+                {/* The status shown above is the local one. Until the file is
+                    committed, students are still going by the repo's copy — so
+                    say so outright rather than letting the badge imply it took
+                    effect everywhere. */}
+                {repoStatus && repoStatus !== rowStatus && (
+                  <span
+                    className="maps-manager-status-badge visibility-drift"
+                    title={
+                      repoStatus === MAP_STATUS_READY
+                        ? `Only hidden in this browser. The committed file still says "ready", so students continue to see this map until you export it and commit.`
+                        : `Only visible in this browser. The committed file still says "draft", so students will not see this map until you export it and commit.`
+                    }
+                  >
+                    {repoStatus === MAP_STATUS_READY ? 'Students still see it' : 'Students cannot see it yet'}
+                  </span>
+                )}
                 {/* Local-only edits are one cleared cache away from gone, so say so. */}
                 {publishState === 'unexported' && (
                   <span
