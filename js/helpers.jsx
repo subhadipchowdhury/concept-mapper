@@ -686,8 +686,10 @@ async function loadBuiltInMaps(manifestPath = MAP_MANIFEST_PATH) {
 // Download one map payload as {mapId}.json for repo promotion.
 function downloadMapJSON(mapId, mapData) {
   if (!mapId || !mapData) return;
+  // `_published` is local sidebar state, not part of the published map file.
+  const { _published, ...publishable } = mapData;
   const payload = {
-    ...mapData,
+    ...publishable,
     id: mapId,
     updatedAt: new Date().toISOString(),
     exportedBy: 'admin',

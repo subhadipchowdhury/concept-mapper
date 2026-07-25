@@ -728,8 +728,5 @@
       ],
       "hint": "It converges by Leibniz, while the absolute-value version is harmonic and diverges."
     }
-  ],
-  "_published": true,
-  "updatedAt": "2026-05-02T00:43:52.662Z",
-  "exportedBy": "admin"
+  ]
 }

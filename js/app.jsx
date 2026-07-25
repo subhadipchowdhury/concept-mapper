@@ -7,6 +7,7 @@ const SUBJECTS_KEY = 'conceptmapper_subjects_v1';
 const SUBJECT_ORDER_KEY = 'conceptmapper_subject_order_v1';
 const SIDEBAR_FOLDER_COLLAPSE_KEY = 'conceptmapper_sidebar_folder_collapse_v1';
 const ACTIVE_MAP_KEY = 'conceptmapper_active_map_v1';
+const EXPORTED_SIGNATURES_KEY = 'conceptmapper_exported_v1';
 const DEFAULT_SUBJECT_ID = 'general';
 const DEFAULT_SUBJECT_TITLE = 'General';
 const MOBILE_VIEWPORT_QUERY = '(max-width: 760px)';
@@ -173,10 +174,15 @@ function arraysEqual(a, b) {
 }
 
 // Normalize map payloads prior to equivalence checks.
+// `_published` is local-only sidebar state and `updatedAt`/`exportedBy` are
+// export stamps — none of them are part of the map's content. Including
+// `_published` here meant an override that had ever been published could never
+// compare equal to its built-in version, so the stale-override cleanup never
+// ran for it and the "out of date" banner never cleared.
 function normalizeForCompare(value) {
   if (Array.isArray(value)) return value.map(normalizeForCompare);
   if (value && typeof value === 'object') {
-    const ignore = new Set(['updatedAt', 'exportedBy']);
+    const ignore = new Set(['updatedAt', 'exportedBy', '_published']);
     const out = {};
     Object.keys(value).sort().forEach((k) => {
       if (ignore.has(k)) return;
@@ -194,6 +200,34 @@ function mapsEquivalent(a, b) {
   } catch {
     return false;
   }
+}
+
+// A content fingerprint for a map, used to tell whether the local copy still
+// matches what was last exported to a file.
+function mapSignature(mapData) {
+  try {
+    return JSON.stringify(normalizeForCompare(mapData));
+  } catch {
+    return '';
+  }
+}
+
+// Remember what each map looked like when it was last exported, so the builder
+// can show which drafts still exist only in this browser. All authoring lives in
+// localStorage until it is exported and committed, and clearing site data loses
+// anything unexported — so that state needs to be visible, not implicit.
+function loadExportedSignatures() {
+  try {
+    const raw = localStorage.getItem(EXPORTED_SIGNATURES_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveExportedSignatures(value) {
+  localStorage.setItem(EXPORTED_SIGNATURES_KEY, JSON.stringify(value || {}));
 }
 
 // Build a stable ordered id list: preferred order first, then unseen ids.
@@ -315,6 +349,7 @@ function App() {
   const [adminSubjectQuery, setAdminSubjectQuery] = useStateApp('');
   const [manifestOrder, setManifestOrder] = useStateApp([]);
   const [positions, setPositions] = useStateApp(() => loadPositions());
+  const [exportedSignatures, setExportedSignatures] = useStateApp(() => loadExportedSignatures());
   const [toast, setToast] = useStateApp(null);
   const [isAdminUnlocked, setIsAdminUnlocked] = useStateApp(() => sessionStorage.getItem(ADMIN_UNLOCK_KEY) === '1');
   const importInputRef = useRefApp(null);
@@ -585,11 +620,42 @@ function App() {
     setView('admin-edit');
   }
 
-  // Export a single map payload as JSON.
+  // Export a single map payload as JSON, and remember the exact content that
+  // went out so later edits show up as unexported.
   function handleExportMapJSON(mapId) {
     const m = adminMaps[mapId];
     if (!m) return;
     downloadMapJSON(mapId, m);
+    const next = { ...exportedSignatures, [mapId]: mapSignature(m) };
+    setExportedSignatures(next);
+    saveExportedSignatures(next);
+  }
+
+  // Put a map's publishable JSON on the clipboard, so it can be pasted straight
+  // into the repo file instead of going via the downloads folder.
+  async function handleCopyMapJSON(mapId) {
+    const m = adminMaps[mapId];
+    if (!m) return;
+    const { _published, ...publishable } = m;
+    const payload = JSON.stringify({ ...publishable, id: mapId }, null, 2);
+    try {
+      await navigator.clipboard.writeText(payload + '\n');
+      const next = { ...exportedSignatures, [mapId]: mapSignature(m) };
+      setExportedSignatures(next);
+      saveExportedSignatures(next);
+      showToast(`Copied. Paste into ${mapRepoPath({ ...m, id: mapId })}`, 'success', 4200);
+    } catch {
+      showToast('Could not access the clipboard. Use Export instead.', 'error');
+    }
+  }
+
+  // 'repo'       — comes from data/maps and has no local override
+  // 'exported'   — local copy matches what was last exported
+  // 'unexported' — local-only edits that are not in any file yet
+  function getPublishState(mapId) {
+    if (!customMaps[mapId]) return 'repo';
+    const signature = mapSignature(customMaps[mapId]);
+    return exportedSignatures[mapId] === signature ? 'exported' : 'unexported';
   }
 
   // Reorder map cards after drag-drop within the admin manager.
@@ -751,7 +817,9 @@ function App() {
 
   // Prompt for admin passphrase and unlock admin session for this tab.
   function requestAdminAccess() {
-    const entered = prompt('Enter the admin passphrase to open the map builder and management tools:');
+    const entered = prompt('Enter the passphrase to open the map builder.
+
+This only hides the builder from students — it is checked in the browser and protects nothing.');
     if (entered === null) return false;
     if (entered !== ADMIN_STATIC_PASSPHRASE) {
       alert('That passphrase did not match. Please try again.');
@@ -903,6 +971,7 @@ function App() {
   const resolvedAdminSubjectId = adminSubjectId === 'all' || allSubjects.some((s) => s.id === adminSubjectId)
     ? adminSubjectId
     : 'all';
+  const unexportedMapIds = Object.keys(customMaps).filter((id) => getPublishState(id) === 'unexported');
   const repoMismatchPreview = repoMismatchMapIds
     .slice(0, 3)
     .map((id) => adminMaps[id]?.title || id)
@@ -1245,7 +1314,7 @@ function App() {
                     <div className="sidebar-item-dot" style={{background: 'var(--uc-goldenrod)'}}></div>
                     Map Builder
                   </div>
-                  <div className="sidebar-item-desc">Create and edit concept maps</div>
+                  <div className="sidebar-item-desc">Draft concept maps in this browser</div>
                 </div>
               </>
             )}
@@ -1315,6 +1384,9 @@ function App() {
               onCreate={handleCreateNewMap}
               onCreateSubject={handleCreateSubject}
               onExportMap={handleExportMapJSON}
+              onCopyMapJSON={handleCopyMapJSON}
+              getPublishState={getPublishState}
+              unexportedCount={unexportedMapIds.length}
               onExportManifest={handleExportManifestJSON}
               onReorderMap={handleReorderMaps}
               onMoveToSubject={handleMoveMapToSubject}

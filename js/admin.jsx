@@ -966,6 +966,9 @@ function MapsManager({
   onCreate,
   onCreateSubject,
   onExportMap,
+  onCopyMapJSON,
+  getPublishState,
+  unexportedCount = 0,
   onExportManifest,
   onReorderMap,
   onMoveToSubject,
@@ -994,6 +997,9 @@ function MapsManager({
     if (activeFilter === 'builtin') return !isCustom;
     if (activeFilter === 'custom') return isCustom;
     if (activeFilter === 'draft') return isCustom && !mapData._published;
+    if (activeFilter === 'unexported') {
+      return typeof getPublishState === 'function' && getPublishState(mapId) === 'unexported';
+    }
     return true;
   });
 
@@ -1051,7 +1057,7 @@ function MapsManager({
           <div>
             <div className="maps-manager-subject-title">{selectedTitle}</div>
             <div className="maps-manager-subject-meta">
-              {displayOrder.length} maps · {selectionStats.builtIn} built-in · {selectionStats.local} local
+              {displayOrder.length} maps · {selectionStats.builtIn} in repo · {selectionStats.local} local draft{selectionStats.local === 1 ? '' : 's'}
             </div>
           </div>
         </div>
@@ -1104,6 +1110,19 @@ function MapsManager({
         </div>
       </div>
 
+      {/* The editor is a drafting surface, not a CMS: there is no server, so
+          edits stay in this browser until they are written into the repo.
+          Saying that plainly beats letting authors discover it by losing work. */}
+      <div className={`maps-manager-storage-note ${unexportedCount > 0 ? 'warn' : ''}`}>
+        <strong>Drafts are saved in this browser only.</strong>{' '}
+        {unexportedCount > 0
+          ? `${unexportedCount} map${unexportedCount === 1 ? '' : 's'} ${unexportedCount === 1 ? 'has' : 'have'} changes that are not in any file yet.`
+          : 'Every local map matches its last export.'}
+        {' '}To publish: <em>Copy</em> or <em>Export</em> a map, write it to its path under
+        {' '}<code>data/maps/{'{subjectId}'}/</code>, re-export the folder manifest if you added
+        or moved a map, then commit and push. Clearing site data discards anything unexported.
+      </div>
+
       <div className="maps-manager-filter-bar">
         <span className="maps-manager-filter-label">Show:</span>
         <button
@@ -1130,6 +1149,13 @@ function MapsManager({
         >
           Draft
         </button>
+        <button
+          className={`maps-manager-filter-chip ${activeFilter === 'unexported' ? 'active' : ''}`}
+          onClick={() => setActiveFilter('unexported')}
+          title="Maps whose current version is not in any file yet"
+        >
+          Not exported{unexportedCount > 0 ? ` (${unexportedCount})` : ''}
+        </button>
       </div>
 
       <div className="maps-manager-rows">
@@ -1141,6 +1167,7 @@ function MapsManager({
           const isRowPublishExportBlocked = rowBlockers.length > 0;
           const isCustom = !!customMaps?.[m.id];
           const hasBuiltInVersion = !!builtInMaps?.[m.id];
+          const publishState = typeof getPublishState === 'function' ? getPublishState(m.id) : 'repo';
           return (
             <div
               key={m.id}
@@ -1194,10 +1221,24 @@ function MapsManager({
               </div>
 
               <div className="maps-manager-row-badges">
-                {!isCustom && <span className="maps-manager-status-badge builtin">Built-in</span>}
+                {!isCustom && <span className="maps-manager-status-badge builtin">In repo</span>}
                 {isCustom && (
                   <span className={`maps-manager-status-badge ${m._published ? 'published' : 'draft'}`}>
-                    {m._published ? 'Published' : 'Draft'}
+                    {m._published ? 'In sidebar' : 'Draft'}
+                  </span>
+                )}
+                {/* Local-only edits are one cleared cache away from gone, so say so. */}
+                {publishState === 'unexported' && (
+                  <span
+                    className="maps-manager-status-badge unexported"
+                    title="This version exists only in this browser. Export or copy it into the repo to keep it."
+                  >
+                    Not exported
+                  </span>
+                )}
+                {publishState === 'exported' && (
+                  <span className="maps-manager-status-badge exported" title="Matches the last exported copy">
+                    Exported
                   </span>
                 )}
               </div>
@@ -1251,8 +1292,25 @@ function MapsManager({
                       onExportMap(m.id);
                     }}
                     disabled={isRowPublishExportBlocked}
+                    title={`Download as ${adminMapPublishPath(m)}`}
                   >
                     Export
+                  </button>
+                )}
+                {typeof onCopyMapJSON === 'function' && (
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => {
+                      if (isRowPublishExportBlocked) {
+                        window.alert(`Cannot copy this map yet:\n\n- ${rowBlockers.join('\n- ')}`);
+                        return;
+                      }
+                      onCopyMapJSON(m.id);
+                    }}
+                    disabled={isRowPublishExportBlocked}
+                    title={`Copy the JSON to paste straight into ${adminMapPublishPath(m)}`}
+                  >
+                    Copy
                   </button>
                 )}
                 <button className="btn btn-ghost btn-sm" onClick={() => onEdit(m.id)}>Open</button>

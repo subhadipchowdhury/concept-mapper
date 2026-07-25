@@ -1757,6 +1757,49 @@ button.edge-label-badge:focus-visible {
   border: 1px solid rgba(176, 125, 0, 0.3);
 }
 
+/* Local-only edits: the one state that can silently lose work */
+.maps-manager-status-badge.unexported {
+  color: var(--uc-brick);
+  background: #F9EAE6;
+  border: 1px solid rgba(154, 59, 38, 0.35);
+}
+
+.maps-manager-status-badge.exported {
+  color: var(--uc-lake);
+  background: #E7F1F5;
+  border: 1px solid rgba(0, 115, 150, 0.28);
+}
+
+/* Storage-model notice above the map list */
+.maps-manager-storage-note {
+  margin: 0 0 12px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--line-2);
+  background: var(--paper-3);
+  color: var(--text-dim);
+  font-size: 11.5px;
+  line-height: 1.55;
+}
+
+.maps-manager-storage-note.warn {
+  border-color: rgba(154, 59, 38, 0.4);
+  background: #F9EAE6;
+}
+
+.maps-manager-storage-note code {
+  font-size: 11px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--paper-4);
+}
+
+.maps-manager-storage-note em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
 .maps-manager-row-actions {
   display: flex;
   gap: 6px;

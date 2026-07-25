@@ -103,6 +103,8 @@ def validate_map(path: Path, entry: dict) -> None:
         err(where, f"map color {data.get('color')!r} is not in the shared palette")
     if "accentColor" in data:
         err(where, "accentColor was removed; nothing reads it")
+    if "_published" in data:
+        err(where, "_published is local builder state and must not be committed")
 
     nodes = data.get("nodes")
     edges = data.get("edges")
