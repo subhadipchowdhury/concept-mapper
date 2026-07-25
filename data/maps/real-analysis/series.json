@@ -4,6 +4,8 @@
   "description": "Module 2 — theorem spine and convergence test strategy",
   "color": "#f59e0b",
   "accentColor": "#fb923c",
+  "subjectId": "real-analysis",
+  "subjectTitle": "Real Analysis",
   "nodes": [
     {
       "id": "seq",

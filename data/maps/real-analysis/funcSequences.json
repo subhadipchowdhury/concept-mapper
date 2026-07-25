@@ -4,6 +4,8 @@
   "description": "Module 3 — theorem spine plus canonical examples and counterexamples",
   "color": "#34d399",
   "accentColor": "#06b6d4",
+  "subjectId": "real-analysis",
+  "subjectTitle": "Real Analysis",
   "nodes": [
     {
       "id": "fseq",
