@@ -6,7 +6,10 @@ const { useState: useState2, useEffect: useEffect2, useRef: useRef2, useCallback
 // ─── Estimate node size from label (so edges can route before measuring) ────
 function estimateNodeSize(label) {
   const lines = (label || '').split('\\n');
-  const longest = Math.max(...lines.map(l => l.replace(/\\\\\([^)]+\\\)/g, 'XXXX').length));
+  // Authored math is `\( … \)` (single backslash). Collapse each span to a short
+  // stand-in so LaTeX source length does not drive the box width — otherwise
+  // every math node measured long and got clamped to the 220px maximum.
+  const longest = Math.max(...lines.map(l => l.replace(/\\\([\s\S]*?\\\)/g, 'XXXXXX').length));
   const w = Math.min(220, Math.max(140, longest * 8 + 36));
   const h = 30 + lines.length * 22;
   return { w, h };
@@ -507,7 +510,10 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
 
   // local node positions: positions[mapId][nodeId] = {x, y}
   const mapPositions = positions[mapData.id] || {};
-  const autoLayout = useMemo2(() => computeAutoNodeLayout(mapData, edgeLabelT), [mapData, edgeLabelT]);
+  // Seed the layout from the map's own label anchor, NOT the live slider value.
+  // Keying it to `edgeLabelT` re-ran the whole force simulation on every slider
+  // tick, so nudging labels made all the nodes jump.
+  const autoLayout = useMemo2(() => computeAutoNodeLayout(mapData), [mapData]);
   // Effective node coords: stored override, else from data
   function nodeXY(node) {
     const p = mapPositions[node.id];
@@ -647,7 +653,8 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
 
   const totalEdges = mapData.edges.length;
   const completed = answeredEdges.size;
-  const progressPct = Math.round((completed / totalEdges) * 100);
+  // Guard against a 0-edge map, which otherwise rendered "NaN%" and width:NaN%.
+  const progressPct = totalEdges > 0 ? Math.round((completed / totalEdges) * 100) : 0;
 
   const fromNode = activeEdge ? validNodes.find(n => n.id === activeEdge.from) : null;
   const toNode = activeEdge ? validNodes.find(n => n.id === activeEdge.to) : null;

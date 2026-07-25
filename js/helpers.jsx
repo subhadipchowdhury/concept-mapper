@@ -146,6 +146,32 @@ function computeEdgePath(from, to, options = {}) {
   };
 }
 
+// Fold an answer to a canonical form: lowercase, single-spaced, with common
+// math spellings unified so "leq"/"<="/"less than or equal to" all compare equal.
+// Applied to both the student's input and every accepted answer.
+function normalizeAnswer(s) {
+  return String(s || '')
+    .toLowerCase()
+    .replace(/[‘’]/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim()
+    // strip trailing punctuation
+    .replace(/[.,;:!?]+$/g, '')
+    // unify common math glyph spellings (order matters: "or equal" before bare
+    // "less than", so "less than or equal to" is not chopped in half)
+    .replace(/<=|≤|=<|\bleq\b|less than or equal( to)?/g, '≤')
+    .replace(/>=|≥|=>|\bgeq\b|greater than or equal( to)?/g, '≥')
+    .replace(/less than/g, '<')
+    .replace(/greater than/g, '>')
+    .replace(/sqrt\(([^)]+)\)/g, '√$1')
+    .replace(/sqrt\s*([a-z0-9])/g, '√$1')
+    // \b guards keep this from mangling unrelated words ("steps" -> "st<eps>")
+    .replace(/\b(?:epsilon|eps)\b/g, 'ε')
+    .replace(/\bzero\b/g, '0')
+    .replace(/\bone\b/g, '1')
+    .replace(/\btwo\b/g, '2');
+}
+
 // AnswerPopup — handles fill-in or dropdown
 function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
   const [value, setValue] = useState('');
@@ -178,33 +204,19 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
   }, [edge.id]);
 
   function checkAnswer() {
-    // Robust normalizer: lowercase, fold smart quotes, equivalent symbols & spellings
-    const norm = (s) => (s || '')
-      .toLowerCase()
-      .replace(/['']/g, "'")
-      .replace(/\s+/g, ' ')
-      .trim()
-      // strip trailing punctuation
-      .replace(/[.,;:!?]+$/g, '')
-      // unify common math glyph spellings
-      .replace(/<=|≤|=<|leq|less than or equal( to)?/g, '≤')
-      .replace(/>=|≥|=>|geq|greater than or equal( to)?/g, '≥')
-      .replace(/less than/g, '<')
-      .replace(/greater than/g, '>')
-      .replace(/sqrt\(([^)]+)\)/g, '√$1')
-      .replace(/sqrt\s*([a-z0-9])/g, '√$1')
-      .replace(/epsilon|eps/g, 'ε')
-      .replace(/\bzero\b/g, '0')
-      .replace(/\bone\b/g, '1')
-      .replace(/\btwo\b/g, '2');
-    const userAns = norm(value);
-    const correct = norm(edge.answer);
-    const isCorrect =
+    const userAns = normalizeAnswer(value);
+    // Authors may list alternate phrasings in `acceptedAnswers`; `answer` is
+    // always accepted and is the one revealed on the map once solved.
+    const accepted = [edge.answer, ...(Array.isArray(edge.acceptedAnswers) ? edge.acceptedAnswers : [])]
+      .map(normalizeAnswer)
+      .filter(Boolean);
+    const isCorrect = accepted.some((correct) => (
       userAns === correct ||
       // accept singular/plural variants for length >=4
       (correct.length >= 4 && (userAns === correct + 's' || userAns + 's' === correct)) ||
       // accept "ly" adverb variants ("conditional"/"conditionally")
-      (correct.length >= 5 && (userAns === correct + 'ly' || userAns + 'ly' === correct));
+      (correct.length >= 5 && (userAns === correct + 'ly' || userAns + 'ly' === correct))
+    ));
     if (isCorrect) {
       setFeedback('correct');
       setTimeout(() => { onCorrect(edge.id); onClose(); }, 800);
@@ -226,8 +238,10 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
 
   const displayLabel = normalizeDisplayText(edge.label || '');
   const rawAnswer = String(edge.answer || '').trim();
-  const mathLikeAnswer = /sqrt|\\\\sqrt|\\\\[a-zA-Z]+|√|ε|π|∞|≤|≥|≈|≠|[<>=+\-*/^()\[\]{}_|]|\d|^[a-z]$|^[A-Z]$/i.test(rawAnswer);
-  const mathLikeLabel = /\\\\\(|\\\\\)|\\b(sum|lim|sup|inf|integral|series|radius|convergen|derivative)\\b|\^|_/.test(String(edge.label || ''));
+  // Authored text carries single-backslash LaTeX (\( … \), \sqrt, \mathbb).
+  // These patterns previously required a doubled backslash and so never fired.
+  const mathLikeAnswer = /sqrt|\\[a-zA-Z]+|√|ε|π|∞|≤|≥|≈|≠|[<>=+\-*/^()\[\]{}_|]|\d|^[a-zA-Z]$/i.test(rawAnswer);
+  const mathLikeLabel = /\\\(|\\\)|\b(sum|lim|sup|inf|integral|series|radius|convergen|derivative)\b|\^|_/.test(String(edge.label || ''));
   const expectsMathAnswer = edge.type === 'fillin' && (mathLikeAnswer || (mathLikeLabel && rawAnswer.length <= 3));
   const answerVars = Array.from(new Set(rawAnswer.match(/[a-zA-Z]/g) || [])).slice(0, 4);
   const mathPaletteTokens = ['√()', 'ε', 'π', '∞', '≤', '≥', '<', '>', '=', '+', '-', '/', '^', '_', '{', '}', '(', ')', ...answerVars];
@@ -261,7 +275,9 @@ function AnswerPopup({ edge, fromNode, toNode, onClose, onCorrect }) {
   return (
     <div className="answer-popup" onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="answer-popup-card" ref={cardRef}>
-        <div className="popup-relationship">Fill in the relationship</div>
+        <div className="popup-relationship">
+          {edge.type === 'fillin' ? 'Fill in the relationship' : 'Choose the relationship'}
+        </div>
 
         <div className="popup-nodes">
           <div className="popup-node-label">
@@ -538,31 +554,41 @@ async function loadBuiltInMaps(manifestPath = MAP_MANIFEST_PATH) {
   const failures = [];
   const order = [];
 
-  for (const entry of manifest) {
-    if (!entry || !entry.id || !entry.file) continue;
+  // Fetch every map concurrently — these were previously awaited one at a time,
+  // so first paint cost one serial round-trip per map in the manifest.
+  const entries = manifest.filter((entry) => entry && entry.id && entry.file);
+  const results = await Promise.all(entries.map(async (entry) => {
     try {
       const resp = await fetch(entry.file, { cache: 'no-store' });
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const rawText = await resp.text();
-      const parsed = parseMapDataText(rawText, entry.file);
-      const normalized = normalizeMapData(parsed, entry.id);
-      const mapId = normalized.id || entry.id;
-      const subjectId = typeof entry.subjectId === 'string' && entry.subjectId.trim()
-        ? entry.subjectId.trim()
-        : (typeof normalized.subjectId === 'string' && normalized.subjectId.trim() ? normalized.subjectId.trim() : 'general');
-      const subjectTitle = typeof entry.subjectTitle === 'string' && entry.subjectTitle.trim()
-        ? entry.subjectTitle.trim()
-        : (typeof normalized.subjectTitle === 'string' && normalized.subjectTitle.trim() ? normalized.subjectTitle.trim() : 'General');
-
-      loadedMaps[mapId] = {
-        ...normalized,
-        subjectId,
-        subjectTitle,
-      };
-      order.push(mapId);
+      return { entry, parsed: parseMapDataText(rawText, entry.file) };
     } catch (err) {
-      failures.push(`${entry.id}: ${err.message}`);
+      return { entry, error: err };
     }
+  }));
+
+  // Apply results in manifest order so sidebar ordering stays deterministic.
+  for (const { entry, parsed, error } of results) {
+    if (error) {
+      failures.push(`${entry.id}: ${error.message}`);
+      continue;
+    }
+    const normalized = normalizeMapData(parsed, entry.id);
+    const mapId = normalized.id || entry.id;
+    const subjectId = typeof entry.subjectId === 'string' && entry.subjectId.trim()
+      ? entry.subjectId.trim()
+      : (typeof normalized.subjectId === 'string' && normalized.subjectId.trim() ? normalized.subjectId.trim() : 'general');
+    const subjectTitle = typeof entry.subjectTitle === 'string' && entry.subjectTitle.trim()
+      ? entry.subjectTitle.trim()
+      : (typeof normalized.subjectTitle === 'string' && normalized.subjectTitle.trim() ? normalized.subjectTitle.trim() : 'General');
+
+    loadedMaps[mapId] = {
+      ...normalized,
+      subjectId,
+      subjectTitle,
+    };
+    order.push(mapId);
   }
 
   return { maps: loadedMaps, failures, order };
@@ -643,6 +669,7 @@ Object.assign(window, {
   launchConfetti,
   computeEdgePath,
   AnswerPopup,
+  normalizeAnswer,
   loadBuiltInMaps,
   downloadMapJSON,
   downloadManifestJSON,
