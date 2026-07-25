@@ -34,13 +34,18 @@ jobs:
       - name: Validate map data
         run: python tools/validate_maps.py
 
+      # A raw newline inside a JS string is a syntax error that blanks the whole
+      # page. esbuild catches it below, but this runs without Node so it can also
+      # be run locally, and it fails with a clearer message.
+      - name: Check JS string literals
+        run: python tools/check_js_strings.py
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      # No package-lock.json is committed, and devDependencies are pinned to
-      # exact versions, so `npm install` is the right call here.
+      # No package-lock.json is committed, so `npm install` is the right call.
       - name: Install build dependencies
         run: npm install
 

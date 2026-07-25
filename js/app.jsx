@@ -817,9 +817,11 @@ function App() {
 
   // Prompt for admin passphrase and unlock admin session for this tab.
   function requestAdminAccess() {
-    const entered = prompt('Enter the passphrase to open the map builder.
-
-This only hides the builder from students — it is checked in the browser and protects nothing.');
+    const entered = prompt(
+      'Enter the passphrase to open the map builder.\n\n'
+      + 'This only hides the builder from students — it is checked in the browser '
+      + 'and protects nothing.'
+    );
     if (entered === null) return false;
     if (entered !== ADMIN_STATIC_PASSPHRASE) {
       alert('That passphrase did not match. Please try again.');
