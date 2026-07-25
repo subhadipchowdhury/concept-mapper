@@ -123,19 +123,14 @@ function saveSidebarFolderCollapse(value) {
   localStorage.setItem(SIDEBAR_FOLDER_COLLAPSE_KEY, JSON.stringify(value || {}));
 }
 
-// Simple XOR+base64 cipher to obfuscate exported progress files.
-const _CIPHER_KEY = 'CM\u2022Progress\u2022Export';
-function _cipherXB64(str) {
-  const key = _CIPHER_KEY;
-  const bytes = new TextEncoder().encode(str);
-  let raw = '';
-  for (let i = 0; i < bytes.length; i++) {
-    raw += String.fromCharCode(bytes[i] ^ (key.charCodeAt(i % key.length) & 0xFF));
-  }
-  return btoa(raw);
-}
-function _decipherXB64(encoded) {
-  const key = _CIPHER_KEY;
+// Legacy decoder for .cmpr files exported before progress backups became plain
+// JSON. This was an XOR against a constant sitting in this same file, so it
+// protected nothing while making a student's own backup unreadable to them \u2014
+// and the map answer keys it implied were secret are plain JSON under
+// data/maps/ anyway. Kept read-only so existing .cmpr files still import.
+const _LEGACY_CIPHER_KEY = 'CM\u2022Progress\u2022Export';
+function _decipherLegacyCmpr(encoded) {
+  const key = _LEGACY_CIPHER_KEY;
   const raw = atob(encoded);
   const bytes = new Uint8Array(raw.length);
   for (let i = 0; i < raw.length; i++) {
@@ -782,7 +777,7 @@ function App() {
     if (view.startsWith('admin')) setView('student');
   }
 
-  // Export student progress + positions for the current map as a portable .cmpr backup.
+  // Export student progress + positions for the current map as a portable JSON backup.
   function exportStudentData() {
     if (!activeMapId || !mapData) return;
     const mapProgress = allProgress[activeMapId]
@@ -798,14 +793,15 @@ function App() {
       progress: mapProgress,
       positions: mapPositions,
     };
-    const encoded = _cipherXB64(JSON.stringify(payload));
-    const blob = new Blob([encoded], { type: 'application/octet-stream' });
+    // Plain, readable JSON: it is the student's own progress, and they should be
+    // able to open the backup they just made.
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     const stamp = new Date().toISOString().slice(0, 10);
     const safeTitle = (mapData.title || activeMapId).replace(/[^a-z0-9]+/gi, '-').toLowerCase();
     a.href = url;
-    a.download = `cm-progress-${safeTitle}-${stamp}.cmpr`;
+    a.download = `cm-progress-${safeTitle}-${stamp}.json`;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -831,12 +827,13 @@ function App() {
     reader.onload = () => {
       try {
         const raw = reader.result.trim();
-        // Support both encrypted (.cmpr) and legacy plain-JSON exports.
+        // Current exports are plain JSON; fall back to the legacy .cmpr decoder
+        // so backups made before that change still load.
         let parsed;
         try {
-          parsed = JSON.parse(_decipherXB64(raw));
-        } catch {
           parsed = JSON.parse(raw);
+        } catch {
+          parsed = JSON.parse(_decipherLegacyCmpr(raw));
         }
         if (!parsed || typeof parsed !== 'object') throw new Error('Invalid file');
 
@@ -867,7 +864,7 @@ function App() {
 
         showToast('Progress imported. Your saved answers and node positions have been updated.', 'success');
       } catch {
-        showToast('Import failed. Choose a valid Concept Mapper progress export file (.cmpr or legacy .json).', 'error');
+        showToast('Import failed. Choose a Concept Mapper progress export (.json, or an older .cmpr file).', 'error');
       }
     };
     reader.readAsText(file);
@@ -1043,7 +1040,7 @@ function App() {
             <input
               ref={importInputRef}
               type="file"
-              accept=".cmpr,application/json,.json"
+              accept="application/json,.json,.cmpr"
               style={{ display: 'none' }}
               onChange={handleImportStudentData}
             />
