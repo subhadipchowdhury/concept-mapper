@@ -23,20 +23,40 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
       # Fails the build (and so skips deployment) on malformed or unreachable
       # map data, keeping a broken map from reaching students.
       - name: Validate map data
         run: python tools/validate_maps.py
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # No package-lock.json is committed, and devDependencies are pinned to
+      # exact versions, so `npm install` is the right call here.
+      - name: Install build dependencies
+        run: npm install
+
+      # Precompiles the JSX, swaps in React's production build and vendors it
+      # locally, then writes a self-contained ./build. index.html itself stays
+      # tooling-free for local preview — see tools/build.mjs for why.
+      - name: Build production site
+        run: npm run build
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: .
+          path: ./build
 
   deploy:
     environment:

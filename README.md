@@ -61,12 +61,26 @@ Inside the editor you can:
 - mark a local map as draft or published for the student sidebar
 - export the current map as `{mapId}.json`
 
+Every map row shows where its current version actually lives:
+
+| Badge | Meaning |
+|-------|---------|
+| **In repo** | Loaded from `data/maps/`, no local override |
+| **Exported** | Local copy matches what you last exported or copied |
+| **Not exported** | Local edits that are in no file yet — a cleared cache loses them |
+
+Use the **Not exported** filter to see what still needs publishing.
+
 To publish a change to the shared repository:
 
-1. Export the map JSON.
-2. If you changed folder organization, export the folder manifest too.
-3. Replace the matching file in its subject folder under `data/maps/{subjectId}/`.
-4. Commit and push the updated files.
+1. **Copy** the map (clipboard, ready to paste into the file) or **Export** it
+   (downloads `{mapId}.json`).
+2. Write it to `data/maps/{subjectId}/{mapId}.json`.
+3. If you added, removed, or moved a map, export the folder manifest too and
+   replace `data/maps/manifest.json`.
+4. Run `python tools/validate_maps.py` — CI runs it too, and a failure blocks the
+   deploy.
+5. Commit and push. The Pages workflow builds and deploys from `main`.
 
 ---
 
@@ -184,40 +198,96 @@ site data, switching browsers, or using a private window loses unexported work.
 
 ```
 concept-mapper/
-├── index.html
+├── index.html            # tooling-free entry point (Babel in the browser)
 ├── styles.css
+├── package.json
 ├── data/maps/
 │   ├── manifest.json
 │   └── <subject-id>/
 │       └── *.json
-└── js/
-    ├── app.jsx       # main component — layout, state, sidebar, routing
-    ├── canvas.jsx    # map canvas — nodes, edges, pan/zoom, interaction
-    ├── admin.jsx     # admin UI — maps manager and map editor
-    └── helpers.jsx   # storage, map loading, math rendering
+├── js/                   # load order: helpers → canvas → admin → app
+│   ├── helpers.jsx       # palette, storage, map loading, math rendering, answer popup
+│   ├── canvas.jsx        # map canvas — nodes, edges, pan/zoom, measured sizing
+│   ├── admin.jsx         # builder UI — maps manager and map editor
+│   └── app.jsx           # root component — layout, state, sidebar, routing
+└── tools/
+    ├── build.mjs         # produces ./build for deployment
+    ├── validate_maps.py  # schema + reachability + palette gate (runs in CI)
+    └── recolor_maps.py   # one-shot palette migration; kept as a record
 ```
 
-**Stack:** React (CDN), MathJax, vanilla CSS, no build tools.
+The four scripts are plain scripts, not modules: each declares top-level
+functions and publishes them with `Object.assign(window, …)` at the bottom, and
+later files use what earlier ones defined. The production build only
+*transpiles* them, preserving that arrangement, which is why identifier
+minification is switched off in `tools/build.mjs`.
+
+### Node colours
+
+`NODE_PALETTE` in `js/helpers.jsx` is the single source of truth. The builder
+swatches derive from it, and `tools/validate_maps.py` reads it out of the JS and
+rejects any map using a colour outside it — so the data and the editor cannot
+drift apart.
+
+**Stack:** React 18, MathJax, vanilla CSS.
+
+---
+
+## Development and deployment
+
+There are two ways the site runs, and they are deliberately different.
+
+**Locally — no tooling at all.** Open `index.html`. React comes from a CDN and
+`@babel/standalone` transpiles the JSX in the browser, so there is nothing to
+install and nothing to build. Edit a `.jsx` file and reload.
+
+Serve over HTTP rather than `file://` if you can, since the app `fetch`es
+`data/maps/manifest.json`:
+
+```sh
+python -m http.server 8000    # then open http://localhost:8000
+```
+
+**In production — precompiled.** `tools/build.mjs` writes a self-contained
+`./build`: JSX precompiled by esbuild, React's *production* build vendored
+locally, and no Babel. The Pages workflow uploads that directory. Visitors get
+none of the in-browser transpilation cost.
+
+```sh
+npm install
+npm run build         # -> ./build
+python tools/validate_maps.py
+```
+
+Because `index.html` stays tooling-free, the build script has to rewrite its
+script tags. It asserts on each replacement and fails loudly if `index.html`
+changes shape, rather than silently shipping a half-rewritten page. If you edit
+those script tags, update `tools/build.mjs` to match.
+
+CI validates map data, then builds; if either step fails the deploy is skipped
+and the previous site stays live.
 
 ---
 
 ## Known limitations
 
-- **No build step.** `index.html` loads React's *development* build plus
-  `@babel/standalone` (~2.7 MB) and transpiles ~4,200 lines of JSX in the
-  browser on every page load. Nothing is minified or cached.
-- **Answering requires a mouse or touch.** Edge labels are click-only `div`s, so
-  a keyboard-only student cannot complete a map. Node dragging has no keyboard
-  equivalent either.
-- **Node boxes are estimated, not measured.** `estimateNodeSize` guesses width
-  from label text; MathJax then renders into a fixed-width box, so long
-  expressions can overflow and edges can anchor away from the visible edge.
-- **Authoring is browser-local.** Admin edits live in `localStorage` until
-  exported and committed by hand. Two people cannot author the same map.
-- **The map colours in `data/` do not match the editor palette.** Published maps
-  use `#0f766e`, `#06b6d4`, `#fb7185`; the builder offers a different
-  seven-colour UChicago set, so editing a built-in map forces a recolour.
-- **No tests or linting**, and no `package.json`.
+- **Dev and production load differently.** Local preview transpiles in the
+  browser; production is precompiled. A JSX error surfaces in the browser
+  console locally and as a failed CI build on push.
+- **Authoring is browser-local.** Builder edits live in `localStorage` until
+  exported and committed by hand. Two people cannot author the same map, and
+  clearing site data discards anything the builder marks *Not exported*.
+- **Answer keys are public.** Every map under `data/maps/` is served as plain
+  JSON, including maps not listed in the manifest. This is a study aid, not an
+  assessment tool.
+- **Answer matching is heuristic.** Beyond an edge's `answer` and
+  `acceptedAnswers`, correctness relies on a fixed normalizer (case, spacing,
+  plurals, `-ly`, common math spellings). Add `acceptedAnswers` rather than
+  hoping the heuristics cover a phrasing.
+- **Long math can still overflow a node.** Boxes are now measured rather than
+  guessed, so edges anchor correctly, but `.node-card` caps at `max-width:
+  220px` and MathJax output does not wrap.
+- **No tests and no linting.**
 
 ---
 
@@ -225,17 +295,67 @@ concept-mapper/
 
 ### 2026-07-25
 
+**Content**
+
+- Published the five authored-but-unreferenced maps: four under
+  `differential-equations` (moved out of `future-plans/`) and `reactionKinetics`.
+  The manifest listed 3 of 8 maps; it now lists all 8, adding 50 edges.
+- Stripped a UTF-8 BOM from `reactionKinetics.json`, which the app tolerated only
+  because `parseMapDataText` trims first.
+
+**Correctness**
+
 - Fixed four regexes that expected doubled backslashes and so never matched
-  authored LaTeX, including the one that made every math node clamp to maximum
-  width.
+  authored LaTeX — including the one in `estimateNodeSize` that made every math
+  node clamp to maximum width, and `mathLikeLabel`'s `\\b` (a literal
+  backslash-`b`, not a word boundary).
+- Node boxes are now measured with `ResizeObserver` instead of guessed, so edges
+  anchor to the visible border even after MathJax typesets.
+- `normalizeForCompare` now ignores `_published`, which had prevented any
+  previously-published override from ever comparing equal to its built-in
+  version.
+- `downloadMapJSON` no longer writes `_published` into exported files. The
+  validator rejects it — and found it already committed in `sequences.json` and
+  `series.json`.
+- Guarded the progress percentage against a zero-edge map (`NaN%`).
+- Fixed the answer popup heading on dropdown questions (most edges are
+  dropdowns).
+
+**Accessibility**
+
+- Maps are completable by keyboard: answerable edge labels are real buttons with
+  descriptive accessible names, revealed nodes are focusable and arrow-key
+  movable, the popup is a proper modal (focus management, focus trap, Escape),
+  and answer feedback is announced.
+
+**Authoring**
+
 - Added optional `acceptedAnswers` per edge, with an editor field.
-- Added a per-row subject-folder picker in Admin, wiring up the previously
-  documented but unimplemented move-between-folders behaviour.
-- Built-in maps now load concurrently instead of one round-trip at a time.
+- Added a per-row subject-folder picker, wiring up the previously documented but
+  unimplemented move-between-folders behaviour.
+- The builder now shows which maps are **Not exported**, states its local-only
+  storage model, and offers **Copy** for pasting straight into a repo file.
+- One shared `NODE_PALETTE` across `data/` and the builder, replacing 17 ad-hoc
+  Tailwind values; enforced by the validator. Removed the dead `accentColor`
+  field.
+
+**Infrastructure**
+
+- Added `tools/validate_maps.py` and wired it into CI: schema, id/path agreement,
+  finite coordinates, dropdown options, palette, and full reachability from the
+  start node.
+- Added a deploy-time esbuild build (`tools/build.mjs`) that precompiles the JSX
+  and vendors React's production build, removing `@babel/standalone` and the
+  React development build from what visitors download. `index.html` stays
+  tooling-free for local preview.
+- Progress backups are plain JSON instead of XOR-obfuscated `.cmpr`; the old
+  format still imports.
+- Built-in maps load concurrently instead of one round-trip at a time.
 - Dragging the label-anchor slider no longer re-runs the auto-layout.
 - Corrected the documented `manifest.json` shape (a bare array, not
   `{ "maps": [...] }`) and the `data/maps/` tree.
-- Stopped tracking `temp/`, which the Pages workflow was publishing.
+- Stopped tracking `temp/`, which the Pages workflow was publishing — including a
+  4.3 MB internal PDF.
 
 ### 2026-05-02
 
