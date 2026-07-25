@@ -1786,6 +1786,66 @@ button.edge-label-badge:focus-visible {
   align-items: center;
 }
 
+/* Readiness picker on each map row. Colour-coded because this is the control
+   that decides whether students can see a map at all. */
+.maps-manager-row-status-select {
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid var(--line-2);
+  background: var(--bg2);
+}
+
+.maps-manager-row-status-select.ready {
+  color: var(--uc-ivy);
+  border-color: rgba(53, 122, 77, 0.45);
+  background: #EEF3E7;
+}
+
+.maps-manager-row-status-select.draft {
+  color: var(--uc-goldenrod);
+  border-color: rgba(176, 125, 0, 0.5);
+  background: #FBF3DC;
+}
+
+/* Readiness picker in the editor toolbar */
+.admin-status-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-status-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.admin-status-select {
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid var(--line-2);
+  background: var(--bg2);
+}
+
+.admin-status-select.ready {
+  color: var(--uc-ivy);
+  border-color: rgba(53, 122, 77, 0.45);
+  background: #EEF3E7;
+}
+
+.admin-status-select.draft {
+  color: var(--uc-goldenrod);
+  border-color: rgba(176, 125, 0, 0.5);
+  background: #FBF3DC;
+}
+
 /* Subject-folder picker on each map row */
 .maps-manager-row-subject-select {
   font: inherit;

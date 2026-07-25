@@ -19,6 +19,8 @@ MANIFEST = MAPS_DIR / "manifest.json"
 
 MANIFEST_FIELDS = ("id", "title", "file", "subjectId", "subjectTitle")
 VALID_EDGE_TYPES = ("fillin", "dropdown")
+VALID_STATUSES = ("ready", "draft")
+MAP_STATUS_READY = "ready"
 
 
 def load_palette() -> set[str]:
@@ -104,7 +106,15 @@ def validate_map(path: Path, entry: dict) -> None:
     if "accentColor" in data:
         err(where, "accentColor was removed; nothing reads it")
     if "_published" in data:
-        err(where, "_published is local builder state and must not be committed")
+        err(where, "_published was replaced by `status`; it must not be committed")
+
+    # Readiness lives in the map file so it applies to every student, not just
+    # whoever flipped the switch in their own browser.
+    status = data.get("status", MAP_STATUS_READY)
+    if status not in VALID_STATUSES:
+        err(where, f"status is {status!r}; expected one of {VALID_STATUSES}")
+    elif status == "draft":
+        warn(where, "status is 'draft', so it is hidden from the student sidebar")
 
     nodes = data.get("nodes")
     edges = data.get("edges")

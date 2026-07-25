@@ -5,6 +5,7 @@
   "color": "#9CAF88",
   "subjectId": "real-analysis",
   "subjectTitle": "Real Analysis",
+  "status": "ready",
   "nodes": [
     {
       "id": "fseq",

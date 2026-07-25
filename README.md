@@ -63,13 +63,20 @@ Inside the editor you can:
 
 Every map row shows where its current version actually lives:
 
+Each row carries a **Status** dropdown and badges:
+
 | Badge | Meaning |
 |-------|---------|
+| **Ready** / **Drafting** | Whether students see this map (the `status` field) |
 | **In repo** | Loaded from `data/maps/`, no local override |
 | **Exported** | Local copy matches what you last exported or copied |
 | **Not exported** | Local edits that are in no file yet — a cleared cache loses them |
 
-Use the **Not exported** filter to see what still needs publishing.
+Use the **Not exported** filter to see what still needs publishing, and **Draft**
+to see what is hidden from students.
+
+Changing the status of a repo map creates a local override, exactly as any other
+edit does, so the row will read **Not exported** until you commit the file.
 
 To publish a change to the shared repository:
 
@@ -135,6 +142,9 @@ descriptions come from the map file itself.
   "title": "Sequences",
   "description": "...",
   "color": "#A9C47F",
+  "subjectId": "real-analysis",
+  "subjectTitle": "Real Analysis",
+  "status": "ready",
   "nodes": [
     { "id": "start", "label": "Sequence", "x": 100, "y": 100, "isStart": true, "color": "#A9C47F" }
   ],
@@ -158,6 +168,27 @@ array containing the correct answer. `acceptedAnswers` is optional — alternate
 phrasings that also count as correct. `answer` is always accepted and is the
 wording revealed on the map once solved.
 
+### Readiness
+
+`status` decides whether students see a map:
+
+| Value | Effect |
+|-------|--------|
+| `"ready"` (default) | Appears in the student sidebar |
+| `"draft"` | Builder only; hidden from students |
+
+A missing `status` reads as `"ready"`, so maps written before the field existed
+keep working.
+
+**This is a field in the map file, not a browser setting.** That is the whole
+point: a readiness flag kept in `localStorage` would hide a map from whoever
+flipped it while every student still saw it. Set it from the **Status** dropdown
+in the builder, then export and commit the map file — the change reaches students
+when the file does, not when you flip the dropdown.
+
+The builder refuses to mark a map ready while it has unreachable nodes or edges
+pointing at missing node ids.
+
 **Escaping.** Inside JSON string values, write `\\n` for a line break in a
 label and `\\(…\\)` for inline math, so the parsed JavaScript string holds a
 single backslash. Node sizing, line splitting, and MathJax all assume that
@@ -171,7 +202,8 @@ Version suffixes (`_v1`, `_v2`, etc.) indicate persisted-data schema versions. W
 |-----|----------|
 | `conceptmapper_progress_v2` | answered edges per map |
 | `conceptmapper_positions_v2` | node positions per map |
-| `conceptmapper_maps_v2` | custom (unpublished) maps |
+| `conceptmapper_maps_v2` | local map drafts and overrides |
+| `conceptmapper_exported_v1` | fingerprint of each map at last export |
 | `conceptmapper_map_order_v1` | map ordering in sidebar |
 | `conceptmapper_subjects_v1` | custom-created subject folders |
 | `conceptmapper_subject_order_v1` | folder order |
@@ -292,6 +324,16 @@ and the previous site stays live.
 ---
 
 ## Changelog
+
+### 2026-07-26
+
+- Added a **Status** dropdown (*Ready for students* / *Still drafting*) to every
+  map row and to the editor toolbar. Only `ready` maps appear in the student
+  sidebar.
+- Replaced the old browser-local `_published` flag with a committed `status`
+  field. The old flag could only hide *locally created* maps, and only in the
+  author's own browser — there was no way to hold a repo map back from students.
+  Existing `_published` values migrate automatically on load.
 
 ### 2026-07-25
 

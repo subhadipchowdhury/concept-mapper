@@ -174,11 +174,15 @@ function arraysEqual(a, b) {
 }
 
 // Normalize map payloads prior to equivalence checks.
-// `_published` is local-only sidebar state and `updatedAt`/`exportedBy` are
-// export stamps — none of them are part of the map's content. Including
-// `_published` here meant an override that had ever been published could never
-// compare equal to its built-in version, so the stale-override cleanup never
-// ran for it and the "out of date" banner never cleared.
+// `updatedAt`/`exportedBy` are export stamps, and `_published` is the retired
+// browser-local visibility flag — none are part of a map's content. Its
+// replacement, `status`, deliberately IS compared: changing a map from draft to
+// ready is a real change to the file and should read as unexported until it is
+// committed.
+//
+// `_published` used to be compared, which meant an override that had ever been
+// published could never equal its built-in version, so the stale-override
+// cleanup never ran for it and the "out of date" banner never cleared.
 function normalizeForCompare(value) {
   if (Array.isArray(value)) return value.map(normalizeForCompare);
   if (value && typeof value === 'object') {
@@ -357,11 +361,13 @@ function App() {
   const toastTimerRef = useRefApp(null);
   const adminRepoPromptSignatureRef = useRefApp('');
 
-  const publishedCustomMaps = Object.fromEntries(
-    Object.entries(customMaps).filter(([, m]) => !!m?._published)
-  );
-  const studentMaps = { ...builtInMaps, ...publishedCustomMaps };
+  // Admin sees everything; students see only maps marked ready. A local override
+  // shadows its built-in version, so setting an override to draft hides the
+  // built-in map too — which is how a repo map gets pulled back from students.
   const adminMaps = { ...builtInMaps, ...customMaps };
+  const studentMaps = Object.fromEntries(
+    Object.entries(adminMaps).filter(([, m]) => isMapReady(m))
+  );
   const repoMismatchMapIds = Object.keys(customMaps).filter((id) => (
     builtInMaps[id] && !mapsEquivalent(customMaps[id], builtInMaps[id])
   ));
@@ -613,7 +619,7 @@ function App() {
       subjectTitle: safeSubjectTitle,
       nodes: [],
       edges: [],
-      _published: false,
+      status: MAP_STATUS_DRAFT,
     };
     handleSaveCustomMap(id, newMap);
     setEditingMapId(id);
@@ -636,8 +642,10 @@ function App() {
   async function handleCopyMapJSON(mapId) {
     const m = adminMaps[mapId];
     if (!m) return;
-    const { _published, ...publishable } = m;
-    const payload = JSON.stringify({ ...publishable, id: mapId }, null, 2);
+    const { _published, ...rest } = m;
+    const payload = JSON.stringify(
+      { ...rest, id: mapId, status: getMapStatus(m) }, null, 2
+    );
     try {
       await navigator.clipboard.writeText(payload + '\n');
       const next = { ...exportedSignatures, [mapId]: mapSignature(m) };
@@ -695,7 +703,7 @@ function App() {
       .filter(Boolean)
       .filter((mapData) => {
         if (!customMaps[mapData.id]) return true;
-        return !!mapData._published;
+        return isMapReady(mapData);
       })
       .map((mapData) => {
         const subject = getSubjectInfo(mapData);
@@ -723,12 +731,22 @@ function App() {
     handleSaveCustomMap(updatedMap.id, updatedMap);
   }
 
-  // Toggle whether a custom map appears in student sidebar.
-  function handleTogglePublish(mapId, published) {
-    const existing = customMaps[mapId];
+  // Set whether a map is offered to students. Works for built-in maps as well as
+  // local ones: editing a built-in map creates a local override, exactly as any
+  // other edit does, and the row then reads 'Not exported' until it is committed.
+  function handleSetMapStatus(mapId, status) {
+    const existing = adminMaps[mapId];
     if (!existing) return;
-    handleSaveCustomMap(mapId, { ...existing, _published: !!published });
-    showToast(published ? 'Map published to student sidebar.' : 'Map moved to draft.', 'info');
+    const next = status === MAP_STATUS_DRAFT ? MAP_STATUS_DRAFT : MAP_STATUS_READY;
+    if (getMapStatus(existing) === next) return;
+    handleSaveCustomMap(mapId, { ...existing, status: next });
+    showToast(
+      next === MAP_STATUS_READY
+        ? 'Marked ready. Export and commit the map file to show it to students.'
+        : 'Marked draft. Export and commit the map file to hide it from students.',
+      'info',
+      4200
+    );
   }
 
   // Remove local override and restore the repository version of a built-in map.
@@ -776,7 +794,7 @@ function App() {
           ...parsed,
           subjectId: subject.id,
           subjectTitle: subjectTitleById[subject.id] || subject.title,
-          _published: false,
+          status: MAP_STATUS_DRAFT,
         });
         setEditingMapId(parsed.id);
         setView('admin-edit');
@@ -1419,7 +1437,7 @@ function App() {
               onReorderMap={handleReorderMaps}
               onMoveToSubject={handleMoveMapToSubject}
               onImportMap={triggerImportCustomMap}
-              onTogglePublish={handleTogglePublish}
+              onSetStatus={handleSetMapStatus}
               onRevertToBuiltIn={handleRevertToBuiltIn}
             />
           </>
@@ -1432,7 +1450,7 @@ function App() {
             onBack={() => setView('admin')}
             onDelete={handleDeleteCustomMap}
             onExport={handleExportMapJSON}
-            onTogglePublish={customMaps[editingMapId] ? ((published) => handleTogglePublish(editingMapId, published)) : undefined}
+            onSetStatus={(status) => handleSetMapStatus(editingMapId, status)}
           />
         )}
         <input

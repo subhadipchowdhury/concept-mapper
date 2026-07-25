@@ -5,6 +5,7 @@
   "color": "#A78BBF",
   "subjectId": "differential-equations",
   "subjectTitle": "Differential Equations",
+  "status": "ready",
   "nodes": [
     {
       "id": "pde",

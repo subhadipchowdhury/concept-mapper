@@ -79,7 +79,7 @@ function getUnlockBlockingIssues(audit) {
 }
 
 // ─── AdminCanvas: Visual builder for one concept map ──────────────────────────
-function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePublish }) {
+function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onSetStatus }) {
   const [tool, setTool] = useStateA('select'); // 'select' | 'addNode' | 'connect'
   const [selectedNodeId, setSelectedNodeId] = useStateA(null);
   const [selectedEdgeId, setSelectedEdgeId] = useStateA(null);
@@ -106,6 +106,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
     ))
   ), [mapData]);
   const isPublishExportBlocked = unlockBlockingIssues.length > 0;
+  const mapStatus = getMapStatus(mapData);
 
   useEffectA(() => {
     latestMapRef.current = mapData;
@@ -599,22 +600,26 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
         <span style={{ fontSize: 11, opacity: 0.72 }}>
           Publish path: {adminMapPublishPath(mapData)}
         </span>
-        {typeof onTogglePublish === 'function' && (
-          <button
-            className={`admin-tool-btn ${mapData._published ? 'active' : ''}`}
-            onClick={() => {
-              const nextPublished = !mapData._published;
-              if (nextPublished && isPublishExportBlocked) {
-                window.alert(`Cannot publish this map yet:\n\n- ${unlockBlockingIssues.join('\n- ')}`);
-                return;
-              }
-              onTogglePublish(nextPublished);
-            }}
-            title="Choose whether this local map appears in the student sidebar"
-            disabled={!mapData._published && isPublishExportBlocked}
-          >
-            {mapData._published ? '📣 Published' : '📝 Draft'}
-          </button>
+        {typeof onSetStatus === 'function' && (
+          <label className="admin-status-field">
+            <span className="admin-status-label">Status</span>
+            <select
+              className={`admin-status-select ${mapStatus}`}
+              value={mapStatus}
+              onChange={(e) => {
+                const next = e.target.value;
+                if (next === MAP_STATUS_READY && isPublishExportBlocked) {
+                  window.alert(`Cannot mark this map ready yet:\n\n- ${unlockBlockingIssues.join('\n- ')}`);
+                  return;
+                }
+                onSetStatus(next);
+              }}
+              title="Ready maps appear in the student sidebar; drafts do not"
+            >
+              <option value={MAP_STATUS_READY}>Ready for students</option>
+              <option value={MAP_STATUS_DRAFT}>Still drafting</option>
+            </select>
+          </label>
         )}
         {typeof onDelete === 'function' && (
           <button
@@ -973,7 +978,7 @@ function MapsManager({
   onReorderMap,
   onMoveToSubject,
   onImportMap,
-  onTogglePublish,
+  onSetStatus,
   onRevertToBuiltIn,
 }) {
   const [draggedId, setDraggedId] = useStateA(null);
@@ -996,7 +1001,7 @@ function MapsManager({
     const isCustom = !!customMaps?.[mapId];
     if (activeFilter === 'builtin') return !isCustom;
     if (activeFilter === 'custom') return isCustom;
-    if (activeFilter === 'draft') return isCustom && !mapData._published;
+    if (activeFilter === 'draft') return getMapStatus(mapData) === MAP_STATUS_DRAFT;
     if (activeFilter === 'unexported') {
       return typeof getPublishState === 'function' && getPublishState(mapId) === 'unexported';
     }
@@ -1168,6 +1173,7 @@ function MapsManager({
           const isCustom = !!customMaps?.[m.id];
           const hasBuiltInVersion = !!builtInMaps?.[m.id];
           const publishState = typeof getPublishState === 'function' ? getPublishState(m.id) : 'repo';
+          const rowStatus = getMapStatus(m);
           return (
             <div
               key={m.id}
@@ -1222,11 +1228,9 @@ function MapsManager({
 
               <div className="maps-manager-row-badges">
                 {!isCustom && <span className="maps-manager-status-badge builtin">In repo</span>}
-                {isCustom && (
-                  <span className={`maps-manager-status-badge ${m._published ? 'published' : 'draft'}`}>
-                    {m._published ? 'In sidebar' : 'Draft'}
-                  </span>
-                )}
+                <span className={`maps-manager-status-badge ${rowStatus === MAP_STATUS_READY ? 'published' : 'draft'}`}>
+                  {rowStatus === MAP_STATUS_READY ? 'Ready' : 'Drafting'}
+                </span>
                 {/* Local-only edits are one cleared cache away from gone, so say so. */}
                 {publishState === 'unexported' && (
                   <span
@@ -1257,21 +1261,24 @@ function MapsManager({
                     ))}
                   </select>
                 )}
-                {isCustom && typeof onTogglePublish === 'function' && (
-                  <button
-                    className="btn btn-ghost btn-sm"
-                    onClick={() => {
-                      const nextPublished = !m._published;
-                      if (nextPublished && isRowPublishExportBlocked) {
-                        window.alert(`Cannot publish this map yet:\n\n- ${rowBlockers.join('\n- ')}`);
+                {typeof onSetStatus === 'function' && (
+                  <select
+                    className={`maps-manager-row-status-select ${rowStatus}`}
+                    value={rowStatus}
+                    onChange={(e) => {
+                      const next = e.target.value;
+                      if (next === MAP_STATUS_READY && isRowPublishExportBlocked) {
+                        window.alert(`Cannot mark this map ready yet:\n\n- ${rowBlockers.join('\n- ')}`);
                         return;
                       }
-                      onTogglePublish(m.id, nextPublished);
+                      onSetStatus(m.id, next);
                     }}
-                    disabled={!m._published && isRowPublishExportBlocked}
+                    title="Ready maps appear in the student sidebar; drafts do not"
+                    aria-label={`Status for ${m.title}`}
                   >
-                    {m._published ? 'Unpublish' : 'Publish'}
-                  </button>
+                    <option value={MAP_STATUS_READY}>Ready</option>
+                    <option value={MAP_STATUS_DRAFT}>Drafting</option>
+                  </select>
                 )}
                 {isCustom && hasBuiltInVersion && typeof onRevertToBuiltIn === 'function' && (
                   <button

@@ -29,6 +29,24 @@ const NODE_PALETTE = [
 
 const DEFAULT_NODE_COLOR = '#3EB1C8';
 
+// ─── Map readiness ──────────────────────────────────────────────────────────
+// Whether a map is offered to students. This is a field in the map file, not
+// browser state: a status kept only in localStorage would hide a map from its
+// author while every student still saw it.
+//
+// Missing status reads as 'ready', so maps authored before this field existed
+// keep appearing.
+const MAP_STATUS_READY = 'ready';
+const MAP_STATUS_DRAFT = 'draft';
+
+function getMapStatus(mapData) {
+  return mapData?.status === MAP_STATUS_DRAFT ? MAP_STATUS_DRAFT : MAP_STATUS_READY;
+}
+
+function isMapReady(mapData) {
+  return getMapStatus(mapData) === MAP_STATUS_READY;
+}
+
 // Normalize display text so authored escape sequences render consistently.
 function normalizeDisplayText(rawText) {
   return String(rawText || '')
@@ -542,18 +560,39 @@ function saveProgress(allProgress) {
   localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(serializable));
 }
 
-// Read custom maps from local storage and remove retired map records.
+// Read custom maps from local storage, removing retired records and migrating
+// the old browser-local `_published` flag to the `status` field.
 function loadCustomMaps() {
   try {
     const raw = localStorage.getItem(CUSTOM_MAPS_STORAGE_KEY);
     const parsed = raw ? JSON.parse(raw) : {};
-    if (parsed && typeof parsed === 'object' && Object.prototype.hasOwnProperty.call(parsed, RETIRED_SERIES_V2_MAP_ID)) {
-      const migrated = { ...parsed };
+    if (!parsed || typeof parsed !== 'object') return {};
+
+    const migrated = { ...parsed };
+    let mutated = false;
+
+    if (Object.prototype.hasOwnProperty.call(migrated, RETIRED_SERIES_V2_MAP_ID)) {
       delete migrated[RETIRED_SERIES_V2_MAP_ID];
-      localStorage.setItem(CUSTOM_MAPS_STORAGE_KEY, JSON.stringify(migrated));
-      return migrated;
+      mutated = true;
     }
-    return parsed && typeof parsed === 'object' ? parsed : {};
+
+    // `_published: true` meant "show in the student sidebar", which is exactly
+    // what status 'ready' means now. Anything else was a draft.
+    Object.entries(migrated).forEach(([mapId, map]) => {
+      if (!map || typeof map !== 'object') return;
+      if (!Object.prototype.hasOwnProperty.call(map, '_published')) return;
+      const { _published, ...rest } = map;
+      migrated[mapId] = {
+        ...rest,
+        status: _published ? MAP_STATUS_READY : MAP_STATUS_DRAFT,
+      };
+      mutated = true;
+    });
+
+    if (mutated) {
+      localStorage.setItem(CUSTOM_MAPS_STORAGE_KEY, JSON.stringify(migrated));
+    }
+    return migrated;
   } catch { return {}; }
 }
 
@@ -622,6 +661,7 @@ function normalizeMapData(rawMap, fallbackId) {
     color: typeof map.color === 'string' ? map.color : DEFAULT_NODE_COLOR,
     subjectId: typeof map.subjectId === 'string' ? map.subjectId : 'general',
     subjectTitle: typeof map.subjectTitle === 'string' ? map.subjectTitle : 'General',
+    status: getMapStatus(map),
     nodes: safeNodes,
     edges: safeEdges,
   };
@@ -686,11 +726,13 @@ async function loadBuiltInMaps(manifestPath = MAP_MANIFEST_PATH) {
 // Download one map payload as {mapId}.json for repo promotion.
 function downloadMapJSON(mapId, mapData) {
   if (!mapId || !mapData) return;
-  // `_published` is local sidebar state, not part of the published map file.
+  // `_published` was the old browser-local visibility flag, replaced by the
+  // `status` field below — drop it rather than committing it into a map file.
   const { _published, ...publishable } = mapData;
   const payload = {
     ...publishable,
     id: mapId,
+    status: getMapStatus(mapData),
     updatedAt: new Date().toISOString(),
     exportedBy: 'admin',
   };
@@ -760,6 +802,10 @@ Object.assign(window, {
   launchConfetti,
   NODE_PALETTE,
   DEFAULT_NODE_COLOR,
+  MAP_STATUS_READY,
+  MAP_STATUS_DRAFT,
+  getMapStatus,
+  isMapReady,
   plainLabel,
   computeEdgePath,
   AnswerPopup,

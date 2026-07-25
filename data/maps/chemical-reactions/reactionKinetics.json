@@ -5,6 +5,7 @@
   "color": "#A4343A",
   "subjectId": "chemical-reactions",
   "subjectTitle": "Chemical Reactions",
+  "status": "ready",
   "nodes": [
     {
       "id": "reaction",

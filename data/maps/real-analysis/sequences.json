@@ -5,6 +5,7 @@
   "color": "#007396",
   "subjectId": "real-analysis",
   "subjectTitle": "Real Analysis",
+  "status": "ready",
   "nodes": [
     {
       "id": "seq",
