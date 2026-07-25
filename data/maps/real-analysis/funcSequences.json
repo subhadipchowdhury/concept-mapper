@@ -2,8 +2,7 @@
   "id": "funcSequences",
   "title": "Sequences & Series of Functions",
   "description": "Module 3 — theorem spine plus canonical examples and counterexamples",
-  "color": "#34d399",
-  "accentColor": "#06b6d4",
+  "color": "#9CAF88",
   "subjectId": "real-analysis",
   "subjectTitle": "Real Analysis",
   "nodes": [
@@ -12,7 +11,7 @@
       "label": "Sequence of Functions\\n\\(\\{f_n\\}\\)",
       "x": 520,
       "y": 60,
-      "color": "#34d399",
+      "color": "#9CAF88",
       "isStart": true
     },
     {
@@ -20,189 +19,189 @@
       "label": "Pointwise\\nConvergence",
       "x": 240,
       "y": 210,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "unif",
       "label": "Uniform\\nConvergence \\(f_n \\rightrightarrows f\\)",
       "x": 780,
       "y": 210,
-      "color": "#34d399"
+      "color": "#9CAF88"
     },
     {
       "id": "ucrit",
       "label": "Uniform Criterion\\n\\(\\sup_{x\\in E}|f_n(x)-f(x)| \\to 0\\)",
       "x": 1050,
       "y": 210,
-      "color": "#a78bfa"
+      "color": "#A78BBF"
     },
     {
       "id": "limf",
       "label": "Limit Function\\n\\(f\\)",
       "x": 240,
       "y": 370,
-      "color": "#a78bfa"
+      "color": "#A78BBF"
     },
     {
       "id": "cont",
       "label": "Uniform Limit Theorem\\n(preserves continuity)",
       "x": 780,
       "y": 370,
-      "color": "#34d399"
+      "color": "#9CAF88"
     },
     {
       "id": "integ",
       "label": "Interchange with\\nIntegral",
       "x": 620,
       "y": 530,
-      "color": "#34d399"
+      "color": "#9CAF88"
     },
     {
       "id": "diffthm",
       "label": "Differentiation\\nTheorem",
       "x": 960,
       "y": 530,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "fseries",
       "label": "Series of Functions\\n\\(\\sum f_n(x)\\)",
       "x": 250,
       "y": 530,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "partial",
       "label": "Partial Sums\\n\\(S_N(x)=\\sum_{n=0}^{N} f_n(x)\\)",
       "x": 250,
       "y": 690,
-      "color": "#fb923c"
+      "color": "#ECA154"
     },
     {
       "id": "mtest",
       "label": "Weierstrass\\nM-Test",
       "x": 90,
       "y": 860,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "power",
       "label": "Power Series\\n\\(\\sum a_n(x-c)^n\\)",
       "x": 470,
       "y": 860,
-      "color": "#f472b6"
+      "color": "#C98AA8"
     },
     {
       "id": "center",
       "label": "Center\\n\\(c\\)",
       "x": 330,
       "y": 1010,
-      "color": "#fb7185"
+      "color": "#B46A55"
     },
     {
       "id": "radius",
       "label": "Radius of\\nConvergence \\(R\\)",
       "x": 540,
       "y": 1010,
-      "color": "#fb7185"
+      "color": "#B46A55"
     },
     {
       "id": "interval",
       "label": "Interval of\\nConvergence",
       "x": 540,
       "y": 1160,
-      "color": "#fb7185"
+      "color": "#B46A55"
     },
     {
       "id": "compact",
       "label": "Absolute and Uniform\\non Compact Subintervals",
       "x": 330,
       "y": 1160,
-      "color": "#34d399"
+      "color": "#9CAF88"
     },
     {
       "id": "termops",
       "label": "Termwise Differentiation\\nand Integration",
       "x": 860,
       "y": 1010,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "tseries",
       "label": "Taylor Series\\n\\(\\sum f^{(n)}(c)(x-c)^n/n!\\)",
       "x": 1030,
       "y": 1160,
-      "color": "#a78bfa"
+      "color": "#A78BBF"
     },
     {
       "id": "tpoly",
       "label": "Taylor Polynomial\\n\\(T_n\\)",
       "x": 860,
       "y": 1310,
-      "color": "#a78bfa"
+      "color": "#A78BBF"
     },
     {
       "id": "maclaurin",
       "label": "Maclaurin Series\\n\\(c=0\\)",
       "x": 1180,
       "y": 1310,
-      "color": "#a78bfa"
+      "color": "#A78BBF"
     },
     {
       "id": "remainder",
       "label": "Remainder\\n\\(R_n(x)=f(x)-T_n(x)\\)",
       "x": 860,
       "y": 1460,
-      "color": "#fb923c"
+      "color": "#ECA154"
     },
     {
       "id": "taylorthm",
       "label": "Taylor's Theorem",
       "x": 1040,
       "y": 1460,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "analytic",
       "label": "Analytic Function",
       "x": 1210,
       "y": 1460,
-      "color": "#34d399"
+      "color": "#9CAF88"
     },
     {
       "id": "xnexample",
       "label": "Example\\n\\(f_n(x)=x^n\\) on \\([0,1]\\)",
       "x": 70,
       "y": 210,
-      "color": "#fb7185"
+      "color": "#B46A55"
     },
     {
       "id": "xnlimit",
       "label": "Limit: 0 on \\([0,1)\\),\\n1 at \\(x=1\\)",
       "x": 70,
       "y": 370,
-      "color": "#fb7185"
+      "color": "#B46A55"
     },
     {
       "id": "expseries",
       "label": "Example\\n\\(e^x=\\sum x^n/n!\\)",
       "x": 70,
       "y": 1010,
-      "color": "#34d399"
+      "color": "#9CAF88"
     },
     {
       "id": "logseries",
       "label": "Example\\n\\(\\ln(1+x)=\\sum (-1)^{n+1}x^n/n\\)",
       "x": 370,
       "y": 1310,
-      "color": "#fb923c"
+      "color": "#ECA154"
     },
     {
       "id": "flatcounter",
       "label": "Counterexample\\n\\(f(x)=e^{-1/x^2},\\ f(0)=0\\)",
       "x": 1400,
       "y": 1460,
-      "color": "#fb7185"
+      "color": "#B46A55"
     }
   ],
   "edges": [

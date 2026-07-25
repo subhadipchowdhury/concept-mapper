@@ -2,8 +2,7 @@
   "id": "secondOrderLaplace",
   "title": "Second-Order ODEs and Laplace Transform",
   "description": "Homogeneous/nonhomogeneous linear ODEs, IVPs, and Laplace-based solving",
-  "color": "#3b82f6",
-  "accentColor": "#1d4ed8",
+  "color": "#007396",
   "subjectId": "differential-equations",
   "subjectTitle": "Differential Equations",
   "nodes": [
@@ -12,7 +11,7 @@
       "label": "Second-Order Linear ODE\\n\\(ay''+by'+cy=g(t)\\)",
       "x": 520,
       "y": 70,
-      "color": "#3b82f6",
+      "color": "#007396",
       "isStart": true
     },
     {
@@ -20,63 +19,63 @@
       "label": "Homogeneous Case\\n\\(g(t)=0\\)",
       "x": 260,
       "y": 220,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "char",
       "label": "Characteristic Equation",
       "x": 260,
       "y": 370,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "roots",
       "label": "Real / Repeated / Complex Roots",
       "x": 260,
       "y": 520,
-      "color": "#34d399"
+      "color": "#9CAF88"
     },
     {
       "id": "nonhom",
       "label": "Nonhomogeneous Case\\n\\(g(t)\\neq 0\\)",
       "x": 780,
       "y": 220,
-      "color": "#22c55e"
+      "color": "#A9C47F"
     },
     {
       "id": "particular",
       "label": "Particular Solution",
       "x": 780,
       "y": 370,
-      "color": "#22c55e"
+      "color": "#A9C47F"
     },
     {
       "id": "general",
       "label": "General Solution\\n\\(y=y_h+y_p\\)",
       "x": 520,
       "y": 520,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "ivp",
       "label": "Second-Order IVP\\n\\(y(t_0), y'(t_0)\\)",
       "x": 520,
       "y": 670,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "laplace",
       "label": "Laplace Transform",
       "x": 780,
       "y": 520,
-      "color": "#a78bfa"
+      "color": "#A78BBF"
     },
     {
       "id": "inverse",
       "label": "Inverse Laplace + Partial Fractions",
       "x": 780,
       "y": 670,
-      "color": "#a78bfa"
+      "color": "#A78BBF"
     }
   ],
   "edges": [

@@ -121,7 +121,6 @@ descriptions come from the map file itself.
   "title": "Sequences",
   "description": "...",
   "color": "#A9C47F",
-  "accentColor": "#9CAF88",
   "nodes": [
     { "id": "start", "label": "Sequence", "x": 100, "y": 100, "isStart": true, "color": "#A9C47F" }
   ],

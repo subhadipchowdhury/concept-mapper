@@ -2,8 +2,7 @@
   "id": "pdeHeatEquation",
   "title": "PDEs and the Heat Equation",
   "description": "Separation of variables, IBVPs, series solutions, and Fourier series",
-  "color": "#8b5cf6",
-  "accentColor": "#7c3aed",
+  "color": "#A78BBF",
   "subjectId": "differential-equations",
   "subjectTitle": "Differential Equations",
   "nodes": [
@@ -12,7 +11,7 @@
       "label": "Partial Differential Equation\\n(PDE)",
       "x": 520,
       "y": 70,
-      "color": "#8b5cf6",
+      "color": "#A78BBF",
       "isStart": true
     },
     {
@@ -20,70 +19,70 @@
       "label": "ODE vs PDE",
       "x": 250,
       "y": 70,
-      "color": "#8b5cf6"
+      "color": "#A78BBF"
     },
     {
       "id": "heat",
       "label": "Heat Equation\\n\\(u_t = k u_{xx}\\)",
       "x": 780,
       "y": 70,
-      "color": "#8b5cf6"
+      "color": "#A78BBF"
     },
     {
       "id": "sov",
       "label": "Separation of Variables\\n\\(u = X(x)T(t)\\)",
       "x": 520,
       "y": 240,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "ibvp",
       "label": "Initial-Boundary Value Problem\\n(IBVP)",
       "x": 780,
       "y": 240,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "dirichlet",
       "label": "Dirichlet Boundary Conditions",
       "x": 980,
       "y": 410,
-      "color": "#22c55e"
+      "color": "#A9C47F"
     },
     {
       "id": "neumann",
       "label": "Neumann Boundary Conditions",
       "x": 780,
       "y": 410,
-      "color": "#22c55e"
+      "color": "#A9C47F"
     },
     {
       "id": "series",
       "label": "Series Solutions",
       "x": 520,
       "y": 410,
-      "color": "#22c55e"
+      "color": "#A9C47F"
     },
     {
       "id": "fourier",
       "label": "Fourier Series",
       "x": 320,
       "y": 410,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "superposition",
       "label": "Superposition Principle",
       "x": 520,
       "y": 580,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "final",
       "label": "Final Heat-Equation Solution",
       "x": 780,
       "y": 580,
-      "color": "#f43f5e"
+      "color": "#B46A55"
     }
   ],
   "edges": [

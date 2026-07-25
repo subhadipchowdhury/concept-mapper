@@ -2,8 +2,7 @@
   "id": "reactionKinetics",
   "title": "Reaction Kinetics and Rate Laws",
   "description": "Pedagogical pathway from measurable rate to mechanism-based rate laws",
-  "color": "#ef4444",
-  "accentColor": "#b91c1c",
+  "color": "#A4343A",
   "subjectId": "chemical-reactions",
   "subjectTitle": "Chemical Reactions",
   "nodes": [
@@ -12,7 +11,7 @@
       "label": "Chemical Reaction",
       "x": 520,
       "y": 70,
-      "color": "#ef4444",
+      "color": "#A4343A",
       "isStart": true
     },
     {
@@ -20,84 +19,84 @@
       "label": "Reaction Rate",
       "x": 280,
       "y": 210,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "concentration",
       "label": "Concentration vs Time",
       "x": 520,
       "y": 210,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "initialRates",
       "label": "Initial-Rates Experiments",
       "x": 760,
       "y": 210,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "rateLaw",
       "label": "Rate Law\\n\\(rate = k[A]^m[B]^n\\)",
       "x": 520,
       "y": 360,
-      "color": "#22c55e"
+      "color": "#A9C47F"
     },
     {
       "id": "order",
       "label": "Reaction Order",
       "x": 300,
       "y": 520,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "rateConstant",
       "label": "Rate Constant \\(k\\)",
       "x": 520,
       "y": 520,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "temperature",
       "label": "Temperature",
       "x": 740,
       "y": 520,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "arrhenius",
       "label": "Arrhenius Equation\\n\\(k = Ae^{-E_a/RT}\\)",
       "x": 740,
       "y": 680,
-      "color": "#a855f7"
+      "color": "#A78BBF"
     },
     {
       "id": "activationEnergy",
       "label": "Activation Energy \\(E_a\\)",
       "x": 520,
       "y": 680,
-      "color": "#a855f7"
+      "color": "#A78BBF"
     },
     {
       "id": "mechanism",
       "label": "Reaction Mechanism",
       "x": 280,
       "y": 680,
-      "color": "#a855f7"
+      "color": "#A78BBF"
     },
     {
       "id": "rds",
       "label": "Rate-Determining Step",
       "x": 300,
       "y": 840,
-      "color": "#f43f5e"
+      "color": "#B46A55"
     },
     {
       "id": "catalyst",
       "label": "Catalyst",
       "x": 740,
       "y": 840,
-      "color": "#f43f5e"
+      "color": "#B46A55"
     }
   ],
   "edges": [

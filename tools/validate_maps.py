@@ -9,6 +9,7 @@ Exits non-zero on any error. Warnings do not fail the build.
 """
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -18,6 +19,20 @@ MANIFEST = MAPS_DIR / "manifest.json"
 
 MANIFEST_FIELDS = ("id", "title", "file", "subjectId", "subjectTitle")
 VALID_EDGE_TYPES = ("fillin", "dropdown")
+
+
+def load_palette() -> set[str]:
+    """Read the allowed node colours straight out of js/helpers.jsx, so the
+    palette is declared in exactly one place and cannot drift from the data."""
+    source = (REPO / "js" / "helpers.jsx").read_text(encoding="utf-8")
+    block = re.search(r"const NODE_PALETTE = \[(.*?)\];", source, re.S)
+    if not block:
+        print("ERROR:   could not find NODE_PALETTE in js/helpers.jsx")
+        sys.exit(1)
+    return set(re.findall(r"hex:\s*'(#[0-9A-Fa-f]{6})'", block.group(1)))
+
+
+PALETTE = load_palette()
 
 errors: list[str] = []
 warnings: list[str] = []
@@ -84,6 +99,11 @@ def validate_map(path: Path, entry: dict) -> None:
         if not isinstance(data.get(field), str) or not data[field].strip():
             err(where, f"missing a non-empty {field}")
 
+    if data.get("color") not in PALETTE:
+        err(where, f"map color {data.get('color')!r} is not in the shared palette")
+    if "accentColor" in data:
+        err(where, "accentColor was removed; nothing reads it")
+
     nodes = data.get("nodes")
     edges = data.get("edges")
     if not isinstance(nodes, list) or not isinstance(edges, list):
@@ -111,6 +131,9 @@ def validate_map(path: Path, entry: dict) -> None:
                 err(at, f"{node_id!r} has non-numeric {axis} ({value!r}); the app would drop this node")
         if not isinstance(node.get("label"), str) or not node["label"].strip():
             err(at, f"{node_id!r} has no label")
+        colour = node.get("color")
+        if colour is not None and colour not in PALETTE:
+            err(at, f"{node_id!r} colour {colour!r} is not in the shared palette (js/helpers.jsx NODE_PALETTE)")
 
     starts = [n.get("id") for n in nodes if n.get("isStart")]
     if not starts:

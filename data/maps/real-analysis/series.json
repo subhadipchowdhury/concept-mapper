@@ -2,8 +2,7 @@
   "id": "series",
   "title": "Infinite Series",
   "description": "Module 2 — theorem spine and convergence test strategy",
-  "color": "#f59e0b",
-  "accentColor": "#fb923c",
+  "color": "#EAAA00",
   "subjectId": "real-analysis",
   "subjectTitle": "Real Analysis",
   "nodes": [
@@ -12,7 +11,7 @@
       "label": "Sequence \\(\\{a_n\\}\\)",
       "x": 200,
       "y": 60,
-      "color": "#4f8ef7",
+      "color": "#007396",
       "isStart": true
     },
     {
@@ -20,7 +19,7 @@
       "label": "Infinite Series\\n\\(\\sum a_n\\)",
       "x": 480,
       "y": 60,
-      "color": "#f59e0b",
+      "color": "#EAAA00",
       "isStart": false
     },
     {
@@ -28,140 +27,140 @@
       "label": "Partial Sums\\n\\(s_n = \\sum_{k=1}^{n} a_k\\)",
       "x": 480,
       "y": 200,
-      "color": "#fb923c"
+      "color": "#ECA154"
     },
     {
       "id": "conv",
       "label": "Convergent Series",
       "x": 250,
       "y": 350,
-      "color": "#34d399"
+      "color": "#9CAF88"
     },
     {
       "id": "div",
       "label": "Divergent Series",
       "x": 710,
       "y": 350,
-      "color": "#fb7185"
+      "color": "#B46A55"
     },
     {
       "id": "divtest",
       "label": "Divergence Test\\n\\(a_n \\not\\to 0\\)",
       "x": 880,
       "y": 200,
-      "color": "#fb7185"
+      "color": "#B46A55"
     },
     {
       "id": "cauchyser",
       "label": "Cauchy Criterion\\nfor Series",
       "x": 100,
       "y": 200,
-      "color": "#a78bfa"
+      "color": "#A78BBF"
     },
     {
       "id": "geom",
       "label": "Geometric Series\\n\\(\\sum ar^n\\)",
       "x": 100,
       "y": 500,
-      "color": "#34d399"
+      "color": "#9CAF88"
     },
     {
       "id": "harmonic",
       "label": "Harmonic Series\\n\\(\\sum 1/n\\)",
       "x": 880,
       "y": 500,
-      "color": "#fb7185"
+      "color": "#B46A55"
     },
     {
       "id": "pseries",
       "label": "p-Series\\n\\(\\sum 1/n^p\\)",
       "x": 480,
       "y": 500,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "mctser",
       "label": "MCT for\\nNonneg Series",
       "x": 250,
       "y": 650,
-      "color": "#a78bfa"
+      "color": "#A78BBF"
     },
     {
       "id": "integral",
       "label": "Integral Test",
       "x": 480,
       "y": 650,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "directcmp",
       "label": "Direct\\nComparison Test",
       "x": 100,
       "y": 800,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "limcmp",
       "label": "Limit\\nComparison Test",
       "x": 280,
       "y": 800,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "ratio",
       "label": "Ratio Test\\n\\(L = \\lim |a_{n+1}/a_n|\\)",
       "x": 720,
       "y": 800,
-      "color": "#f472b6"
+      "color": "#C98AA8"
     },
     {
       "id": "root",
       "label": "Root Test\\n\\(L = \\limsup |a_n|^{1/n}\\)",
       "x": 900,
       "y": 800,
-      "color": "#f472b6"
+      "color": "#C98AA8"
     },
     {
       "id": "alt",
       "label": "Alternating Series\\n\\(\\sum (-1)^n b_n\\)",
       "x": 250,
       "y": 950,
-      "color": "#a78bfa"
+      "color": "#A78BBF"
     },
     {
       "id": "leibniz",
       "label": "Leibniz Test\\n(Alternating Series Test)",
       "x": 480,
       "y": 1100,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "abs",
       "label": "Absolute Convergence\\n\\(\\sum |a_n| < \\infty\\)",
       "x": 720,
       "y": 950,
-      "color": "#34d399"
+      "color": "#9CAF88"
     },
     {
       "id": "cond",
       "label": "Conditional\\nConvergence",
       "x": 900,
       "y": 1100,
-      "color": "#f472b6"
+      "color": "#C98AA8"
     },
     {
       "id": "abstest",
       "label": "Absolute Convergence\\nTest",
       "x": 720,
       "y": 1100,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "dirichlet",
       "label": "Dirichlet's Test",
       "x": 250,
       "y": 1250,
-      "color": "#a78bfa"
+      "color": "#A78BBF"
     }
   ],
   "edges": [

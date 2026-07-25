@@ -2,8 +2,7 @@
   "id": "firstOrderDE",
   "title": "First-Order Differential Equations",
   "description": "From modeling to separable, autonomous, and linear first-order ODEs",
-  "color": "#22c55e",
-  "accentColor": "#16a34a",
+  "color": "#A9C47F",
   "subjectId": "differential-equations",
   "subjectTitle": "Differential Equations",
   "nodes": [
@@ -12,7 +11,7 @@
       "label": "First-Order ODE\\n\\(y' = f(t,y)\\)",
       "x": 500,
       "y": 70,
-      "color": "#22c55e",
+      "color": "#A9C47F",
       "isStart": true
     },
     {
@@ -20,63 +19,63 @@
       "label": "Mathematical Modeling",
       "x": 240,
       "y": 70,
-      "color": "#22c55e"
+      "color": "#A9C47F"
     },
     {
       "id": "ivp",
       "label": "Initial Value Problem\\n\\(y(t_0)=y_0\\)",
       "x": 760,
       "y": 70,
-      "color": "#22c55e"
+      "color": "#A9C47F"
     },
     {
       "id": "existuniq",
       "label": "Existence and Uniqueness",
       "x": 760,
       "y": 230,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "autonomous",
       "label": "Autonomous ODE\\n\\(y' = g(y)\\)",
       "x": 240,
       "y": 230,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "phase",
       "label": "Phase Line and Equilibria",
       "x": 240,
       "y": 390,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "separable",
       "label": "Separable Equations",
       "x": 500,
       "y": 230,
-      "color": "#34d399"
+      "color": "#9CAF88"
     },
     {
       "id": "linear",
       "label": "Linear First-Order ODE\\n\\(y'+p(t)y=q(t)\\)",
       "x": 760,
       "y": 390,
-      "color": "#34d399"
+      "color": "#9CAF88"
     },
     {
       "id": "ifactor",
       "label": "Integrating Factor\\n\\(\\mu(t)=e^{\\int p(t)dt}\\)",
       "x": 760,
       "y": 550,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "logistic",
       "label": "Logistic Model\\n\\(P' = rP(1-P/K)\\)",
       "x": 500,
       "y": 550,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     }
   ],
   "edges": [

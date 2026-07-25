@@ -3,15 +3,10 @@
 
 const { useState: useStateA, useRef: useRefA, useEffect: useEffectA, useMemo: useMemoA } = React;
 
-const NODE_COLOR_PALETTE = [
-  '#3EB1C8', // Light Lake
-  '#A9C47F', // Light Ivy
-  '#EAAA00', // Goldenrod
-  '#B46A55', // Light Brick
-  '#9CAF88', // Light Forest
-  '#A6A6A6', // Light Greystone
-  '#ECA154', // Light Terracotta
-];
+// Swatches come from the shared palette in helpers.jsx, so every colour present
+// in data/ is reachable from the builder and vice versa.
+const NODE_COLOR_PALETTE = NODE_PALETTE.map((c) => c.hex);
+const NODE_COLOR_NAME = Object.fromEntries(NODE_PALETTE.map((c) => [c.hex, c.name]));
 
 // Resolve the subject folder a map belongs to, defaulting to 'general'.
 function mapSubjectIdOf(mapData) {
@@ -578,7 +573,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
                 setActiveColor(c);
                 if (selectedNode) updateNode(selectedNode.id, { color: c });
               }}
-              title="Choose a color for new nodes, or recolor the selected node"
+              title={`${NODE_COLOR_NAME[c]} — colour for new nodes, or recolour the selected node`}
             ></div>
           ))}
         </div>
@@ -682,7 +677,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
               if (!f || !to) return null;
               const path = computeEdgePath(f, to);
               const fromN = mapData.nodes.find(n => n.id === edge.from);
-              const stroke = selectedEdgeId === edge.id ? 'var(--uc-goldenrod)' : nodeBorder(fromN.color || '#3EB1C8');
+              const stroke = selectedEdgeId === edge.id ? 'var(--uc-goldenrod)' : nodeBorder(fromN.color || DEFAULT_NODE_COLOR);
               return (
                 <g key={edge.id} style={{color: stroke}}>
                   <path
@@ -760,8 +755,8 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
                 <div
                   className={`node-card unlocked ${node.isStart ? 'start' : ''} ${isSelected ? 'selected' : ''} ${isConnectSource ? 'connect-source' : ''} ${hoverNode === node.id && connectSource && connectSource !== node.id ? 'connect-target-hover' : ''}`}
                   style={{
-                    background: nodeBg(node.color || '#3EB1C8'),
-                    borderColor: nodeBorder(node.color || '#3EB1C8'),
+                    background: nodeBg(node.color || DEFAULT_NODE_COLOR),
+                    borderColor: nodeBorder(node.color || DEFAULT_NODE_COLOR),
                     width: sz.w,
                   }}
                 >
@@ -842,6 +837,7 @@ function AdminCanvas({ mapData, onChange, onBack, onDelete, onExport, onTogglePu
                     className={`color-swatch ${selectedNode.color === c ? 'active' : ''}`}
                     style={{background: c, width: 24, height: 24}}
                     onClick={() => updateNode(selectedNode.id, { color: c })}
+                    title={NODE_COLOR_NAME[c]}
                   ></div>
                 ))}
               </div>

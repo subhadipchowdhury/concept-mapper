@@ -2,8 +2,7 @@
   "id": "sequences",
   "title": "Sequences of Real Numbers",
   "description": "Module 1 — theorem structure, subsequences, and completeness",
-  "color": "#0f766e",
-  "accentColor": "#f59e0b",
+  "color": "#007396",
   "subjectId": "real-analysis",
   "subjectTitle": "Real Analysis",
   "nodes": [
@@ -12,7 +11,7 @@
       "label": "Sequence\\n\\(\\{a_n\\}: \\mathbb{N} \\to \\mathbb{R}\\)",
       "x": 1138.4721647231906,
       "y": 327.5646497941945,
-      "color": "#0f766e",
+      "color": "#007396",
       "isStart": true
     },
     {
@@ -20,133 +19,133 @@
       "label": "Geometric Progression\\n\\(a_n=ar^{n-1}\\)",
       "x": 1663.1058503891704,
       "y": 120,
-      "color": "#0f766e"
+      "color": "#007396"
     },
     {
       "id": "enconv",
       "label": "ε–N Convergence\\n\\(a_n \\to L\\)",
       "x": 1367.255221110264,
       "y": 770.7612798119433,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "shift",
       "label": "Shift Theorem\\n\\(a_n\\to L \\Rightarrow a_{n+k}\\to L\\)",
       "x": 1894.743761934861,
       "y": 422.0505873289254,
-      "color": "#34d399"
+      "color": "#9CAF88"
     },
     {
       "id": "div",
       "label": "Divergence",
       "x": 1960.8390981407176,
       "y": 125.10557675903374,
-      "color": "#fb7185"
+      "color": "#B46A55"
     },
     {
       "id": "unique",
       "label": "Uniqueness of Limit",
       "x": 1203.956475111241,
       "y": 1466,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "algebra",
       "label": "Algebra of Limits",
       "x": 744.5998271146095,
       "y": 1380,
-      "color": "#34d399"
+      "color": "#9CAF88"
     },
     {
       "id": "order",
       "label": "Order Limit Theorem",
       "x": 1010.261371816569,
       "y": 977.7135774618598,
-      "color": "#34d399"
+      "color": "#9CAF88"
     },
     {
       "id": "squeeze",
       "label": "Squeeze Theorem",
       "x": 861.6157035490172,
       "y": 415.806419679064,
-      "color": "#34d399"
+      "color": "#9CAF88"
     },
     {
       "id": "bdd",
       "label": "Bounded Sequence\\n\\(|a_n| \\le M\\)",
       "x": 820.3130993814555,
       "y": 811.0008002014142,
-      "color": "#a78bfa"
+      "color": "#A78BBF"
     },
     {
       "id": "mono",
       "label": "Monotone Sequence",
       "x": 1556.1880804347481,
       "y": 378.57745564410357,
-      "color": "#a78bfa"
+      "color": "#A78BBF"
     },
     {
       "id": "subseq",
       "label": "Subsequence\\n\\(\\{a_{n_k}\\}\\)",
       "x": 1018.5431584449168,
       "y": 64,
-      "color": "#f472b6"
+      "color": "#C98AA8"
     },
     {
       "id": "substable",
       "label": "Subsequences Share\\nThe Same Limit",
       "x": 663.0747317736386,
       "y": 580.2661953814221,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "eo",
       "label": "Even–Odd\\nCriterion",
       "x": 4.887324879442701,
       "y": 820.5757722964966,
-      "color": "#f472b6"
+      "color": "#C98AA8"
     },
     {
       "id": "cesaro",
       "label": "Cesàro Mean\\n\\(\\sigma_n=\\frac{a_1+\\cdots+a_n}{n}\\)",
       "x": 1442.7441598657858,
       "y": 122.11050406376305,
-      "color": "#fcd34d"
+      "color": "#F6D25A"
     },
     {
       "id": "sublim",
       "label": "Subsequential Limit",
       "x": 554.2052870558048,
       "y": 120,
-      "color": "#f472b6"
+      "color": "#C98AA8"
     },
     {
       "id": "limpt",
       "label": "Limit Point of a Set",
       "x": 203.8979265000028,
       "y": 120,
-      "color": "#f472b6"
+      "color": "#C98AA8"
     },
     {
       "id": "peak",
       "label": "Peak Point",
       "x": 384.3907981554573,
       "y": 492.8442560718471,
-      "color": "#f472b6"
+      "color": "#C98AA8"
     },
     {
       "id": "monlemma",
       "label": "Monotone Subsequence\\nLemma",
       "x": 229.9160965302772,
       "y": 1060.7457803149418,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "completeness",
       "label": "Completeness of \\(\\mathbb{R}\\)\\n(LUB property)",
       "x": 1752.4683120842221,
       "y": 1567,
-      "color": "#f59e0b",
+      "color": "#EAAA00",
       "isStart": true
     },
     {
@@ -154,7 +153,7 @@
       "label": "AM–GM Inequality\\n\\(\\sqrt{ab} \\le (a+b)/2\\)",
       "x": 2447.7102715494193,
       "y": 1021.2615647435039,
-      "color": "#fcd34d",
+      "color": "#F6D25A",
       "isStart": true
     },
     {
@@ -162,49 +161,49 @@
       "label": "Monotone Convergence\\nTheorem",
       "x": 1648.2366853958608,
       "y": 1111.5312301273655,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "bw",
       "label": "Bolzano–Weierstrass\\nTheorem",
       "x": 580.2928383737305,
       "y": 1135.8757465566887,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "cauchy",
       "label": "Cauchy Sequence",
       "x": 1540.187139456923,
       "y": 1358.4595084629668,
-      "color": "#fb7185"
+      "color": "#B46A55"
     },
     {
       "id": "cauchy_bdd",
       "label": "Cauchy ⟹ Bounded",
       "x": 2207.765987459411,
       "y": 1380,
-      "color": "#fb7185"
+      "color": "#B46A55"
     },
     {
       "id": "babylonian",
       "label": "Babylonian Iteration\\n\\(x_{n+1}=\\frac{1}{2}(x_n+c/x_n)\\)",
       "x": 1817.2432980581937,
       "y": 801.1227623539146,
-      "color": "#fcd34d"
+      "color": "#F6D25A"
     },
     {
       "id": "agm",
       "label": "Arithmetic–Geometric\\nMean (AGM)",
       "x": 1985.7352131265798,
       "y": 1273.6981522972017,
-      "color": "#fcd34d"
+      "color": "#F6D25A"
     },
     {
       "id": "cc",
       "label": "Cauchy Convergence\\nCriterion",
       "x": 974.1228950261913,
       "y": 1380,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     }
   ],
   "edges": [

@@ -3,6 +3,32 @@
 
 const { useState, useEffect, useRef, useMemo } = React;
 
+// ─── Node palette ───────────────────────────────────────────────────────────
+// The single source of truth for node colours, shared by the builder swatches
+// and the authored maps in data/. Previously the data used 17 ad-hoc Tailwind
+// values while the builder offered a different 7-colour set, so opening a
+// built-in map in the editor forced a recolour. tools/recolor_maps.py records
+// how the old values were folded onto these.
+//
+// Nodes render as `hex + '22'` fill with a darkened border (see shadeForPaper),
+// so these read as tints on the paper background.
+const NODE_PALETTE = [
+  { name: 'Lake',            hex: '#007396' },
+  { name: 'Light Lake',      hex: '#3EB1C8' },
+  { name: 'Ivy',             hex: '#A9C47F' },
+  { name: 'Forest',          hex: '#9CAF88' },
+  { name: 'Goldenrod',       hex: '#EAAA00' },
+  { name: 'Light Goldenrod', hex: '#F6D25A' },
+  { name: 'Terracotta',      hex: '#ECA154' },
+  { name: 'Brick',           hex: '#A4343A' },
+  { name: 'Light Brick',     hex: '#B46A55' },
+  { name: 'Violet',          hex: '#A78BBF' },
+  { name: 'Plum',            hex: '#C98AA8' },
+  { name: 'Greystone',       hex: '#A6A6A6' },
+];
+
+const DEFAULT_NODE_COLOR = '#3EB1C8';
+
 // Normalize display text so authored escape sequences render consistently.
 function normalizeDisplayText(rawText) {
   return String(rawText || '')
@@ -57,7 +83,7 @@ function launchConfetti() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   const ctx = canvas.getContext('2d');
-  const colors = ['#3EB1C8','#A9C47F','#EAAA00','#B46A55','#9CAF88','#A6A6A6','#ECA154'];
+  const colors = NODE_PALETTE.map((c) => c.hex);
   const pieces = Array.from({ length: 160 }, () => ({
     x: Math.random() * canvas.width,
     y: Math.random() * -canvas.height,
@@ -529,8 +555,7 @@ function normalizeMapData(rawMap, fallbackId) {
     id: typeof map.id === 'string' ? map.id : fallbackId,
     title: typeof map.title === 'string' ? map.title : 'Untitled Map',
     description: typeof map.description === 'string' ? map.description : '',
-    color: typeof map.color === 'string' ? map.color : '#3EB1C8',
-    accentColor: typeof map.accentColor === 'string' ? map.accentColor : '#9CAF88',
+    color: typeof map.color === 'string' ? map.color : DEFAULT_NODE_COLOR,
     subjectId: typeof map.subjectId === 'string' ? map.subjectId : 'general',
     subjectTitle: typeof map.subjectTitle === 'string' ? map.subjectTitle : 'General',
     nodes: safeNodes,
@@ -667,6 +692,8 @@ function savePositions(p) {
 Object.assign(window, {
   MathNode,
   launchConfetti,
+  NODE_PALETTE,
+  DEFAULT_NODE_COLOR,
   computeEdgePath,
   AnswerPopup,
   normalizeAnswer,

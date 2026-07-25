@@ -2,8 +2,7 @@
   "id": "systemsFirstOrder",
   "title": "Systems of First-Order ODEs",
   "description": "Lotka-Volterra, phase plane, equilibria, and linear systems",
-  "color": "#0ea5e9",
-  "accentColor": "#0284c7",
+  "color": "#007396",
   "subjectId": "differential-equations",
   "subjectTitle": "Differential Equations",
   "nodes": [
@@ -12,7 +11,7 @@
       "label": "System of ODEs\\n\\(\\mathbf{x}' = F(t,\\mathbf{x})\\)",
       "x": 520,
       "y": 70,
-      "color": "#0ea5e9",
+      "color": "#007396",
       "isStart": true
     },
     {
@@ -20,56 +19,56 @@
       "label": "Lotka-Volterra Model",
       "x": 250,
       "y": 220,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "phaseplane",
       "label": "Phase Plane",
       "x": 520,
       "y": 220,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "nullclines",
       "label": "Nullclines",
       "x": 780,
       "y": 220,
-      "color": "#06b6d4"
+      "color": "#3EB1C8"
     },
     {
       "id": "equil",
       "label": "Equilibrium Points",
       "x": 780,
       "y": 380,
-      "color": "#22c55e"
+      "color": "#A9C47F"
     },
     {
       "id": "linear",
       "label": "Linear System\\n\\(\\mathbf{x}' = A\\mathbf{x}\\)",
       "x": 250,
       "y": 380,
-      "color": "#22c55e"
+      "color": "#A9C47F"
     },
     {
       "id": "eigs",
       "label": "Eigenvalues and Eigenvectors",
       "x": 250,
       "y": 540,
-      "color": "#34d399"
+      "color": "#9CAF88"
     },
     {
       "id": "stability",
       "label": "Stability Classification",
       "x": 520,
       "y": 540,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     },
     {
       "id": "portraits",
       "label": "Phase Portraits",
       "x": 780,
       "y": 540,
-      "color": "#f59e0b"
+      "color": "#EAAA00"
     }
   ],
   "edges": [
