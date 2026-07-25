@@ -1066,35 +1066,14 @@ button.edge-label-badge:focus-visible {
   box-shadow: var(--shadow-lg);
 }
 
-/* Keyboard hint strip listing the canvas shortcuts */
-.canvas-keyboard-hint {
-  position: absolute;
-  left: 14px;
-  bottom: 12px;
-  z-index: 12;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 10px;
-  border: 1px solid var(--line-2);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.92);
-  color: var(--text-muted);
-  font-size: 10.5px;
-  box-shadow: var(--shadow-sm);
-  pointer-events: none;
+/* Sidebar cards are role=button; give them a ring that reads inside the panel. */
+.sidebar-item:focus-visible {
+  outline: 2px solid var(--maroon);
+  outline-offset: -2px;
 }
 
-.canvas-keyboard-hint kbd {
-  font-family: var(--font-sans);
-  font-size: 10px;
-  padding: 1px 4px;
-  border: 1px solid var(--line-2);
-  border-bottom-width: 2px;
-  border-radius: 4px;
-  background: var(--paper-3);
-  color: var(--text-dim);
-}
+/* The canvas keyboard shortcuts are documented in the Quick guide (.mini-help),
+   which already occupies the bottom-left corner. */
 
 /* ─── ANSWER POPUP ─── */
 .answer-popup {

@@ -729,6 +729,38 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
 
   const nodeLabelById = Object.fromEntries(validNodes.map((n) => [n.id, n.label]));
 
+  // Tabbing to something off-screen is the most disorienting thing the canvas can
+  // do: focus moves but nothing visible changes. Pan just enough to bring the
+  // focused item into view, in canvas coordinates.
+  function ensureVisible(canvasX, canvasY) {
+    const rect = viewportRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setT((prev) => {
+      const screenX = canvasX * prev.scale + prev.x;
+      const screenY = canvasY * prev.scale + prev.y;
+      const pad = 110;
+      let x = prev.x;
+      let y = prev.y;
+      if (screenX < pad) x = prev.x + (pad - screenX);
+      else if (screenX > rect.width - pad) x = prev.x - (screenX - (rect.width - pad));
+      if (screenY < pad) y = prev.y + (pad - screenY);
+      else if (screenY > rect.height - pad) y = prev.y - (screenY - (rect.height - pad));
+      // Returning prev unchanged keeps this from looping on every focus event.
+      if (x === prev.x && y === prev.y) return prev;
+      return { ...prev, x, y };
+    });
+  }
+
+  // Tab order follows the DOM, and the DOM followed authoring order — so tabbing
+  // jumped around the map at random. Sort the interactive layers top-to-bottom,
+  // left-to-right so the sequence matches what the eye expects. Keys are stable
+  // ids, and everything is absolutely positioned, so reordering is invisible.
+  function topToBottom(items) {
+    return items.slice().sort((a, b) => (
+      Math.abs(a.y - b.y) > 24 ? a.y - b.y : a.x - b.x
+    ));
+  }
+
   // Build node geometry map for edge routing, from measured boxes where we have
   // them so arrows land on the visible border rather than a guessed one.
   const geom = {};
@@ -738,6 +770,26 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
     geom[n.id] = { x: xy.x, y: xy.y, w: sz.w, h: sz.h };
   });
   const edgeDirectionSet = new Set(mapData.edges.map(e => `${e.from}->${e.to}`));
+
+  // Must come after `geom` is populated — these read it.
+  const edgeLabels = topToBottom(
+    mapData.edges.reduce((acc, edge) => {
+      const from = geom[edge.from];
+      const to = geom[edge.to];
+      if (!from || !to) return acc;
+      const isAnswered = answeredEdges.has(edge.id);
+      const fromUnlocked = unlockedNodes.has(edge.from);
+      if (!fromUnlocked && !isAnswered) return acc;
+      const path = computeEdgePath(from, to, { labelT: edgeLabelT });
+      acc.push({ edge, isAnswered, x: path.midX, y: path.midY });
+      return acc;
+    }, [])
+  );
+
+  const orderedNodes = topToBottom(validNodes.map((node) => {
+    const xy = nodeXY(node);
+    return { node, x: xy.x, y: xy.y };
+  }));
 
   const totalEdges = mapData.edges.length;
   const completed = answeredEdges.size;
@@ -872,19 +924,13 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
             })}
           </svg>
 
-          {/* Edge labels */}
-          {mapData.edges.map(edge => {
-            const f = geom[edge.from], to = geom[edge.to];
-            if (!f || !to) return null;
-            const isAnswered = answeredEdges.has(edge.id);
-            const fromUnlocked = unlockedNodes.has(edge.from);
-            if (!fromUnlocked && !isAnswered) return null;
-            const path = computeEdgePath(f, to, { labelT: edgeLabelT });
+          {/* Edge labels, ordered top-to-bottom so Tab follows the page */}
+          {edgeLabels.map(({ edge, isAnswered, x: labelX, y: labelY }) => {
             return (
               <div
                 key={edge.id}
                 className="edge-label-wrap"
-                style={{ left: path.midX, top: path.midY }}
+                style={{ left: labelX, top: labelY }}
               >
                 {/* A real <button> when it can be answered, so the map is
                     completable by keyboard. Answered edges become static text —
@@ -899,6 +945,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
                     className="edge-label-badge answering"
                     onMouseDown={e => { e.stopPropagation(); }}
                     onClick={(e) => { e.stopPropagation(); handleEdgeClick(edge); }}
+                    onFocus={() => ensureVisible(labelX, labelY)}
                     title="Answer this relationship"
                     aria-label={
                       `Answer the relationship from ${plainLabel(nodeLabelById[edge.from])}`
@@ -913,9 +960,9 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
             );
           })}
 
-          {/* Nodes */}
-          {validNodes.map(node => {
-            const xy = nodeXY(node);
+          {/* Nodes, ordered top-to-bottom to match the Tab sequence above */}
+          {orderedNodes.map(({ node, x: nodeCx, y: nodeCy }) => {
+            const xy = { x: nodeCx, y: nodeCy };
             const sz = sizeOf(node);
             const unlocked = unlockedNodes.has(node.id);
             return (
@@ -957,6 +1004,7 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
                   aria-label={unlocked
                     ? `Concept: ${plainLabel(node.label)}. Use the arrow keys to move it.`
                     : 'Hidden concept — answer an incoming relationship to reveal it'}
+                  onFocus={() => ensureVisible(nodeCx, nodeCy)}
                   onKeyDown={(e) => {
                     if (!unlocked) return;
                     const step = e.shiftKey ? 40 : 10;
@@ -978,9 +1026,6 @@ function ConceptMap({ mapData, progress, onProgress, positions, onPositions }) {
 
         <ZoomControl scale={t.scale} setScale={(fn) => setT(prev => ({...prev, scale: typeof fn === 'function' ? fn(prev.scale) : fn}))} />
 
-        <div className="canvas-keyboard-hint">
-          <kbd>Tab</kbd> to a relationship · <kbd>Enter</kbd> to answer · arrows move a concept
-        </div>
 
         <div
           className={`mini-help ${isHelpOpen ? 'open' : 'collapsed'}`}

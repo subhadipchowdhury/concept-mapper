@@ -1264,6 +1264,21 @@ function App() {
                       key={m.id}
                       className={`sidebar-item ${activeMapId === m.id && view === 'student' ? 'active' : ''}`}
                       style={{'--item-color': m.color}}
+                      /* role=button rather than a real <button>: this card
+                         contains its own "clear answers" button, and nesting
+                         buttons is invalid. Without a tabIndex the sidebar was
+                         skipped entirely and Tab jumped straight to the canvas. */
+                      role="button"
+                      tabIndex={0}
+                      aria-current={activeMapId === m.id && view === 'student' ? 'true' : undefined}
+                      aria-label={`${m.title} — ${done} of ${total} relationships answered`}
+                      onKeyDown={(e) => {
+                        if (e.key !== 'Enter' && e.key !== ' ') return;
+                        e.preventDefault();
+                        setActiveMapId(m.id);
+                        setView('student');
+                        collapseSidebarOnMobile(setIsSidebarCollapsed);
+                      }}
                       onClick={() => {
                         setActiveMapId(m.id);
                         setView('student');
@@ -1311,7 +1326,18 @@ function App() {
               <>
                 <div className="sidebar-divider"></div>
                 <div className="sidebar-section-title">Admin</div>
-                <div className={`sidebar-item ${view.startsWith('admin') ? 'active' : ''}`} style={{'--item-color': 'var(--uc-goldenrod)'}} onClick={openAdmin}>
+                <div
+                  className={`sidebar-item ${view.startsWith('admin') ? 'active' : ''}`}
+                  style={{'--item-color': 'var(--uc-goldenrod)'}}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key !== 'Enter' && e.key !== ' ') return;
+                    e.preventDefault();
+                    openAdmin();
+                  }}
+                  onClick={openAdmin}
+                >
                   <div className="sidebar-item-title">
                     <div className="sidebar-item-dot" style={{background: 'var(--uc-goldenrod)'}}></div>
                     Map Builder
